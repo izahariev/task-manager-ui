@@ -49,7 +49,7 @@ function TasksTable() {
         <TableContainer component={Paper}>
             <Table aria-label="collapsible table">
                 <TableHead>
-                    <TableRow>
+                    <TableRow sx={{backgroundColor: '#0EB1D2'}}>
                         <TableCell />
                         <TableCell>Priority</TableCell>
                         <TableCell>Title</TableCell>
