@@ -1,3 +1,4 @@
+import Grid from "@mui/material/Grid2";
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -6,6 +7,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Row from "./Row.jsx";
+import FilterListIcon from '@mui/icons-material/FilterList';
 
 
 function createData(priority, title, deadline, assignees) {
@@ -49,12 +51,32 @@ function TasksTable() {
         <TableContainer component={Paper}>
             <Table aria-label="collapsible table">
                 <TableHead>
-                    <TableRow sx={{backgroundColor: '#0EB1D2'}}>
+                    <TableRow sx={{backgroundColor: '#8C8C8C'}}>
                         <TableCell />
-                        <TableCell>Priority</TableCell>
-                        <TableCell>Title</TableCell>
-                        <TableCell>Deadline</TableCell>
-                        <TableCell>Assignees</TableCell>
+                        <TableCell>
+                            <Grid container spacing={1}>
+                                <Grid item xs={6}>Priority</Grid>
+                                <Grid item xs={6}><FilterListIcon/></Grid>
+                            </Grid>
+                        </TableCell>
+                        <TableCell>
+                            <Grid container spacing={1}>
+                                <Grid item xs={6}>Title</Grid>
+                                <Grid item xs={6}><FilterListIcon/></Grid>
+                            </Grid>
+                        </TableCell>
+                        <TableCell>
+                            <Grid container spacing={1}>
+                                <Grid item xs={6}>Deadline</Grid>
+                                <Grid item xs={6}><FilterListIcon/></Grid>
+                            </Grid>
+                        </TableCell>
+                        <TableCell>
+                            <Grid container spacing={1}>
+                                <Grid item xs={6}>Assignees</Grid>
+                                <Grid item xs={6}><FilterListIcon/></Grid>
+                            </Grid>
+                        </TableCell>
                         <TableCell />
                     </TableRow>
                 </TableHead>
