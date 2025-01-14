@@ -56,7 +56,7 @@ function Row(props) {
                 <TableCell>{row.assignees}</TableCell>
                 <TableCell align={'right'}><CheckIcon/><EditIcon/><DeleteIcon/></TableCell>
             </TableRow>
-            <TableRow>
+            <TableRow sx={{backgroundColor: index % 2 === 0 ? '#BFBFBF' : '#A6A6A6'}}>
                 <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
                     <Collapse in={open} timeout="auto" unmountOnExit>
                         <Box sx={{ margin: 1 }}>
@@ -95,10 +95,10 @@ function Row(props) {
 
 const StyledTableRow = styled(TableRow)(() => ({
     '&:nth-of-type(odd)': {
-        backgroundColor: "gray",
+        backgroundColor: "#8C5E58",
     },
     '&:nth-of-type(even)': {
-        backgroundColor: "white",
+        backgroundColor: "#A67F76",
     },
 }));
 
