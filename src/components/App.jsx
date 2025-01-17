@@ -9,7 +9,7 @@ import Button from "@mui/material/Button";
 function App() {
   return (
       <div className="App">
-        <Container maxWidth="xxl">
+        <Container maxWidth="xxl" sx={{'marginBottom': '1%'}}>
           <Grid container>
             <Grid item size={12} sx={{
               marginTop: '2%',
@@ -41,8 +41,8 @@ function App() {
               display: 'flex',
               justifyContent: 'right',
             }}>
-              <Button variant="outlined" sx={{marginRight: '1%'}}>Manage Users</Button>
-              <Button variant="outlined">Add Task</Button>
+              <Button variant="contained" sx={{marginRight: '1%'}}>Manage Users</Button>
+              <Button variant="contained">Add Task</Button>
             </Grid>
           </Grid>
         </Container>
