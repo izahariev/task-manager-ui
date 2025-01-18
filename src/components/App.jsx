@@ -1,10 +1,10 @@
 import '../css/App.css'
-import {Pagination, Stack, Switch} from "@mui/material";
+import {Container, Pagination, Stack, Switch} from "@mui/material";
+import Button from "@mui/material/Button";
+import Grid from "@mui/material/Grid2";
 import Typography from "@mui/material/Typography";
 import TasksTable from "./TasksTable.jsx";
-import Container from '@mui/material/Container';
-import Grid from '@mui/material/Grid2';
-import Button from "@mui/material/Button";
+
 
 function App() {
   return (

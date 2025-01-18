@@ -1,3 +1,4 @@
+import FilterListIcon from '@mui/icons-material/FilterList';
 import {
     Checkbox,
     FormControl,
@@ -5,25 +6,23 @@ import {
     ListItemText,
     MenuItem,
     OutlinedInput,
+    Paper,
     Select,
+    TableContainer,
     TextField
 } from "@mui/material";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid2";
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
-import {LocalizationProvider} from "@mui/x-date-pickers";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import {ClearIcon, DatePicker, LocalizationProvider} from "@mui/x-date-pickers";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import React from "react";
 import Row from "./Row.jsx";
-import FilterListIcon from '@mui/icons-material/FilterList';
-import ClearIcon from '@mui/icons-material/Clear';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+
 
 function createData(priority, title, deadline, assignees) {
     return {
@@ -49,7 +48,7 @@ function createData(priority, title, deadline, assignees) {
 }
 
 const rows = [
-    createData('P0', 'Car service service service service service service service service service service service service service service service service service service service service service service service service service service service service service service service service service service service service service service service service service service service service service service service service service service service service service service service service service service service service service service service service', '2024-07-15', 'Ivo Ivo2'),
+    createData('P0', 'Car service', '2024-07-15', 'Ivo Ivo2'),
     createData('P0', 'Pay taxes', '2025-03-31', 'Ivo'),
     createData('P1', 'Throw out trash', '', 'Ivo'),
     createData('P0', 'Car service', '2024-07-15', 'Ivo Ivo2'),
