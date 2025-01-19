@@ -1,4 +1,5 @@
 import FilterListIcon from '@mui/icons-material/FilterList';
+import FilterListOffIcon from '@mui/icons-material/FilterListOff';
 import {
     Checkbox,
     FormControl,
@@ -18,7 +19,7 @@ import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import {ClearIcon, DatePicker, LocalizationProvider} from "@mui/x-date-pickers";
+import {DatePicker, LocalizationProvider} from "@mui/x-date-pickers";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import React from "react";
 import Row from "./Row.jsx";
@@ -74,6 +75,7 @@ function TasksTable() {
 
     const [priorityFilterValue, setPriorityFilterValue] = React.useState('');
     const [personName, setPersonName] = React.useState([]);
+    const [filterEnabled, setFilterEnabled] = React.useState(false);
 
     const handlePriorityFilterValueChange = (event) => {
         setPriorityFilterValue(event.target.value);
@@ -98,21 +100,24 @@ function TasksTable() {
                       <TableCell>Title</TableCell>
                       <TableCell>Deadline</TableCell>
                       <TableCell>Assignees</TableCell>
-                      <TableCell align={"right"}><FilterListIcon/></TableCell>
+                      <TableCell align={"right"}>
+                          {!filterEnabled && <FilterListIcon onClick={() => setFilterEnabled(!filterEnabled)}/>}
+                          {filterEnabled && <FilterListOffIcon onClick={() => setFilterEnabled(!filterEnabled)}/>}
+                      </TableCell>
                   </TableRow>
               </TableHead>
-              <TableHead>
+              {filterEnabled &&
+                <TableHead>
                   <TableRow sx={{backgroundColor: '#8C8C8C'}}>
                       <TableCell/>
-                      <TableCell sx={{minWidth: '7%'}}>
-                          <Grid container spacing={1}>
-                              <Grid item sm={11}>
+                      <TableCell sx={{minWidth: '10%'}}>
+                          <Grid container>
+                              <Grid item size={6}>
                                   <Select
                                     labelId="demo-simple-select-label"
                                     id="demo-simple-select"
                                     value={priorityFilterValue}
                                     onChange={handlePriorityFilterValueChange}
-                                    size="small"
                                     variant={"outlined"}
                                   >
                                       <MenuItem value={"P0"}>P0</MenuItem>
@@ -121,22 +126,22 @@ function TasksTable() {
                                       <MenuItem value={"P3"}>P3</MenuItem>
                                   </Select>
                               </Grid>
-                              <Grid item>
-                                  <ClearIcon sx={{marginTop: "25%"}} fontSize={"medium"} />
+                              <Grid item size={6}>
+                                  <Button variant="contained" sx={{marginTop: "17%"}}>X</Button>
                               </Grid>
                           </Grid>
                       </TableCell>
                       <TableCell>
                           <Grid container spacing={1}>
-                              <Grid item size={11}>
+                              <Grid item size={10}>
                                   <TextField id="outlined-basic" variant="outlined" multiline fullWidth={true}/>
                               </Grid>
                               <Grid item>
-                                  <ClearIcon sx={{marginTop: "50%"}} fontSize={"medium"} />
+                                  <Button variant="contained" sx={{marginTop: "17%"}}>X</Button>
                               </Grid>
                           </Grid>
                       </TableCell>
-                      <TableCell sx={{minWidth: '18%'}}>
+                      <TableCell sx={{minWidth: '20%'}}>
                           <Grid container spacing={1}>
                               <Grid item>
                                   <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -144,13 +149,13 @@ function TasksTable() {
                                   </LocalizationProvider>
                               </Grid>
                               <Grid item>
-                                  <ClearIcon sx={{marginTop: "50%"}} fontSize={"medium"} />
+                                  <Button variant="contained" sx={{marginTop: "17%"}}>X</Button>
                               </Grid>
                           </Grid>
                       </TableCell>
                       <TableCell sx={{minWidth: '15%'}}>
                           <Grid container spacing={1}>
-                              <Grid item size={10}>
+                              <Grid item size={8}>
                                   <FormControl fullWidth={true}>
                                       <InputLabel id="demo-multiple-checkbox-label"></InputLabel>
                                       <Select
@@ -172,16 +177,16 @@ function TasksTable() {
                                   </FormControl>
                               </Grid>
                               <Grid item>
-                                  <ClearIcon sx={{marginTop: "50%"}} fontSize={"medium"} />
+                                  <Button variant="contained" sx={{marginTop: "17%"}}>X</Button>
                               </Grid>
                           </Grid>
                       </TableCell>
-                      <TableCell sx={{minWidth: '11%'}}>
-                          <Button variant="contained">Clear</Button>
+                      <TableCell sx={{minWidth: '12%'}}>
+                          <Button variant="contained">Clear all</Button>
                           <Button variant="contained" sx={{marginLeft: '5%'}}>Apply</Button>
                       </TableCell>
                   </TableRow>
-              </TableHead>
+              </TableHead>}
               <TableBody>
                   {rows.map((row, index) => (
                     <Row key={row.title} row={row} index={index}/>
