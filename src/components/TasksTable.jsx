@@ -100,7 +100,7 @@ function TasksTable() {
                       <TableCell>Title</TableCell>
                       <TableCell>Deadline</TableCell>
                       <TableCell>Assignees</TableCell>
-                      <TableCell align={"right"}>
+                      <TableCell align={"right"} sx={{minWidth: '7%'}}>
                           {!filterEnabled && <FilterListIcon onClick={() => setFilterEnabled(!filterEnabled)}/>}
                           {filterEnabled && <FilterListOffIcon onClick={() => setFilterEnabled(!filterEnabled)}/>}
                       </TableCell>

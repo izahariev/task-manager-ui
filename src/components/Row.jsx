@@ -53,7 +53,15 @@ function Row(props) {
                 <TableCell>{row.deadline}</TableCell>
                 <TableCell>{row.assignees}</TableCell>
                 <TableCell align={'right'}>
-                    <CheckIcon/><EditIcon/><DeleteIcon/>
+                    <IconButton sx={{backgroundColor: "#1976d2"}} size={"small"}>
+                        <CheckIcon sx={{color: "white"}} fontSize={"small"}/>
+                    </IconButton>
+                    <IconButton sx={{backgroundColor: "#1976d2", marginLeft: "1%"}} size={"small"}>
+                        <EditIcon sx={{color: "white"}} fontSize={"small"}/>
+                    </IconButton>
+                    <IconButton sx={{backgroundColor: "#1976d2", marginLeft: "1%"}} size={"small"}>
+                        <DeleteIcon sx={{color: "white"}} fontSize={"small"}/>
+                    </IconButton>
                 </TableCell>
             </TableRow>
             <TableRow sx={{backgroundColor: index % 2 === 0 ? '#BFBFBF' : '#A6A6A6'}}>
@@ -81,7 +89,21 @@ function Row(props) {
                                             <TableCell>{subtaskRow.deadline}</TableCell>
                                             <TableCell>{subtaskRow.assignees}</TableCell>
                                             <TableCell align={'right'}>
-                                                <CheckIcon/><EditIcon/><DeleteIcon/>
+                                                <IconButton sx={{backgroundColor: "#1976d2"}} size={"small"}>
+                                                    <CheckIcon sx={{color: "white"}} fontSize={"small"}/>
+                                                </IconButton>
+                                                <IconButton
+                                                  sx={{backgroundColor: "#1976d2", marginLeft: "1%"}}
+                                                  size={"small"}
+                                                >
+                                                    <EditIcon sx={{color: "white"}} fontSize={"small"}/>
+                                                </IconButton>
+                                                <IconButton
+                                                  sx={{backgroundColor: "#1976d2", marginLeft: "1%"}}
+                                                  size={"small"}
+                                                >
+                                                    <DeleteIcon sx={{color: "white"}} fontSize={"small"}/>
+                                                </IconButton>
                                             </TableCell>
                                         </StyledTableRow>
                                     ))}
