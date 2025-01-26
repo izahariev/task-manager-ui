@@ -10,6 +10,7 @@ import UsersPopup from "./UsersPopup.jsx";
 
 function App() {
     const [showUsersPopup, setShowUsersPopup] = React.useState(false);
+    const [editedUser, setEditedUser] = React.useState("");
 
     return (
       <div className="App">
@@ -66,7 +67,7 @@ function App() {
               fullWidth={true}
             >
                 <DialogTitle align={"center"} sx={{backgroundColor: "#A6A6A6"}}>Users</DialogTitle>
-                <UsersPopup/>
+                <UsersPopup editedUser={editedUser} setEditedUser={setEditedUser} />
             </Dialog>
           }
       </div>

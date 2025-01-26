@@ -1,14 +1,23 @@
+import CheckIcon from "@mui/icons-material/Check";
+import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import {IconButton} from "@mui/material";
+import {IconButton, Input} from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
+import PropTypes from "prop-types";
 import * as React from 'react';
 
-export default function UsersPopup() {
+UsersPopup.propTypes = {
+    editedUser: PropTypes.string,
+    setEditedUser: PropTypes.func,
+}
+
+export default function UsersPopup(props) {
+    const {editedUser, setEditedUser} = props;
     const [checked, setChecked] = React.useState([1]);
 
     const handleToggle = (value) => () => {
@@ -26,37 +35,74 @@ export default function UsersPopup() {
 
     return (
       <List dense sx={{width: '100%', bgcolor: '#A6A6A6'}}>
-          {[0, 1, 2, 3].map((value) => {
-              const labelId = `checkbox-list-secondary-label-${value}`;
+          {["0", "1", "2", "3"].map((element) => {
+              const labelId = `checkbox-list-secondary-label-${element}`;
               return (
-                <ListItem
-                  key={value}
-                  secondaryAction={
-                      <Grid container spacing={0.5}>
-                          <Grid item size={6}>
-                              <IconButton
-                                sx={{backgroundColor: "#1976d2"}}
-                                size={"small"}
-                              >
-                                  <EditIcon sx={{color: "white"}} fontSize={"small"}/>
-                              </IconButton>
-                          </Grid>
-                          <Grid item size={6}>
-                              <IconButton
-                                sx={{backgroundColor: "#1976d2"}}
-                                size={"small"}
-                              >
-                                  <DeleteIcon sx={{color: "white"}} fontSize={"small"}/>
-                              </IconButton>
-                          </Grid>
-                      </Grid>
-                  }
-                  disablePadding
-                >
-                    <ListItemButton>
-                        <ListItemText id={labelId} primary={`Line item ${value + 1}`}/>
-                    </ListItemButton>
-                </ListItem>
+                <React.Fragment key={element}>
+                    {element !== editedUser &&
+                      <ListItem
+                        key={element}
+                        secondaryAction={
+                            <Grid container spacing={0.5}>
+                                <Grid item size={6}>
+                                    <IconButton
+                                      sx={{backgroundColor: "#1976d2"}}
+                                      size={"small"}
+                                      onClick={() => setEditedUser(element)}
+                                    >
+                                        <EditIcon sx={{color: "white"}} fontSize={"small"}/>
+                                    </IconButton>
+                                </Grid>
+                                <Grid item size={6}>
+                                    <IconButton
+                                      sx={{backgroundColor: "#1976d2"}}
+                                      size={"small"}
+                                    >
+                                        <DeleteIcon sx={{color: "white"}} fontSize={"small"}/>
+                                    </IconButton>
+                                </Grid>
+                            </Grid>
+                        }
+                        disablePadding
+                      >
+                          <ListItemButton>
+                              <ListItemText id={labelId} primary={`Line item ${element}`}/>
+                          </ListItemButton>
+                      </ListItem>
+                    }
+                    {element === editedUser &&
+                      <ListItem
+                        key={element}
+                        secondaryAction={
+                            <Grid container spacing={0.5}>
+                                <Grid item size={6}>
+                                    <IconButton
+                                      sx={{backgroundColor: "#1976d2"}}
+                                      size={"small"}
+                                      onClick={() => setEditedUser("")}
+                                    >
+                                        <CheckIcon sx={{color: "white"}} fontSize={"small"}/>
+                                    </IconButton>
+                                </Grid>
+                                <Grid item size={6}>
+                                    <IconButton
+                                      sx={{backgroundColor: "#1976d2"}}
+                                      size={"small"}
+                                      onClick={() => setEditedUser("")}
+                                    >
+                                        <CloseIcon sx={{color: "white"}} fontSize={"small"}/>
+                                    </IconButton>
+                                </Grid>
+                            </Grid>
+                        }
+                        disablePadding
+                      >
+                          <ListItemButton>
+                              <Input defaultValue="Hello world"/>
+                          </ListItemButton>
+                      </ListItem>
+                    }
+                </React.Fragment>
               );
           })}
       </List>
