@@ -95,7 +95,7 @@ function TasksTable() {
           <Table aria-label="collapsible table">
               <TableHead>
                   <TableRow sx={{backgroundColor: '#8C8C8C'}}>
-                      <TableCell/>
+                      <TableCell sx={{width: "1%"}}/>
                       <TableCell>Priority</TableCell>
                       <TableCell>Title</TableCell>
                       <TableCell>Deadline</TableCell>
