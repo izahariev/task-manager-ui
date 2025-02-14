@@ -52,11 +52,11 @@ const rows = [
     createData('P0', 'Car service', '2024-07-15', 'Ivo Ivo2'),
     createData('P0', 'Pay taxes', '2025-03-31', 'Ivo'),
     createData('P1', 'Throw out trash', '', 'Ivo'),
-    createData('P0', 'Car service', '2024-07-15', 'Ivo Ivo2'),
-    createData('P0', 'Pay taxes', '2025-03-31', 'Ivo'),
-    createData('P1', 'Throw out trash', '', 'Ivo'),
-    createData('P0', 'Car service', '2024-07-15', 'Ivo Ivo2'),
-    createData('P0', 'Pay taxes', '2025-03-31', 'Ivo'),
+    createData('P0', 'Car service2', '2024-07-15', 'Ivo Ivo2'),
+    createData('P0', 'Pay taxes2', '2025-03-31', 'Ivo'),
+    createData('P1', 'Throw out trash2', '', 'Ivo'),
+    createData('P0', 'Car service3', '2024-07-15', 'Ivo Ivo2'),
+    createData('P0', 'Pay taxes3', '2025-03-31', 'Ivo'),
 ];
 
 function TasksTable() {
