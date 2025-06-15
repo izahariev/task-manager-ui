@@ -5,12 +5,14 @@ import Grid from "@mui/material/Grid2";
 import Typography from "@mui/material/Typography";
 import React from "react";
 import {fetchUsers} from "../js/BackendApis.js";
+import TaskPopup from "./TaskPopup.jsx";
 import TasksTable from "./TasksTable.jsx";
 import UsersPopup from "./UsersPopup.jsx";
 
 
 function App() {
     const [showUsersPopup, setShowUsersPopup] = React.useState(false);
+    const [addTaskPopup, setAddTaskPopup] = React.useState(false);
     const [users, setUsers] = React.useState([]);
 
     return (
@@ -57,7 +59,7 @@ function App() {
                       >
                           Manage Users
                       </Button>
-                      <Button variant="contained">Add Task</Button>
+                      <Button variant="contained" onClick={() => setAddTaskPopup(!addTaskPopup)}>Add Task</Button>
                   </Grid>
               </Grid>
           </Container>
@@ -71,6 +73,9 @@ function App() {
                 <DialogTitle align={"center"} sx={{backgroundColor: "#A6A6A6"}}>Users</DialogTitle>
                 <UsersPopup users={users} setUsers={setUsers} />
             </Dialog>
+          }
+          {addTaskPopup &&
+            <TaskPopup open={addTaskPopup} setOpen={setAddTaskPopup} />
           }
       </div>
     )
