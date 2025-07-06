@@ -111,7 +111,7 @@ function TasksTable() {
                   <TableRow sx={{backgroundColor: '#8C8C8C'}}>
                       <TableCell/>
                       <TableCell sx={{minWidth: '10%'}}>
-                          <Grid container>
+                          <Grid container spacing={0}>
                               <Grid item size={6}>
                                   <Select
                                     labelId="demo-simple-select-label"
@@ -119,25 +119,29 @@ function TasksTable() {
                                     value={priorityFilterValue}
                                     onChange={handlePriorityFilterValueChange}
                                     variant={"outlined"}
+                                    size={"small"}
+                                    sx={{width: '90%'}}
                                   >
                                       <MenuItem value={"P0"}>P0</MenuItem>
                                       <MenuItem value={"P1"}>P1</MenuItem>
                                       <MenuItem value={"P2"}>P2</MenuItem>
                                       <MenuItem value={"P3"}>P3</MenuItem>
+                                      <MenuItem value={"P4"}>P4</MenuItem>
                                   </Select>
                               </Grid>
                               <Grid item size={6}>
-                                  <Button variant="contained" sx={{marginTop: "17%"}}>X</Button>
+                                  <Button variant="contained" sx={{marginTop: "2%"}}>X</Button>
                               </Grid>
                           </Grid>
                       </TableCell>
                       <TableCell>
                           <Grid container spacing={1}>
                               <Grid item size={10}>
-                                  <TextField id="outlined-basic" variant="outlined" multiline fullWidth={true}/>
+                                  <TextField id="outlined-basic" variant="outlined" multiline fullWidth={true}
+                                             size={"small"}/>
                               </Grid>
                               <Grid item>
-                                  <Button variant="contained" sx={{marginTop: "17%"}}>X</Button>
+                                  <Button variant="contained" sx={{marginTop: "2%"}}>X</Button>
                               </Grid>
                           </Grid>
                       </TableCell>
@@ -145,11 +149,11 @@ function TasksTable() {
                           <Grid container spacing={1}>
                               <Grid item>
                                   <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                      <DatePicker/>
+                                      <DatePicker slotProps={{ textField: { size: 'small' } }}/>
                                   </LocalizationProvider>
                               </Grid>
                               <Grid item>
-                                  <Button variant="contained" sx={{marginTop: "17%"}}>X</Button>
+                                  <Button variant="contained" sx={{marginTop: "2%"}}>X</Button>
                               </Grid>
                           </Grid>
                       </TableCell>
@@ -166,6 +170,7 @@ function TasksTable() {
                                         onChange={handleChange}
                                         input={<OutlinedInput/>}
                                         renderValue={(selected) => selected.join(', ')}
+                                        size={"small"}
                                       >
                                           {names.map((name) => (
                                             <MenuItem key={name} value={name}>
@@ -177,7 +182,7 @@ function TasksTable() {
                                   </FormControl>
                               </Grid>
                               <Grid item>
-                                  <Button variant="contained" sx={{marginTop: "17%"}}>X</Button>
+                                  <Button variant="contained" sx={{marginTop: "2%"}}>X</Button>
                               </Grid>
                           </Grid>
                       </TableCell>
