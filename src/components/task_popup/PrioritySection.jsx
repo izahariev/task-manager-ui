@@ -4,10 +4,11 @@ import PropTypes from "prop-types";
 
 PrioritySection.propTypes = {
     priority: PropTypes.string,
-    setPriority: PropTypes.func
+    setPriority: PropTypes.func,
+    readOnly: PropTypes.bool
 }
 
-function PrioritySection({priority, setPriority}) {
+function PrioritySection({priority, setPriority, readOnly}) {
     return (
       <Grid container sx={{marginBottom: "2%", height: "25%"}}>
           <Grid size={12} sx={{
@@ -24,6 +25,7 @@ function PrioritySection({priority, setPriority}) {
           }}>
               <FormControl sx={{m: 1, minWidth: 120}}>
                   <Select
+                    {...(readOnly ? { disabled: true } : {})}
                     value={priority}
                     onChange={(e) => setPriority(e.target.value)}
                     displayEmpty

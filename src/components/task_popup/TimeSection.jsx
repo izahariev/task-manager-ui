@@ -7,15 +7,18 @@ import React from "react";
 
 TimeSection.propTypes = {
     title: PropTypes.string,
+    readOnly: PropTypes.bool
 }
 
 PeriodField.propTypes = {
-    label: PropTypes.string
+    label: PropTypes.string,
+    readOnly: PropTypes.bool
 };
 
-function PeriodField({ label }) {
+function PeriodField({ label, readOnly}) {
     return (
       <TextField
+        {...(readOnly ? { disabled: true } : {})}
         id={`outlined-number-${label.toLowerCase()}`}
         label={label}
         type="number"
@@ -31,7 +34,7 @@ function PeriodField({ label }) {
     );
 }
 
-function TimeSection({title}) {
+function TimeSection({title, readOnly}) {
     const [isDate, setIsDate] = React.useState(true)
 
     return (
@@ -44,7 +47,7 @@ function TimeSection({title}) {
               <h2>{title}</h2>
           </Grid>
           <Grid size={12} sx={{}}>
-              <Grid component="label" container alignItems="center" spacing={1}>
+              {!readOnly && (<Grid component="label" container alignItems="center" spacing={1}>
                   <Grid size={5} textAlign={"right"}>Period</Grid>
                   <Grid size={2}>
                       <Switch
@@ -72,7 +75,7 @@ function TimeSection({title}) {
                       />
                   </Grid>
                   <Grid size={4} marginLeft={"2%"}>Date</Grid>
-              </Grid>
+              </Grid>)}
           </Grid>
           <Grid size={12} sx={{
               display: 'flex',
@@ -81,14 +84,14 @@ function TimeSection({title}) {
           }}>
               {isDate && (
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
-                      <DatePicker />
+                      <DatePicker {...(readOnly ? { disabled: true } : {})}/>
                   </LocalizationProvider>
               )}
               {!isDate && (
                 <Grid container sx={{height: "25%"}}>
-                    <PeriodField label="Days" />
-                    <PeriodField label="Months" />
-                    <PeriodField label="Years" />
+                    <PeriodField label="Days" readOnly={readOnly} />
+                    <PeriodField label="Months" readOnly={readOnly} />
+                    <PeriodField label="Years" readOnly={readOnly} />
                 </Grid>
               )}
           </Grid>

@@ -3,12 +3,13 @@ import Grid from "@mui/material/Grid2";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
+import PropTypes from "prop-types";
 import React from "react";
 import {FixedSizeList} from "react-window";
 
 
 function renderRow({index, style, data}) {
-    const { users } = data;
+    const { users, readOnly } = data;
     const [checked, setChecked] = React.useState([0]);
 
     const handleToggle = (value) => () => {
@@ -30,6 +31,7 @@ function renderRow({index, style, data}) {
         key={index}
         secondaryAction={
             <Checkbox
+              {...(readOnly ? { disabled: true } : {})}
               edge="end"
               onChange={handleToggle(index)}
               checked={checked.includes(index)}
@@ -45,7 +47,11 @@ function renderRow({index, style, data}) {
     );
 }
 
-function AssigneesSection() {
+AssigneesSection.propTypes = {
+    readOnly: PropTypes.bool
+}
+
+function AssigneesSection({readOnly}) {
     const users = ["Any", "Ivo", "Didka", "Ivo2"];
 
     return (
@@ -77,7 +83,7 @@ function AssigneesSection() {
                     width={360}
                     itemSize={46}
                     itemCount={users.length}
-                    itemData={{users}}
+                    itemData={{users, readOnly}}
                     overscanCount={5}
                   >
                       {renderRow}

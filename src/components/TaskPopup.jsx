@@ -12,7 +12,8 @@ import TimeSection from "./task_popup/TimeSection.jsx";
 
 TaskPopup.propTypes = {
     open: PropTypes.bool,
-    setOpen: PropTypes.func
+    setOpen: PropTypes.func,
+    readOnlyProp: PropTypes.bool
 }
 
 const Transition = React.forwardRef(
@@ -21,8 +22,9 @@ const Transition = React.forwardRef(
   });
 
 export default function TaskPopup(props) {
-    const {open, setOpen} = props;
+    const {open, setOpen, readOnlyProp} = props;
     const [priority, setPriority] = React.useState("P3");
+    const [readOnly, setReadOnly] = React.useState(true);
 
     const handleClose = () => {
         setOpen(false);
@@ -49,9 +51,12 @@ export default function TaskPopup(props) {
                       <Typography sx={{ml: 2, flex: 1}} variant="h6" component="div">
                           Add Task
                       </Typography>
-                      <Button autoFocus color="inherit" onClick={handleClose}>
+                      {!readOnly && (<Button autoFocus color="inherit" onClick={handleClose}>
                           save
-                      </Button>
+                      </Button>)}
+                      {readOnly && (<Button autoFocus color="inherit" onClick={handleClose}>
+                          edit
+                      </Button>)}
                   </Toolbar>
               </AppBar>
               <List>
@@ -68,7 +73,11 @@ export default function TaskPopup(props) {
                           justifyContent: 'center',
                           marginBottom: "1%"
                       }}>
-                          <TextField sx={{width: "96%", margin: "0, 2%"}} size={"small"}/>
+                          <TextField
+                            {...(readOnly ? { disabled: true } : {})}
+                            sx={{width: "96%", margin: "0 2%"}}
+                            size={"small"}
+                          />
                       </Grid>
                       <Grid size={12} sx={{
                           display: 'flex',
@@ -82,42 +91,46 @@ export default function TaskPopup(props) {
                           justifyContent: 'center',
                           marginBottom: "1%"
                       }}>
-                          <TextField multiline={true} rows={3} sx={{width: "96%", margin: "0, 2%"}} size={"small"}/>
+                          <TextField
+                            {...(readOnly ? { disabled: true } : {})}
+                            multiline={true}
+                            rows={3}
+                            sx={{width: "96%", margin: "0, 2%"}} size={"small"}/>
                       </Grid>
                       <Grid size={3} sx={{
                           display: 'flex',
                           justifyContent: 'center',
                           marginBottom: "4%"
                       }}>
-                          <PrioritySection priority={priority} setPriority={setPriority} />
+                          <PrioritySection priority={priority} setPriority={setPriority} readOnly={readOnly} />
                       </Grid>
                       <Grid size={2} sx={{
                           display: 'flex',
                           justifyContent: 'center',
                           marginBottom: "4%"
                       }}>
-                          <TimeSection title={"Start time"} />
+                          <TimeSection title={"Start time"} readOnly={readOnly} />
                       </Grid>
                       <Grid size={2} sx={{
                           display: 'flex',
                           justifyContent: 'center',
                           marginBottom: "4%"
                       }}>
-                          <TimeSection title={"Deadline"} />
+                          <TimeSection title={"Deadline"} readOnly={readOnly} />
                       </Grid>
                       <Grid size={2} sx={{
                           display: 'flex',
                           justifyContent: 'center',
                           marginBottom: "4%"
                       }}>
-                          <TimeSection title={"Repeat"} />
+                          <TimeSection title={"Repeat"} readOnly={readOnly} />
                       </Grid>
                       <Grid size={3} sx={{
                           display: 'flex',
                           justifyContent: 'center',
                           marginBottom: "1%"
                       }}>
-                          <AssigneesSection />
+                          <AssigneesSection readOnly={readOnly} />
                       </Grid>
                   </Grid>
               </List>
