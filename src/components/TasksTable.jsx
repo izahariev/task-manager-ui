@@ -74,18 +74,28 @@ function TasksTable() {
     ];
 
     const [priorityFilterValue, setPriorityFilterValue] = React.useState('');
-    const [personName, setPersonName] = React.useState([]);
+    const [titleFilterValue, setTitleFilterValue] = React.useState('');
+    const [assigneesFilterValues, setAssigneesFilterValues] = React.useState([]);
     const [filterEnabled, setFilterEnabled] = React.useState(false);
+    const [dateFilterValue, setDateFilterValue] = React.useState(null);
 
     const handlePriorityFilterValueChange = (event) => {
         setPriorityFilterValue(event.target.value);
     };
 
-    const handleChange = (event) => {
+    const handleTitleFilterValueChange = (event) => {
+        setTitleFilterValue(event.target.value);
+    };
+
+    const handleDateFilterChange = (newValue) => {
+        setDateFilterValue(newValue);
+    };
+
+    const handleAssigneesFilterChange = (event) => {
         const {
             target: { value },
         } = event;
-        setPersonName(
+        setAssigneesFilterValues(
           typeof value === 'string' ? value.split(',') : value,
         );
     };
@@ -130,18 +140,35 @@ function TasksTable() {
                                   </Select>
                               </Grid>
                               <Grid item size={6}>
-                                  <Button variant="contained" sx={{marginTop: "2%"}}>X</Button>
+                                  <Button
+                                    variant="contained"
+                                    sx={{marginTop: "2%"}}
+                                    onClick={() => setPriorityFilterValue("")}
+                                  >
+                                      X
+                                  </Button>
                               </Grid>
                           </Grid>
                       </TableCell>
                       <TableCell>
                           <Grid container spacing={1}>
                               <Grid item size={10}>
-                                  <TextField id="outlined-basic" variant="outlined" multiline fullWidth={true}
-                                             size={"small"}/>
+                                  <TextField
+                                    id="outlined-basic"
+                                    variant="outlined"
+                                    fullWidth={true}
+                                    size={"small"}
+                                    value={titleFilterValue}
+                                    onChange={handleTitleFilterValueChange}/>
                               </Grid>
                               <Grid item>
-                                  <Button variant="contained" sx={{marginTop: "2%"}}>X</Button>
+                                  <Button
+                                    variant="contained"
+                                    sx={{marginTop: "2%"}}
+                                    onClick={() => setTitleFilterValue("")}
+                                  >
+                                      X
+                                  </Button>
                               </Grid>
                           </Grid>
                       </TableCell>
@@ -149,11 +176,21 @@ function TasksTable() {
                           <Grid container spacing={1}>
                               <Grid item>
                                   <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                      <DatePicker slotProps={{ textField: { size: 'small' } }}/>
+                                      <DatePicker
+                                        value={dateFilterValue}
+                                        onChange={handleDateFilterChange}
+                                        slotProps={{textField: {size: 'small'}}}
+                                      />
                                   </LocalizationProvider>
                               </Grid>
                               <Grid item>
-                                  <Button variant="contained" sx={{marginTop: "2%"}}>X</Button>
+                                  <Button
+                                    variant="contained"
+                                    sx={{marginTop: "2%"}}
+                                    onClick={() => setDateFilterValue(null)}
+                                  >
+                                      X
+                                  </Button>
                               </Grid>
                           </Grid>
                       </TableCell>
@@ -166,15 +203,15 @@ function TasksTable() {
                                         labelId="demo-multiple-checkbox-label"
                                         id="demo-multiple-checkbox"
                                         multiple
-                                        value={personName}
-                                        onChange={handleChange}
+                                        value={assigneesFilterValues}
+                                        onChange={handleAssigneesFilterChange}
                                         input={<OutlinedInput/>}
                                         renderValue={(selected) => selected.join(', ')}
                                         size={"small"}
                                       >
                                           {names.map((name) => (
                                             <MenuItem key={name} value={name}>
-                                                <Checkbox checked={personName.includes(name)} />
+                                                <Checkbox checked={assigneesFilterValues.includes(name)} />
                                                 <ListItemText primary={name} />
                                             </MenuItem>
                                           ))}
@@ -182,12 +219,28 @@ function TasksTable() {
                                   </FormControl>
                               </Grid>
                               <Grid item>
-                                  <Button variant="contained" sx={{marginTop: "2%"}}>X</Button>
+                                  <Button
+                                    variant="contained"
+                                    sx={{marginTop: "2%"}}
+                                    onClick={() => setAssigneesFilterValues([])}
+                                  >
+                                      X
+                                  </Button>
                               </Grid>
                           </Grid>
                       </TableCell>
                       <TableCell sx={{minWidth: '12%'}}>
-                          <Button variant="contained">Clear all</Button>
+                          <Button
+                            variant="contained"
+                            onClick={() => {
+                                setPriorityFilterValue("");
+                                setTitleFilterValue("");
+                                setDateFilterValue(null);
+                                setAssigneesFilterValues([]);
+                            }}
+                          >
+                              Clear all
+                          </Button>
                           <Button variant="contained" sx={{marginLeft: '5%'}}>Apply</Button>
                       </TableCell>
                   </TableRow>
