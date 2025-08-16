@@ -1,8 +1,7 @@
 import '../css/App.css'
-import {Container, Dialog, DialogTitle, Pagination, Stack, Switch} from "@mui/material";
+import {Alert, Container, Dialog, DialogTitle, Pagination} from "@mui/material";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid2";
-import Typography from "@mui/material/Typography";
 import React from "react";
 import {fetchUsers} from "../js/BackendApis.js";
 import TaskPopup from "./TaskPopup.jsx";
@@ -14,17 +13,51 @@ function App() {
     const [showUsersPopup, setShowUsersPopup] = React.useState(false);
     const [addTaskPopup, setAddTaskPopup] = React.useState(false);
     const [users, setUsers] = React.useState([]);
+    const [taskCreated, setTaskCreated] = React.useState('');
 
     return (
       <div className="App">
           <Container maxWidth="xxl" sx={{'marginBottom': '1%'}}>
+              {taskCreated !== '' &&
+                <Alert
+                  variant="filled"
+                  severity="success"
+                  sx={{marginTop: '0.5%'}}
+                  onClose={() => setTaskCreated('')}
+                >
+                    <Grid container>
+                        <Grid size={12} sx={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                        }}>
+                            <div style={{display: 'flex', justifyContent: 'space-around'}}>
+                                Task &#34;{taskCreated}&#34; created successfully
+                            </div>
+                        </Grid>
+                    </Grid>
+                </Alert>
+              }
               <Grid container>
-                  <Grid size={12} sx={{
+                  <Grid size={4} sx={{
+                      marginTop: '2%',
+                      display: 'flex',
+                      justifyContent: 'center',
+                  }}>
+                      <h1 style={{color: 'gray'}}>Inactive tasks</h1>
+                  </Grid>
+                  <Grid size={4} sx={{
                       marginTop: '2%',
                       display: 'flex',
                       justifyContent: 'center',
                   }}>
                       <h1>Active tasks</h1>
+                  </Grid>
+                  <Grid size={4} sx={{
+                      marginTop: '2%',
+                      display: 'flex',
+                      justifyContent: 'center',
+                  }}>
+                      <h1 style={{color: 'gray'}}>Completed tasks</h1>
                   </Grid>
                   <Grid size={12} sx={{margin: '1%  0 0.5% 0'}}>
                       <TasksTable/>
@@ -39,11 +72,6 @@ function App() {
                       display: 'flex',
                       justifyContent: 'left',
                   }}>
-                      <Stack direction="row" spacing={1} sx={{alignItems: 'center'}}>
-                          <Typography>Completed Tasks</Typography>
-                          <Switch defaultChecked inputProps={{'aria-label': 'ant design'}}/>
-                          <Typography>Active Tasks</Typography>
-                      </Stack>
                   </Grid>
                   <Grid size={6} sx={{
                       display: 'flex',
@@ -59,7 +87,17 @@ function App() {
                       >
                           Manage Users
                       </Button>
-                      <Button variant="contained" onClick={() => setAddTaskPopup(!addTaskPopup)}>Add Task</Button>
+                      <Button
+                        variant="contained"
+                        onClick={() => {
+                            fetchUsers().then(r => {
+                                r.unshift("Any")
+                                setUsers(r)
+                            });
+                            setAddTaskPopup(!addTaskPopup)
+                        }}>
+                          Add Task
+                      </Button>
                   </Grid>
               </Grid>
           </Container>
@@ -75,7 +113,12 @@ function App() {
             </Dialog>
           }
           {addTaskPopup &&
-            <TaskPopup open={addTaskPopup} setOpen={setAddTaskPopup} />
+            <TaskPopup
+              open={addTaskPopup}
+              setOpen={setAddTaskPopup}
+              users={users}
+              setTaskCreated={setTaskCreated}
+            />
           }
       </div>
     )

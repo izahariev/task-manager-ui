@@ -9,21 +9,7 @@ import {FixedSizeList} from "react-window";
 
 
 function renderRow({index, style, data}) {
-    const { users, readOnly } = data;
-    const [checked, setChecked] = React.useState([0]);
-
-    const handleToggle = (value) => () => {
-        const currentIndex = checked.indexOf(value);
-        const newChecked = [...checked];
-
-        if (currentIndex === -1) {
-            newChecked.push(value);
-        } else {
-            newChecked.splice(currentIndex, 1);
-        }
-
-        setChecked(newChecked);
-    };
+    const { users, readOnly, checked, handleToggle } = data;
 
     return (
       <ListItem
@@ -35,10 +21,15 @@ function renderRow({index, style, data}) {
               edge="end"
               onChange={handleToggle(index)}
               checked={checked.includes(index)}
-              inputProps={{ 'aria-labelledby': index }}
+              slotProps={{
+                  input: {
+                      'aria-labelledby': index
+                  }
+              }}
             />
         }
         disablePadding
+        sx={{backgroundColor: checked.includes(index) ? "#aecce4" : ""}}
       >
           <ListItemButton>
               <ListItemText id={index} primary={`${users[index]}`} />
@@ -48,11 +39,40 @@ function renderRow({index, style, data}) {
 }
 
 AssigneesSection.propTypes = {
-    readOnly: PropTypes.bool
+    readOnly: PropTypes.bool,
+    users: PropTypes.array,
+    assignees: PropTypes.array,
+    setAssignees: PropTypes.func
 }
 
-function AssigneesSection({readOnly}) {
-    const users = ["Any", "Ivo", "Didka", "Ivo2"];
+function AssigneesSection({readOnly, users, assignees, setAssignees}) {
+    const [checked, setChecked] = React.useState([0]);
+
+    const handleToggle = (value) => () => {
+        const currentIndex = checked.indexOf(value);
+        let newChecked = [...checked];
+
+        if (currentIndex === -1) {
+            if (value === 0) {
+                newChecked = [0]
+            } else {
+                if (newChecked.indexOf(0) !== -1) {
+                    newChecked.splice(0, 1);
+                }
+                newChecked.push(value);
+            }
+            const tmpAssignees = assignees;
+            tmpAssignees.push(users[value])
+            setAssignees(tmpAssignees)
+        } else {
+            newChecked.splice(currentIndex, 1);
+            const tmpAssignees = assignees;
+            tmpAssignees.splice(assignees.indexOf(users[value]), 1)
+            setAssignees(tmpAssignees)
+        }
+
+        setChecked(newChecked);
+    };
 
     return (
       <Grid container sx={{marginBottom: "2%"}}>
@@ -74,7 +94,6 @@ function AssigneesSection({readOnly}) {
                     width: '100%',
                     height: '100%',
                     maxWidth: 360,
-                    bgcolor: 'background.paper',
                     border: '1px solid #ccc'
                 }}
               >
@@ -83,7 +102,8 @@ function AssigneesSection({readOnly}) {
                     width={360}
                     itemSize={46}
                     itemCount={users.length}
-                    itemData={{users, readOnly}}
+                    itemData={{users, readOnly, assignees, setAssignees, checked, setChecked, handleToggle}}
+                    style={{ overflow: 'auto'}}
                     overscanCount={5}
                   >
                       {renderRow}
