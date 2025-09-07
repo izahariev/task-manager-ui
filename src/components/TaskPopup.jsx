@@ -7,7 +7,7 @@ import Typography from "@mui/material/Typography";
 import dayjs from "dayjs";
 import PropTypes from "prop-types";
 import React from "react";
-import {addTask, fetchTasks} from "../js/BackendApis.js";
+import {addTask, fetchAllTasks} from "../js/BackendApis.js";
 import AssigneesSection from "./task_popup/AssigneesSection.jsx";
 import PrioritySection from "./task_popup/PrioritySection.jsx";
 import TimeSection from "./task_popup/TimeSection.jsx";
@@ -60,7 +60,7 @@ export default function TaskPopup(props) {
 
         addTask(title, description, priority, startTime, deadline, repeat, assignees)
           .then(() => {
-              fetchTasks(1, 10).then(() => {
+              fetchAllTasks(1, 10).then(() => {
               })
               // fetchUsers().then(r => setUsers(r));
               // setNewUser("");

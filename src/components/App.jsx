@@ -3,17 +3,42 @@ import {Alert, Container, Dialog, DialogTitle, Pagination} from "@mui/material";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid2";
 import React from "react";
-import {fetchUsers} from "../js/BackendApis.js";
+import {fetchAllTasks, fetchUsers} from "../js/BackendApis.js";
 import TaskPopup from "./TaskPopup.jsx";
 import TasksTable from "./TasksTable.jsx";
 import UsersPopup from "./UsersPopup.jsx";
-
 
 function App() {
     const [showUsersPopup, setShowUsersPopup] = React.useState(false);
     const [addTaskPopup, setAddTaskPopup] = React.useState(false);
     const [users, setUsers] = React.useState([]);
+    const [tasks, setTasks] = React.useState([])
     const [taskCreated, setTaskCreated] = React.useState('');
+    const [errorMessages, setErrorMessages] = React.useState([])
+
+    React.useEffect(() => {
+        fetchUsers()
+          .then(r => setUsers(r))
+          .catch(error => {
+              const errors = []
+              error.response.data['errors'].forEach((error) => {
+                  errors.push(error['description']);
+              })
+              setErrorMessages([...errors]);
+          });
+    },[])
+
+    React.useEffect(() => {
+        fetchAllTasks()
+          .then(r => setTasks(r))
+          .catch(error => {
+              const errors = []
+              error.response.data['errors'].forEach((error) => {
+                  errors.push(error['description']);
+              })
+              setErrorMessages([...errors]);
+          });
+    },[])
 
     return (
       <div className="App">
@@ -32,6 +57,25 @@ function App() {
                         }}>
                             <div style={{display: 'flex', justifyContent: 'space-around'}}>
                                 Task &#34;{taskCreated}&#34; created successfully
+                            </div>
+                        </Grid>
+                    </Grid>
+                </Alert>
+              }
+              {errorMessages.length !== 0 &&
+                <Alert variant="filled" severity="error" onClose={() => setErrorMessages([])}>
+                    <Grid container>
+                        <Grid size={12} sx={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                        }}>
+                            <div style={{display: 'flex', justifyContent: 'space-around'}}>
+                                <ul style={{flexGrow: '0', listStyleType: 'none'}}>
+                                    {errorMessages && errorMessages.map((errorMessage, index) => (
+                                      <li key={index}>
+                                          {errorMessage}
+                                      </li>))}
+                                </ul>
                             </div>
                         </Grid>
                     </Grid>
@@ -60,7 +104,7 @@ function App() {
                       <h1 style={{color: 'gray'}}>Completed tasks</h1>
                   </Grid>
                   <Grid size={12} sx={{margin: '1%  0 0.5% 0'}}>
-                      <TasksTable/>
+                      <TasksTable users={users} tasks={tasks} setTasks={setTasks} setErrorMessages={setErrorMessages} />
                   </Grid>
                   <Grid size={12} sx={{
                       display: 'flex',
@@ -109,7 +153,7 @@ function App() {
               fullWidth={true}
             >
                 <DialogTitle align={"center"} sx={{backgroundColor: "#A6A6A6"}}>Users</DialogTitle>
-                <UsersPopup users={users} setUsers={setUsers} />
+                <UsersPopup users={users} setUsers={setUsers}/>
             </Dialog>
           }
           {addTaskPopup &&

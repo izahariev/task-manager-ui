@@ -5,7 +5,6 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import {Box, Collapse, Dialog, DialogTitle, IconButton, styled} from "@mui/material";
 import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
@@ -50,10 +49,23 @@ function Row(props) {
                       {open ? <KeyboardArrowUpIcon/> : <KeyboardArrowDownIcon/>}
                   </IconButton>
               </TableCell>
-              <TableCell onClick={() => {setShowUsersPopup(!showUsersPopup)}}>{row.priority}</TableCell>
-              <TableCell onClick={() => {setShowUsersPopup(!showUsersPopup)}}>{row.title}</TableCell>
-              <TableCell onClick={() => {setShowUsersPopup(!showUsersPopup)}}>{row.deadline}</TableCell>
-              <TableCell onClick={() => {setShowUsersPopup(!showUsersPopup)}}>{row.assignees}</TableCell>
+              <TableCell onClick={() => {
+                  setShowUsersPopup(!showUsersPopup)
+              }}>{row.priority}</TableCell>
+              <TableCell onClick={() => {
+                  setShowUsersPopup(!showUsersPopup)
+              }}>{row.title}</TableCell>
+              <TableCell onClick={() => {
+                  setShowUsersPopup(!showUsersPopup)
+              }}>{row.deadline}</TableCell>
+              <TableCell onClick={() => {
+                  setShowUsersPopup(!showUsersPopup)
+              }}>
+                  {row.assignees.length > 0 ?
+                    row.assignees.join(", ") :
+                    <span style={{fontStyle: "italic"}}>Any</span>
+                  }
+              </TableCell>
               <TableCell align={'right'}>
                   <IconButton sx={{backgroundColor: "#1976d2"}} size={"small"}>
                       <CheckIcon sx={{color: "white"}} fontSize={"small"}/>
@@ -83,33 +95,33 @@ function Row(props) {
                                       <TableCell/>
                                   </TableRow>
                               </TableHead>
-                              <TableBody>
-                                  {row.subtasks.map((subtaskRow) => (
-                                    <StyledTableRow key={subtaskRow.title}>
-                                        <TableCell>{subtaskRow.priority}</TableCell>
-                                        <TableCell>{subtaskRow.title}</TableCell>
-                                        <TableCell>{subtaskRow.deadline}</TableCell>
-                                        <TableCell>{subtaskRow.assignees}</TableCell>
-                                        <TableCell align={'right'}>
-                                            <IconButton sx={{backgroundColor: "#1976d2"}} size={"small"}>
-                                                <CheckIcon sx={{color: "white"}} fontSize={"small"}/>
-                                            </IconButton>
-                                            <IconButton
-                                              sx={{backgroundColor: "#1976d2", marginLeft: "1%"}}
-                                              size={"small"}
-                                            >
-                                                <EditIcon sx={{color: "white"}} fontSize={"small"}/>
-                                            </IconButton>
-                                            <IconButton
-                                              sx={{backgroundColor: "#1976d2", marginLeft: "1%"}}
-                                              size={"small"}
-                                            >
-                                                <DeleteIcon sx={{color: "white"}} fontSize={"small"}/>
-                                            </IconButton>
-                                        </TableCell>
-                                    </StyledTableRow>
-                                  ))}
-                              </TableBody>
+                              {/*<TableBody>*/}
+                              {/*    {row.subtasks.map((subtaskRow) => (*/}
+                              {/*      <StyledTableRow key={subtaskRow.title}>*/}
+                              {/*          <TableCell>{subtaskRow.priority}</TableCell>*/}
+                              {/*          <TableCell>{subtaskRow.title}</TableCell>*/}
+                              {/*          <TableCell>{subtaskRow.deadline}</TableCell>*/}
+                              {/*          <TableCell>{subtaskRow.assignees}</TableCell>*/}
+                              {/*          <TableCell align={'right'}>*/}
+                              {/*              <IconButton sx={{backgroundColor: "#1976d2"}} size={"small"}>*/}
+                              {/*                  <CheckIcon sx={{color: "white"}} fontSize={"small"}/>*/}
+                              {/*              </IconButton>*/}
+                              {/*              <IconButton*/}
+                              {/*                sx={{backgroundColor: "#1976d2", marginLeft: "1%"}}*/}
+                              {/*                size={"small"}*/}
+                              {/*              >*/}
+                              {/*                  <EditIcon sx={{color: "white"}} fontSize={"small"}/>*/}
+                              {/*              </IconButton>*/}
+                              {/*              <IconButton*/}
+                              {/*                sx={{backgroundColor: "#1976d2", marginLeft: "1%"}}*/}
+                              {/*                size={"small"}*/}
+                              {/*              >*/}
+                              {/*                  <DeleteIcon sx={{color: "white"}} fontSize={"small"}/>*/}
+                              {/*              </IconButton>*/}
+                              {/*          </TableCell>*/}
+                              {/*      </StyledTableRow>*/}
+                              {/*    ))}*/}
+                              {/*</TableBody>*/}
                           </Table>
                       </Box>
                   </Collapse>
