@@ -2,6 +2,7 @@ import '../css/App.css'
 import {Alert, Container, Dialog, DialogTitle, Pagination} from "@mui/material";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid2";
+import dayjs from "dayjs";
 import React from "react";
 import {fetchAllTasks, fetchUsers} from "../js/BackendApis.js";
 import TaskPopup from "./TaskPopup.jsx";
@@ -43,7 +44,7 @@ function App() {
     return (
       <div className="App">
           <Container maxWidth="xxl" sx={{'marginBottom': '1%'}}>
-              {taskCreated !== '' &&
+              {taskCreated !== '' &&//TODO: Task edited
                 <Alert
                   variant="filled"
                   severity="success"
@@ -135,7 +136,6 @@ function App() {
                         variant="contained"
                         onClick={() => {
                             fetchUsers().then(r => {
-                                r.unshift("Any")
                                 setUsers(r)
                             });
                             setAddTaskPopup(!addTaskPopup)
@@ -160,8 +160,10 @@ function App() {
             <TaskPopup
               open={addTaskPopup}
               setOpen={setAddTaskPopup}
-              users={users}
+              users={["Any", ...users]}
               setTaskCreated={setTaskCreated}
+              inputPriority={"P3"}
+              inputStartTime={dayjs().format('YYYY-MM-DD').toString()}
             />
           }
       </div>

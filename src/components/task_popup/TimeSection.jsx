@@ -59,7 +59,8 @@ function TimeSection({title, readOnly, timeValue, setTimeValue, tooltipContent})
           <Grid size={12} sx={{
               display: 'flex',
               justifyContent: 'center',
-              marginRight: "1.5%"
+              marginRight: "1.5%",
+              marginBottom: readOnly ? "12%" : 0
           }}>
               <h2 style={{'marginLeft': '9%'}}>{title}</h2>
               <Tooltip title={tooltipContent}>
@@ -168,7 +169,7 @@ function TimeSection({title, readOnly, timeValue, setTimeValue, tooltipContent})
                 </Grid>
               )}
           </Grid>
-          <Grid size={12} sx={{
+          {!readOnly && (<Grid size={12} sx={{
               display: 'flex',
               justifyContent: 'center',
               marginBottom: "3%",
@@ -196,7 +197,7 @@ function TimeSection({title, readOnly, timeValue, setTimeValue, tooltipContent})
               }>
                   Reset
               </Button>
-          </Grid>
+          </Grid>)}
       </Grid>
     )
 }

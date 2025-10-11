@@ -3,7 +3,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import {Box, Collapse, Dialog, DialogTitle, IconButton, styled} from "@mui/material";
+import {Box, Collapse, IconButton, styled} from "@mui/material";
 import Table from "@mui/material/Table";
 import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
@@ -11,31 +11,36 @@ import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
 import PropTypes from "prop-types";
 import React from "react";
-import UsersPopup from "./UsersPopup.jsx";
+import TaskPopup from "./TaskPopup.jsx";
 
 
 Row.propTypes = {
     row: PropTypes.shape({
-        priority: PropTypes.string.isRequired,
-        title: PropTypes.string.isRequired,
-        deadline: PropTypes.string.isRequired,
-        assignees: PropTypes.string.isRequired,
+        id: PropTypes.string,
+        title: PropTypes.string,
+        description: PropTypes.string,
+        priority: PropTypes.string,
+        start: PropTypes.string,
+        deadline: PropTypes.string,
+        repeat: PropTypes.string,
+        assignees: PropTypes.string,
         subtasks: PropTypes.arrayOf(
           PropTypes.shape({
-              priority: PropTypes.string.isRequired,
-              title: PropTypes.string.isRequired,
-              deadline: PropTypes.string.isRequired,
-              assignees: PropTypes.string.isRequired,
+              priority: PropTypes.string,
+              title: PropTypes.string,
+              deadline: PropTypes.string,
+              assignees: PropTypes.string,
           }),
-        ).isRequired,
-    }).isRequired,
-    index: PropTypes.number.isRequired,
+        ),
+    }),
+    index: PropTypes.number,
+    users: PropTypes.array
 };
 
 function Row(props) {
-    const {row, index} = props;
+    const {row, index, users} = props;
     const [open, setOpen] = React.useState(false);
-    const [showUsersPopup, setShowUsersPopup] = React.useState(false);
+    const [viewTaskPopup, setViewTaskPopup] = React.useState(false);
 
     return (
       <React.Fragment>
@@ -49,18 +54,10 @@ function Row(props) {
                       {open ? <KeyboardArrowUpIcon/> : <KeyboardArrowDownIcon/>}
                   </IconButton>
               </TableCell>
-              <TableCell onClick={() => {
-                  setShowUsersPopup(!showUsersPopup)
-              }}>{row.priority}</TableCell>
-              <TableCell onClick={() => {
-                  setShowUsersPopup(!showUsersPopup)
-              }}>{row.title}</TableCell>
-              <TableCell onClick={() => {
-                  setShowUsersPopup(!showUsersPopup)
-              }}>{row.deadline}</TableCell>
-              <TableCell onClick={() => {
-                  setShowUsersPopup(!showUsersPopup)
-              }}>
+              <TableCell onClick={() => {setViewTaskPopup(true)}}>{row.priority}</TableCell>
+              <TableCell onClick={() => {setViewTaskPopup(true)}}>{row.title}</TableCell>
+              <TableCell onClick={() => {setViewTaskPopup(true)}}>{row.deadline}</TableCell>
+              <TableCell onClick={() => {setViewTaskPopup(true)}}>
                   {row.assignees.length > 0 ?
                     row.assignees.join(", ") :
                     <span style={{fontStyle: "italic"}}>Any</span>
@@ -127,10 +124,14 @@ function Row(props) {
                   </Collapse>
               </TableCell>
           </TableRow>
-          {showUsersPopup && <Dialog open={showUsersPopup} onClose={() => setShowUsersPopup(false)}>
-              <DialogTitle>Users</DialogTitle>
-              <UsersPopup/>
-          </Dialog>
+          {viewTaskPopup &&
+            <TaskPopup
+              open={viewTaskPopup}
+              setOpen={setViewTaskPopup}
+              users={["Any", ...users]}
+              setTaskCreated={() => {}} //TODO: Update for task edited
+              taskId={row.id}
+            />
           }
       </React.Fragment>
     );

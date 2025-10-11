@@ -7,7 +7,7 @@ import Typography from "@mui/material/Typography";
 import dayjs from "dayjs";
 import PropTypes from "prop-types";
 import React from "react";
-import {addTask, fetchAllTasks} from "../js/BackendApis.js";
+import {addTask, fetchAllTasks, fetchTask} from "../js/BackendApis.js";
 import AssigneesSection from "./task_popup/AssigneesSection.jsx";
 import PrioritySection from "./task_popup/PrioritySection.jsx";
 import TimeSection from "./task_popup/TimeSection.jsx";
@@ -17,7 +17,16 @@ TaskPopup.propTypes = {
     setOpen: PropTypes.func,
     readOnlyProp: PropTypes.bool,
     users: PropTypes.array,
-    setTaskCreated: PropTypes.func
+    setTaskCreated: PropTypes.func,
+    taskId: PropTypes.string,
+    // inputTitle: PropTypes.string,
+    // inputDescription: PropTypes.string,
+    // inputPriority: PropTypes.string,
+    // inputStartTime: PropTypes.string,
+    // inputDeadline: PropTypes.string,
+    // inputRepeat: PropTypes.string,
+    // inputAssignees: PropTypes.array,
+    // inputReadOnly: PropTypes.bool
 }
 
 const Transition = React.forwardRef(
@@ -36,7 +45,13 @@ Transition.propTypes = {
 }
 
 export default function TaskPopup(props) {
-    const {open, setOpen, users, setTaskCreated} = props;
+    const {
+        open,
+        setOpen,
+        users,
+        setTaskCreated,
+        taskId
+    } = props;
     const [title, setTitle] = React.useState("");
     const [description, setDescription] = React.useState("");
     const [priority, setPriority] = React.useState("P3");
@@ -44,8 +59,32 @@ export default function TaskPopup(props) {
     const [deadline, setDeadline] = React.useState("");
     const [repeat, setRepeat] = React.useState("");
     const [assignees, setAssignees] = React.useState([])
-    const [readOnly] = React.useState(false);
+    const [readOnly, setReadOnly] = React.useState(false)
+    const [updated, setUpdated] = React.useState(false)
     const [errorMessages, setErrorMessages] = React.useState([]);
+
+    React.useEffect(() => {
+        if (taskId !== undefined) {
+            fetchTask(taskId)
+              .then(r => {
+                  setTitle(r.title)
+                  setDescription(r.description)
+                  setPriority(r.priority)
+                  setStartTime(r.startTime)
+                  setDeadline(r.deadline)
+                  setRepeat(r.repeat)
+                  setAssignees(r.assignees)
+                  setReadOnly(r.readOnly)
+              })
+              .catch(error => {
+                  const errors = []
+                  error.response.data['errors'].forEach((error) => {
+                      errors.push(error['description']);
+                  })
+                  setErrorMessages([...errors]);
+              });
+        }
+    },[taskId])
 
     const handleSaveClick = () => {
         const errors = [];
@@ -62,8 +101,6 @@ export default function TaskPopup(props) {
           .then(() => {
               fetchAllTasks(1, 10).then(() => {
               })
-              // fetchUsers().then(r => setUsers(r));
-              // setNewUser("");
               setErrorMessages([]);
               setOpen(false);
               setTaskCreated(title);
@@ -111,7 +148,10 @@ export default function TaskPopup(props) {
                       {!readOnly && (<Button autoFocus color="inherit" onClick={handleSaveClick}>
                           save
                       </Button>)}
-                      {readOnly && (<Button autoFocus color="inherit" onClick={handleClose}>
+                      {readOnly && (<Button autoFocus color="inherit" onClick={() => {
+                          setReadOnly(false)
+                          setUpdated(true)
+                      }}>
                           edit
                       </Button>)}
                   </Toolbar>
@@ -169,6 +209,7 @@ export default function TaskPopup(props) {
                           marginBottom: "1%"
                       }}>
                           <TextField
+                            value={description}
                             {...(readOnly ? {disabled: true} : {})}
                             multiline={true}
                             rows={3}

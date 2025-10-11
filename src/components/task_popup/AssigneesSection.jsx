@@ -48,6 +48,18 @@ AssigneesSection.propTypes = {
 function AssigneesSection({readOnly, users, assignees, setAssignees}) {
     const [checked, setChecked] = React.useState([0]);
 
+    React.useEffect(() => {
+        if (!assignees || assignees.length === 0) {
+            setChecked([0]);
+        } else {
+            const indexes = assignees
+              .map(a => users.indexOf(a))
+              .filter(i => i !== -1);
+
+            setChecked(indexes.length > 0 ? indexes : [0]);
+        }
+    }, [users, assignees]);
+
     const handleToggle = (value) => () => {
         const currentIndex = checked.indexOf(value);
         let newChecked = [...checked];

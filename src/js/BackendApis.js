@@ -6,9 +6,14 @@ export async function fetchUsers() {
     return  response.data['content']['elements'];
 }
 
+export async function fetchTask(id) {
+    const response = await axios.get('http://localhost:8080/tasks/' + id);
+    return  response.data['content'];
+}
+
 export async function fetchAllTasks(page, size) {
     const response = await axios.get(
-      'http://localhost:8080/tasks/get',
+      'http://localhost:8080/tasks/list',
       {params: {page: page, size: size}}
     )
     return  response.data['content']['elements'];
