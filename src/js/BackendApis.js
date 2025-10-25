@@ -47,11 +47,16 @@ export async function fetchTasks(priority, title, deadline, assignees, page, siz
     return response.data["content"]["elements"];
 }
 
-export async function addTask(title, description, priority, start, deadline, repeat, assignees) {
+export async function addTask(task) {
     const response = await axios.post(
       'http://localhost:8080/tasks/create',
-      {title: title, description: description, priority: priority,
-          start: start, deadline: deadline, repeat: repeat, assignees: assignees}
+      {title: task.title, description: task.description, priority: task.priority,
+          start: task.start, deadline: task.deadline, repeat: task.repeat, assignees: task.assignees}
     )
+    return  response.data['content'];
+}
+
+export async function updateTask(id, updatedFields) {
+    const response = await axios.patch('http://localhost:8080/tasks/' + id, updatedFields);
     return  response.data['content'];
 }

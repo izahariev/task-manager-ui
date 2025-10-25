@@ -54,6 +54,10 @@ function TimeSection({title, readOnly, timeValue, setTimeValue, tooltipContent})
     const [years, setYears] = React.useState(0);
     const [isDate, setIsDate] = React.useState(true)
 
+    React.useEffect(() => {
+        setDate(timeValue);
+    }, [timeValue]);
+
     return (
       <Grid container sx={{marginBottom: "2%", height: "25%"}}>
           <Grid size={12} sx={{

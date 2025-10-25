@@ -2,7 +2,6 @@ import '../css/App.css'
 import {Alert, Container, Dialog, DialogTitle, Pagination} from "@mui/material";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid2";
-import dayjs from "dayjs";
 import React from "react";
 import {fetchAllTasks, fetchUsers} from "../js/BackendApis.js";
 import TaskPopup from "./TaskPopup.jsx";
@@ -162,8 +161,7 @@ function App() {
               setOpen={setAddTaskPopup}
               users={["Any", ...users]}
               setTaskCreated={setTaskCreated}
-              inputPriority={"P3"}
-              inputStartTime={dayjs().format('YYYY-MM-DD').toString()}
+              setTasks={setTasks}
             />
           }
       </div>

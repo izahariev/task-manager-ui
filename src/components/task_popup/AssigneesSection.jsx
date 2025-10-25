@@ -67,15 +67,16 @@ function AssigneesSection({readOnly, users, assignees, setAssignees}) {
         if (currentIndex === -1) {
             if (value === 0) {
                 newChecked = [0]
+                setAssignees([])
             } else {
                 if (newChecked.indexOf(0) !== -1) {
                     newChecked.splice(0, 1);
                 }
                 newChecked.push(value);
+                const tmpAssignees = assignees;
+                tmpAssignees.push(users[value])
+                setAssignees(tmpAssignees)
             }
-            const tmpAssignees = assignees;
-            tmpAssignees.push(users[value])
-            setAssignees(tmpAssignees)
         } else {
             newChecked.splice(currentIndex, 1);
             const tmpAssignees = assignees;

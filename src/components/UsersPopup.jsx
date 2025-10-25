@@ -27,6 +27,7 @@ export default function UsersPopup(props) {
     const [deleteUser, setDeleteUser] = React.useState("");
     const [errorMessages, setErrorMessages] = React.useState([]);
 
+    //TODO: Extract API call to BackendApis
     const handleAddUser = () => {
         if (newUser.trim() === '') {
             setErrorMessages(['Please enter a user name']);

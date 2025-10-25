@@ -222,7 +222,7 @@ function TasksTable({users, tasks, setTasks, setErrorMessages}) {
                 </TableHead>}
               <TableBody>
                   {tasks.map((row, index) => (
-                    <Row key={row.title} row={row} index={index} users={users}/>
+                    <Row key={row.title} row={row} index={index} users={users} setTasks={setTasks} />
                   ))}
               </TableBody>
           </Table>

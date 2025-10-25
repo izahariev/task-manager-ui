@@ -7,7 +7,7 @@ import Typography from "@mui/material/Typography";
 import dayjs from "dayjs";
 import PropTypes from "prop-types";
 import React from "react";
-import {addTask, fetchAllTasks, fetchTask} from "../js/BackendApis.js";
+import {addTask, fetchAllTasks, fetchTask, updateTask} from "../js/BackendApis.js";
 import AssigneesSection from "./task_popup/AssigneesSection.jsx";
 import PrioritySection from "./task_popup/PrioritySection.jsx";
 import TimeSection from "./task_popup/TimeSection.jsx";
@@ -15,18 +15,10 @@ import TimeSection from "./task_popup/TimeSection.jsx";
 TaskPopup.propTypes = {
     open: PropTypes.bool,
     setOpen: PropTypes.func,
-    readOnlyProp: PropTypes.bool,
     users: PropTypes.array,
     setTaskCreated: PropTypes.func,
     taskId: PropTypes.string,
-    // inputTitle: PropTypes.string,
-    // inputDescription: PropTypes.string,
-    // inputPriority: PropTypes.string,
-    // inputStartTime: PropTypes.string,
-    // inputDeadline: PropTypes.string,
-    // inputRepeat: PropTypes.string,
-    // inputAssignees: PropTypes.array,
-    // inputReadOnly: PropTypes.bool
+    setTasks: PropTypes.func
 }
 
 const Transition = React.forwardRef(
@@ -50,31 +42,48 @@ export default function TaskPopup(props) {
         setOpen,
         users,
         setTaskCreated,
-        taskId
+        taskId,
+        setTasks
     } = props;
-    const [title, setTitle] = React.useState("");
-    const [description, setDescription] = React.useState("");
-    const [priority, setPriority] = React.useState("P3");
-    const [startTime, setStartTime] = React.useState(dayjs().format('YYYY-MM-DD').toString());
-    const [deadline, setDeadline] = React.useState("");
-    const [repeat, setRepeat] = React.useState("");
-    const [assignees, setAssignees] = React.useState([])
+    const [currentTask, setCurrentTask] = React.useState({
+        title: "",
+        description: "",
+        priority: "P3",
+        startTime: dayjs().format('YYYY-MM-DD').toString(),
+        deadline: "",
+        repeat: "",
+        assignees: []
+    });
+    const [initialTask, setInitialTask] = React.useState(null)
     const [readOnly, setReadOnly] = React.useState(false)
-    const [updated, setUpdated] = React.useState(false)
+    const [isEdit, setIsEdit] = React.useState(false)
     const [errorMessages, setErrorMessages] = React.useState([]);
 
     React.useEffect(() => {
         if (taskId !== undefined) {
             fetchTask(taskId)
               .then(r => {
-                  setTitle(r.title)
-                  setDescription(r.description)
-                  setPriority(r.priority)
-                  setStartTime(r.startTime)
-                  setDeadline(r.deadline)
-                  setRepeat(r.repeat)
-                  setAssignees(r.assignees)
-                  setReadOnly(r.readOnly)
+                  setCurrentTask({
+                      title: r.title,
+                      description: r.description,
+                      priority: r.priority,
+                      startTime: r.start,
+                      deadline: r.deadline,
+                      repeat: r.repeat,
+                      assignees: [...r.assignees]
+                  })
+                  setInitialTask(
+                    {
+                        title: r.title,
+                        description: r.description,
+                        priority: r.priority,
+                        startTime: r.start,
+                        deadline: r.deadline,
+                        repeat: r.repeat,
+                        assignees: [...r.assignees]
+                    }
+                  )
+                  setReadOnly(true)
               })
               .catch(error => {
                   const errors = []
@@ -84,11 +93,11 @@ export default function TaskPopup(props) {
                   setErrorMessages([...errors]);
               });
         }
-    },[taskId])
+    }, [taskId])
 
     const handleSaveClick = () => {
         const errors = [];
-        if (title.trim() === '') {
+        if (currentTask.title.trim() === '') {
             errors.push('Missing title');
         }
 
@@ -97,25 +106,73 @@ export default function TaskPopup(props) {
             return;
         }
 
-        addTask(title, description, priority, startTime, deadline, repeat, assignees)
-          .then(() => {
-              fetchAllTasks(1, 10).then(() => {
-              })
-              setErrorMessages([]);
-              setOpen(false);
-              setTaskCreated(title);
-          }).catch(error => {
-            const errors = []
-            error.response.data['errors'].forEach((error) => {
-                errors.push(error['description']);
-            })
-            setErrorMessages([...errors]);
-        });
-        if (errors.length !== 0) {
-            setErrorMessages(errors);
+        if (initialTask === null) {
+            addTask(currentTask)
+              .then(() => {
+                  fetchAllTasks(1, 10).then(r => {
+                      setTasks(r)
+                  })
+                  setErrorMessages([]);
+                  setOpen(false);
+                  setTaskCreated(currentTask.title);
+              }).catch(error => {
+                const errors = []
+                error.response.data['errors'].forEach((error) => {
+                    errors.push(error['description']);
+                })
+                setErrorMessages([...errors]);
+            });
+            if (errors.length !== 0) {
+                setErrorMessages(errors);
+            } else {
+                setErrorMessages([]);
+            }
         } else {
-            setErrorMessages([]);
+            const updatedFields = diffTasks(currentTask, initialTask)
+            if (Object.keys(updatedFields).length > 0) {
+                updateTask(taskId, updatedFields)
+                  .then(() => {
+                        fetchAllTasks(1, 10).then(r => {
+                            setTasks(r)
+                        })
+                        setErrorMessages([]);
+                        setOpen(false);
+                        setTaskCreated(currentTask.title);
+                    }
+                  )
+                  .catch(error => {
+                        const errors = []
+                        error.response.data['errors'].forEach((error) => {
+                            errors.push(error['description']);
+                        })
+                        setErrorMessages([...errors]);
+                    }
+                  );
+                if (errors.length !== 0) {
+                    setErrorMessages(errors);
+                } else {
+                    setErrorMessages([]);
+                }
+            } else {
+                setErrorMessages([...errors, "Nothing was updated"]);
+            }
         }
+    }
+
+    function diffTasks(currentTask, initialTask) {
+        const diffs = {};
+
+        for (const key of Object.keys(currentTask)) {
+            if (currentTask[key] !== initialTask[key]) {
+                if (currentTask[key] === "" || currentTask[key].length === 0) {
+                    diffs[key] = null;
+                } else {
+                    diffs[key] = currentTask[key];
+                }
+            }
+        }
+
+        return diffs;
     }
 
     const handleClose = () => {
@@ -143,17 +200,21 @@ export default function TaskPopup(props) {
                           <CloseIcon/>
                       </IconButton>
                       <Typography sx={{ml: 2, flex: 1}} variant="h6" component="div">
-                          Add Task
+                          {readOnly ? 'Task Details' : isEdit ? 'Edit Task' : 'Add Task'}
                       </Typography>
-                      {!readOnly && (<Button autoFocus color="inherit" onClick={handleSaveClick}>
-                          save
-                      </Button>)}
-                      {readOnly && (<Button autoFocus color="inherit" onClick={() => {
-                          setReadOnly(false)
-                          setUpdated(true)
-                      }}>
-                          edit
-                      </Button>)}
+                      {!readOnly && (
+                        <Button autoFocus color="inherit" onClick={handleSaveClick}>
+                            save
+                        </Button>
+                      )}
+                      {readOnly && (
+                        <Button autoFocus color="inherit" onClick={() => {
+                            setReadOnly(false)
+                            setIsEdit(true)
+                        }}>
+                            edit
+                        </Button>
+                      )}
                   </Toolbar>
               </AppBar>
               <List>
@@ -166,9 +227,11 @@ export default function TaskPopup(props) {
                             }}>
                                 <div style={{display: 'flex', justifyContent: 'space-around'}}>
                                     <ul style={{flexGrow: '0', listStyleType: 'none'}}>
-                                        {errorMessages && errorMessages.map((errorMessage, index) => (<li key={index}>
-                                            {errorMessage}
-                                        </li>))}
+                                        {errorMessages && errorMessages.map((errorMessage, index) => (
+                                          <li key={index}>
+                                              {errorMessage}
+                                          </li>
+                                        ))}
                                     </ul>
                                 </div>
                             </Grid>
@@ -189,8 +252,11 @@ export default function TaskPopup(props) {
                           marginBottom: "1%"
                       }}>
                           <TextField
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
+                            value={currentTask.title}
+                            onChange={(e) => {
+                                // setTitle(e.target.value)
+                                setCurrentTask(currentTask => ({...currentTask, title: e.target.value}));
+                            }}
                             {...(readOnly ? {disabled: true} : {})}
                             sx={{width: "96%", margin: "0 2%"}}
                             size={"small"}
@@ -209,11 +275,18 @@ export default function TaskPopup(props) {
                           marginBottom: "1%"
                       }}>
                           <TextField
-                            value={description}
+                            value={currentTask.description}
                             {...(readOnly ? {disabled: true} : {})}
                             multiline={true}
                             rows={3}
-                            onChange={(e) => setDescription(e.target.value)}
+                            onChange={(e) => {
+                                setCurrentTask(currentTask => (
+                                  {
+                                      ...currentTask,
+                                      description: e.target.value
+                                  }
+                                ));
+                            }}
                             sx={{width: "96%", margin: "0, 2%"}} size={"small"}/>
                       </Grid>
                       <Grid size={3} sx={{
@@ -221,7 +294,12 @@ export default function TaskPopup(props) {
                           justifyContent: 'center',
                           marginBottom: "4%"
                       }}>
-                          <PrioritySection priority={priority} setPriority={setPriority} readOnly={readOnly} />
+                          <PrioritySection
+                            priority={currentTask.priority}
+                            setPriority={(p) =>
+                              setCurrentTask((currentTask) => ({...currentTask, priority: p}))}
+                            readOnly={readOnly}
+                          />
                       </Grid>
                       <Grid size={2} sx={{
                           display: 'flex',
@@ -231,8 +309,9 @@ export default function TaskPopup(props) {
                           <TimeSection
                             title={"Start time"}
                             readOnly={readOnly}
-                            timeValue={startTime}
-                            setTimeValue={setStartTime}
+                            timeValue={currentTask.startTime}
+                            setTimeValue={(t) =>
+                              setCurrentTask((currentTask) => ({...currentTask, startTime: t}))}
                             tooltipContent={
                                 <div>
                                     The time from which the task can be completed and will appear in the active
@@ -254,8 +333,9 @@ export default function TaskPopup(props) {
                           <TimeSection
                             title={"Deadline"}
                             readOnly={readOnly}
-                            timeValue={deadline}
-                            setTimeValue={setDeadline}
+                            timeValue={currentTask.deadline}
+                            setTimeValue={(t) =>
+                              setCurrentTask((currentTask) => ({...currentTask, deadline: t}))}
                             tooltipContent={
                                 <div>
                                     The time at which the task must be completed. If provided the task priority will
@@ -273,8 +353,9 @@ export default function TaskPopup(props) {
                           <TimeSection
                             title={"Repeat"}
                             readOnly={readOnly}
-                            timeValue={repeat}
-                            setTimeValue={setRepeat}
+                            timeValue={currentTask.repeat}
+                            setTimeValue={(t) =>
+                              setCurrentTask((currentTask) => ({...currentTask, repeat: t}))}
                             tooltipContent={
                                 <div>
                                     The time at which the task task will repeat and appear again in the active tasks
@@ -308,8 +389,9 @@ export default function TaskPopup(props) {
                           <AssigneesSection
                             readOnly={readOnly}
                             users={users}
-                            assignees={assignees}
-                            setAssignees={setAssignees}
+                            assignees={currentTask.assignees}
+                            setAssignees={(a) =>
+                              setCurrentTask((currentTask) => ({...currentTask, assignees: a}))}
                           />
                       </Grid>
                   </Grid>

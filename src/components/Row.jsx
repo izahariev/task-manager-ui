@@ -34,11 +34,12 @@ Row.propTypes = {
         ),
     }),
     index: PropTypes.number,
-    users: PropTypes.array
+    users: PropTypes.array,
+    setTasks: PropTypes.func,
 };
 
 function Row(props) {
-    const {row, index, users} = props;
+    const {row, index, users, setTasks} = props;
     const [open, setOpen] = React.useState(false);
     const [viewTaskPopup, setViewTaskPopup] = React.useState(false);
 
@@ -131,6 +132,7 @@ function Row(props) {
               users={["Any", ...users]}
               setTaskCreated={() => {}} //TODO: Update for task edited
               taskId={row.id}
+              setTasks={setTasks}
             />
           }
       </React.Fragment>
