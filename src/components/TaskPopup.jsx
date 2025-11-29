@@ -16,9 +16,10 @@ TaskPopup.propTypes = {
     open: PropTypes.bool,
     setOpen: PropTypes.func,
     users: PropTypes.array,
-    setTaskCreated: PropTypes.func,
+    setTaskChanged: PropTypes.func,
     taskId: PropTypes.string,
-    setTasks: PropTypes.func
+    setTasks: PropTypes.func,
+    customReadOnly: PropTypes.bool,
 }
 
 const Transition = React.forwardRef(
@@ -41,9 +42,10 @@ export default function TaskPopup(props) {
         open,
         setOpen,
         users,
-        setTaskCreated,
+        setTaskChanged,
         taskId,
-        setTasks
+        setTasks,
+        customReadOnly
     } = props;
     const [currentTask, setCurrentTask] = React.useState({
         title: "",
@@ -83,7 +85,11 @@ export default function TaskPopup(props) {
                         assignees: [...r.assignees]
                     }
                   )
-                  setReadOnly(true)
+                  if (customReadOnly !== undefined) {
+                      setReadOnly(customReadOnly)
+                  } else {
+                      setReadOnly(true)
+                  }
               })
               .catch(error => {
                   const errors = []
@@ -114,7 +120,7 @@ export default function TaskPopup(props) {
                   })
                   setErrorMessages([]);
                   setOpen(false);
-                  setTaskCreated(currentTask.title);
+                  setTaskChanged({title: currentTask.title, change: "created"});
               }).catch(error => {
                 const errors = []
                 error.response.data['errors'].forEach((error) => {
@@ -137,7 +143,7 @@ export default function TaskPopup(props) {
                         })
                         setErrorMessages([]);
                         setOpen(false);
-                        setTaskCreated(currentTask.title);
+                        setTaskChanged({title: currentTask.title, change: "updated"});
                     }
                   )
                   .catch(error => {
@@ -203,17 +209,41 @@ export default function TaskPopup(props) {
                           {readOnly ? 'Task Details' : isEdit ? 'Edit Task' : 'Add Task'}
                       </Typography>
                       {!readOnly && (
-                        <Button autoFocus color="inherit" onClick={handleSaveClick}>
+                        <Button color="inherit" onClick={handleSaveClick}>
                             save
                         </Button>
                       )}
                       {readOnly && (
-                        <Button autoFocus color="inherit" onClick={() => {
-                            setReadOnly(false)
-                            setIsEdit(true)
-                        }}>
-                            edit
-                        </Button>
+                        <div>
+                            <Button color="inherit" onClick={() => {
+                                updateTask(taskId, {"isCompleted": true})
+                                  .then(() => {
+                                        fetchAllTasks(1, 10).then(r => {
+                                            setTasks(r)
+                                        })
+                                        setErrorMessages([]);
+                                        setOpen(false);
+                                        setTaskChanged({title: currentTask.title, change: "updated"});
+                                    }
+                                  )
+                                  .catch(error => {
+                                        const errors = []
+                                        error.response.data['errors'].forEach((error) => {
+                                            errors.push(error['description']);
+                                        })
+                                        setErrorMessages([...errors]);
+                                    }
+                                  )
+                            }}>
+                                complete
+                            </Button>
+                            <Button color="inherit" onClick={() => {
+                                setReadOnly(false)
+                                setIsEdit(true)
+                            }}>
+                                edit
+                            </Button>
+                        </div>
                       )}
                   </Toolbar>
               </AppBar>

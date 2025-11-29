@@ -13,7 +13,7 @@ function App() {
     const [addTaskPopup, setAddTaskPopup] = React.useState(false);
     const [users, setUsers] = React.useState([]);
     const [tasks, setTasks] = React.useState([])
-    const [taskCreated, setTaskCreated] = React.useState('');
+    const [taskChanged, setTaskChanged] = React.useState(null);
     const [errorMessages, setErrorMessages] = React.useState([])
 
     React.useEffect(() => {
@@ -28,6 +28,7 @@ function App() {
           });
     },[])
 
+    //TODO: Check fetch tasks logic. Should fetch only one page (9-10 tasks) everywhere
     React.useEffect(() => {
         fetchAllTasks()
           .then(r => setTasks(r))
@@ -43,12 +44,12 @@ function App() {
     return (
       <div className="App">
           <Container maxWidth="xxl" sx={{'marginBottom': '1%'}}>
-              {taskCreated !== '' &&//TODO: Task edited
+              {taskChanged !== null &&
                 <Alert
                   variant="filled"
                   severity="success"
                   sx={{marginTop: '0.5%'}}
-                  onClose={() => setTaskCreated('')}
+                  onClose={() => setTaskChanged(null)}
                 >
                     <Grid container>
                         <Grid size={12} sx={{
@@ -56,7 +57,7 @@ function App() {
                             justifyContent: 'center',
                         }}>
                             <div style={{display: 'flex', justifyContent: 'space-around'}}>
-                                Task &#34;{taskCreated}&#34; created successfully
+                                Task &#34;{taskChanged.title}&#34; {taskChanged.change}
                             </div>
                         </Grid>
                     </Grid>
@@ -104,7 +105,13 @@ function App() {
                       <h1 style={{color: 'gray'}}>Completed tasks</h1>
                   </Grid>
                   <Grid size={12} sx={{margin: '1%  0 0.5% 0'}}>
-                      <TasksTable users={users} tasks={tasks} setTasks={setTasks} setErrorMessages={setErrorMessages} />
+                      <TasksTable
+                        users={users}
+                        tasks={tasks}
+                        setTasks={setTasks}
+                        setTaskChanged={setTaskChanged}
+                        setErrorMessages={setErrorMessages}
+                      />
                   </Grid>
                   <Grid size={12} sx={{
                       display: 'flex',
@@ -160,7 +167,7 @@ function App() {
               open={addTaskPopup}
               setOpen={setAddTaskPopup}
               users={["Any", ...users]}
-              setTaskCreated={setTaskCreated}
+              setTaskChanged={setTaskChanged}
               setTasks={setTasks}
             />
           }

@@ -11,6 +11,7 @@ import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
 import PropTypes from "prop-types";
 import React from "react";
+import {fetchAllTasks, updateTask} from "../js/BackendApis.js";
 import TaskPopup from "./TaskPopup.jsx";
 
 
@@ -36,12 +37,21 @@ Row.propTypes = {
     index: PropTypes.number,
     users: PropTypes.array,
     setTasks: PropTypes.func,
+    setTaskChanged: PropTypes.func,
+    setErrorMessages: PropTypes.func
 };
 
 function Row(props) {
-    const {row, index, users, setTasks} = props;
+    const {row, index, users, setTasks, setTaskChanged, setErrorMessages} = props;
     const [open, setOpen] = React.useState(false);
     const [viewTaskPopup, setViewTaskPopup] = React.useState(false);
+    const [readOnly, setReadOnly] = React.useState(true);
+
+    React.useEffect(() => {
+        if (open === false) {
+            setReadOnly(true);
+        }
+    }, [open, readOnly])
 
     return (
       <React.Fragment>
@@ -55,20 +65,53 @@ function Row(props) {
                       {open ? <KeyboardArrowUpIcon/> : <KeyboardArrowDownIcon/>}
                   </IconButton>
               </TableCell>
-              <TableCell onClick={() => {setViewTaskPopup(true)}}>{row.priority}</TableCell>
-              <TableCell onClick={() => {setViewTaskPopup(true)}}>{row.title}</TableCell>
-              <TableCell onClick={() => {setViewTaskPopup(true)}}>{row.deadline}</TableCell>
-              <TableCell onClick={() => {setViewTaskPopup(true)}}>
+              <TableCell onClick={() => {
+                  setViewTaskPopup(true)
+              }}>{row.priority}</TableCell>
+              <TableCell onClick={() => {
+                  setViewTaskPopup(true)
+              }}>{row.title}</TableCell>
+              <TableCell onClick={() => {
+                  setViewTaskPopup(true)
+              }}>{row.deadline}</TableCell>
+              <TableCell onClick={() => {
+                  setViewTaskPopup(true)
+              }}>
                   {row.assignees.length > 0 ?
                     row.assignees.join(", ") :
                     <span style={{fontStyle: "italic"}}>Any</span>
                   }
               </TableCell>
               <TableCell align={'right'}>
-                  <IconButton sx={{backgroundColor: "#1976d2"}} size={"small"}>
+                  <IconButton sx={{backgroundColor: "#1976d2"}} size={"small"} onClick={() => {
+                      updateTask(row.id, {"isCompleted": true})
+                        .then(() => {
+                              fetchAllTasks(1, 10).then(r => {
+                                  setTasks(r)
+                              })
+                              setErrorMessages([]);
+                              setOpen(false);
+                              setTaskChanged({title: row.title, change: "completed"});
+                          }
+                        )
+                        .catch(error => {
+                              const errors = []
+                              error.response.data['errors'].forEach((error) => {
+                                  errors.push(error['description']);
+                              })
+                              setErrorMessages([...errors]);
+                          }
+                        );
+                  }}>
                       <CheckIcon sx={{color: "white"}} fontSize={"small"}/>
                   </IconButton>
-                  <IconButton sx={{backgroundColor: "#1976d2", marginLeft: "1%"}} size={"small"}>
+                  <IconButton
+                    sx={{backgroundColor: "#1976d2", marginLeft: "1%"}}
+                    size={"small"}
+                    onClick={() => {
+                        setReadOnly(false);
+                        setViewTaskPopup(true);
+                    }}>
                       <EditIcon sx={{color: "white"}} fontSize={"small"}/>
                   </IconButton>
                   <IconButton sx={{backgroundColor: "#1976d2", marginLeft: "1%"}} size={"small"}>
@@ -130,9 +173,10 @@ function Row(props) {
               open={viewTaskPopup}
               setOpen={setViewTaskPopup}
               users={["Any", ...users]}
-              setTaskCreated={() => {}} //TODO: Update for task edited
+              setTaskChanged={setTaskChanged}
               taskId={row.id}
               setTasks={setTasks}
+              customReadOnly={readOnly}
             />
           }
       </React.Fragment>

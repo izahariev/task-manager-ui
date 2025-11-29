@@ -30,10 +30,11 @@ TasksTable.propTypes = {
     users: PropTypes.array,
     tasks: PropTypes.array,
     setTasks: PropTypes.func,
-    setErrorMessages: PropTypes.func,
+    setTaskChanged: PropTypes.func,
+    setErrorMessages: PropTypes.func
 }
 
-function TasksTable({users, tasks, setTasks, setErrorMessages}) {
+function TasksTable({users, tasks, setTasks, setTaskChanged, setErrorMessages}) {
     const [priorityFilterValue, setPriorityFilterValue] = React.useState('');
     const [titleFilterValue, setTitleFilterValue] = React.useState('');
     const [assigneesFilterValues, setAssigneesFilterValues] = React.useState([]);
@@ -222,7 +223,15 @@ function TasksTable({users, tasks, setTasks, setErrorMessages}) {
                 </TableHead>}
               <TableBody>
                   {tasks.map((row, index) => (
-                    <Row key={row.title} row={row} index={index} users={users} setTasks={setTasks} />
+                    <Row
+                      key={row.title}
+                      row={row}
+                      index={index}
+                      users={users}
+                      setTasks={setTasks}
+                      setTaskChanged={setTaskChanged}
+                      setErrorMessages={setErrorMessages}
+                    />
                   ))}
               </TableBody>
           </Table>
