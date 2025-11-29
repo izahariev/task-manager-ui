@@ -17,8 +17,15 @@ function App() {
     const [errorMessages, setErrorMessages] = React.useState([])
 
     React.useEffect(() => {
+        //TODO: Increase abstraction. Try not to repeat code
         fetchUsers()
-          .then(r => setUsers(r))
+          .then(r => {
+              if (r.errors.length > 0) {
+                  setErrorMessages([...r.errors]);
+              } else {
+                  setUsers(r.content.elements)
+              }
+          })
           .catch(error => {
               const errors = []
               error.response.data['errors'].forEach((error) => {
@@ -31,7 +38,13 @@ function App() {
     //TODO: Check fetch tasks logic. Should fetch only one page (9-10 tasks) everywhere
     React.useEffect(() => {
         fetchAllTasks()
-          .then(r => setTasks(r))
+          .then(r => {
+              if (r.errors.length > 0) {
+                  setErrorMessages([...r.errors]);
+              } else {
+                  setTasks(r.content.elements)
+              }
+          })
           .catch(error => {
               const errors = []
               error.response.data['errors'].forEach((error) => {
@@ -132,7 +145,13 @@ function App() {
                         variant="contained"
                         sx={{marginRight: '1%'}}
                         onClick={() => {
-                            fetchUsers().then(r => setUsers(r));
+                            fetchUsers().then(r => {
+                                if (r.errors.length > 0) {
+                                    setErrorMessages([...r.errors]);
+                                } else {
+                                    setUsers(r.content.elements)
+                                }
+                            });
                             setShowUsersPopup(!showUsersPopup)
                         }}
                       >
@@ -142,9 +161,13 @@ function App() {
                         variant="contained"
                         onClick={() => {
                             fetchUsers().then(r => {
-                                setUsers(r)
+                                if (r.errors.length > 0) {
+                                    setErrorMessages([...r.errors]);
+                                } else {
+                                    setUsers(r.content.elements)
+                                    setAddTaskPopup(!addTaskPopup)
+                                }
                             });
-                            setAddTaskPopup(!addTaskPopup)
                         }}>
                           Add Task
                       </Button>

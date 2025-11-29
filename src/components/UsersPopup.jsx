@@ -35,9 +35,15 @@ export default function UsersPopup(props) {
         }
         axios.post('http://localhost:8080/users/create', null, {params: {name: newUser}})
           .then(() => {
-              fetchUsers().then(r => setUsers(r));
-              setNewUser("");
-              setErrorMessages([]);
+              fetchUsers().then(r => {
+                  if (r.errors.length > 0) {
+                      setErrorMessages([...r.errors]);
+                  } else {
+                      setUsers(r.content.elements)
+                      setNewUser("");
+                      setErrorMessages([]);
+                  }
+              });
           })
           .catch(error => {
               const errors = []
@@ -55,10 +61,16 @@ export default function UsersPopup(props) {
             }
         })
           .then(() => {
-            fetchUsers().then(r => setUsers(r));
-            setEditedUser("");
-            setEditedUserNewName("");
-            setErrorMessages([]);
+            fetchUsers().then(r => {
+                if (r.errors.length > 0) {
+                    setErrorMessages([...r.errors]);
+                } else {
+                    setUsers(r.content.elements)
+                    setEditedUser("");
+                    setEditedUserNewName("");
+                    setErrorMessages([]);
+                }
+            });
         })
           .catch(error => {
               const errors = []
@@ -72,8 +84,14 @@ export default function UsersPopup(props) {
     const handleDeleteUserClick = () => {
         axios.delete('http://localhost:8080/users/remove', {params: {name: deleteUser}})
           .then(() => {
-              fetchUsers().then(r => setUsers(r));
-              setDeleteUser('');
+              fetchUsers().then(r => {
+                  if (r.errors.length > 0) {
+                      setErrorMessages([...r.errors]);
+                  } else {
+                      setUsers(r.content.elements)
+                      setDeleteUser('');
+                  }
+              });
           })
           .catch(error => {
               const errors = []

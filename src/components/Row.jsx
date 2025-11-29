@@ -85,13 +85,21 @@ function Row(props) {
               <TableCell align={'right'}>
                   <IconButton sx={{backgroundColor: "#1976d2"}} size={"small"} onClick={() => {
                       updateTask(row.id, {"isCompleted": true})
-                        .then(() => {
-                              fetchAllTasks(1, 10).then(r => {
-                                  setTasks(r)
-                              })
-                              setErrorMessages([]);
-                              setOpen(false);
-                              setTaskChanged({title: row.title, change: "completed"});
+                        .then(r => {
+                              if (r.errors.length > 0) {
+                                  setErrorMessages([...r.errors]);
+                              } else {
+                                  fetchAllTasks(1, 10).then(r => {
+                                      if (r.errors.length > 0) {
+                                          setErrorMessages([...r.errors]);
+                                      } else {
+                                          setTasks(r.content.elements)
+                                          setErrorMessages([]);
+                                          setOpen(false);
+                                          setTaskChanged({title: row.title, change: "completed"});
+                                      }
+                                  })
+                              }
                           }
                         )
                         .catch(error => {

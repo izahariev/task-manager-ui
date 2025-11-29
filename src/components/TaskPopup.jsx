@@ -65,30 +65,35 @@ export default function TaskPopup(props) {
         if (taskId !== undefined) {
             fetchTask(taskId)
               .then(r => {
-                  setCurrentTask({
-                      title: r.title,
-                      description: r.description,
-                      priority: r.priority,
-                      startTime: r.start,
-                      deadline: r.deadline,
-                      repeat: r.repeat,
-                      assignees: [...r.assignees]
-                  })
-                  setInitialTask(
-                    {
-                        title: r.title,
-                        description: r.description,
-                        priority: r.priority,
-                        startTime: r.start,
-                        deadline: r.deadline,
-                        repeat: r.repeat,
-                        assignees: [...r.assignees]
-                    }
-                  )
-                  if (customReadOnly !== undefined) {
-                      setReadOnly(customReadOnly)
+                  if (r.errors.length > 0) {
+                      setErrorMessages([...r.errors]);
                   } else {
-                      setReadOnly(true)
+                      const task = r.content
+                      setCurrentTask({
+                          title: task.title,
+                          description: task.description,
+                          priority: task.priority,
+                          startTime: task.start,
+                          deadline: task.deadline,
+                          repeat: task.repeat,
+                          assignees: [...task.assignees]
+                      })
+                      setInitialTask(
+                        {
+                            title: task.title,
+                            description: task.description,
+                            priority: task.priority,
+                            startTime: task.start,
+                            deadline: task.deadline,
+                            repeat: task.repeat,
+                            assignees: [...task.assignees]
+                        }
+                      )
+                      if (customReadOnly !== undefined) {
+                          setReadOnly(customReadOnly)
+                      } else {
+                          setReadOnly(true)
+                      }
                   }
               })
               .catch(error => {
@@ -114,13 +119,21 @@ export default function TaskPopup(props) {
 
         if (initialTask === null) {
             addTask(currentTask)
-              .then(() => {
-                  fetchAllTasks(1, 10).then(r => {
-                      setTasks(r)
-                  })
-                  setErrorMessages([]);
-                  setOpen(false);
-                  setTaskChanged({title: currentTask.title, change: "created"});
+              .then(r => {
+                  if (r.errors.length > 0) {
+                      setErrorMessages([...r.errors]);
+                  } else {
+                      fetchAllTasks(1, 10).then(r => {
+                          if (r.errors.length > 0) {
+                              setErrorMessages([...r.errors]);
+                          } else {
+                              setTasks(r.content.elements)
+                              setErrorMessages([]);
+                              setOpen(false);
+                              setTaskChanged({title: currentTask.title, change: "created"});
+                          }
+                      })
+                  }
               }).catch(error => {
                 const errors = []
                 error.response.data['errors'].forEach((error) => {
@@ -137,13 +150,24 @@ export default function TaskPopup(props) {
             const updatedFields = diffTasks(currentTask, initialTask)
             if (Object.keys(updatedFields).length > 0) {
                 updateTask(taskId, updatedFields)
-                  .then(() => {
-                        fetchAllTasks(1, 10).then(r => {
-                            setTasks(r)
-                        })
-                        setErrorMessages([]);
-                        setOpen(false);
-                        setTaskChanged({title: currentTask.title, change: "updated"});
+                  .then(r => {
+                        if (r.errors.length > 0) {
+                            setErrorMessages([...r.errors]);
+                        } else {
+                            fetchAllTasks(1, 10).then(r => {
+                                setTasks(r.content.elements)
+                                setErrorMessages([]);
+                                setOpen(false);
+                                setTaskChanged({title: currentTask.title, change: "updated"});
+                            }).catch(error => {
+                                  const errors = []
+                                  error.response.data['errors'].forEach((error) => {
+                                      errors.push(error['description']);
+                                  })
+                                  setErrorMessages([...errors]);
+                              }
+                            )
+                        }
                     }
                   )
                   .catch(error => {
@@ -217,13 +241,21 @@ export default function TaskPopup(props) {
                         <div>
                             <Button color="inherit" onClick={() => {
                                 updateTask(taskId, {"isCompleted": true})
-                                  .then(() => {
-                                        fetchAllTasks(1, 10).then(r => {
-                                            setTasks(r)
-                                        })
-                                        setErrorMessages([]);
-                                        setOpen(false);
-                                        setTaskChanged({title: currentTask.title, change: "updated"});
+                                  .then(r => {
+                                        if (r.errors.length > 0) {
+                                            setErrorMessages([...r.errors]);
+                                        } else {
+                                            fetchAllTasks(1, 10).then(r => {
+                                                if (r.errors.length > 0) {
+                                                    setErrorMessages([...r.errors]);
+                                                } else {
+                                                    setTasks(r.content.elements)
+                                                    setErrorMessages([]);
+                                                    setOpen(false);
+                                                    setTaskChanged({title: currentTask.title, change: "updated"});
+                                                }
+                                            })
+                                        }
                                     }
                                   )
                                   .catch(error => {
