@@ -55,7 +55,15 @@ function Row(props) {
 
     return (
       <React.Fragment>
-          <TableRow sx={{'& > *': {borderBottom: 'unset'}, backgroundColor: index % 2 === 0 ? '#BFBFBF' : '#A6A6A6'}}>
+          <TableRow sx={{
+              '& > *': {borderBottom: 'unset'},
+              backgroundColor: index % 2 === 0 ? '#FFFFFF' : '#F7FAFC',
+              '&:hover': {
+                  backgroundColor: '#EDF2F7',
+                  transition: 'background-color 0.2s ease'
+              },
+              cursor: 'pointer'
+          }}>
               <TableCell>
                   <IconButton
                     aria-label="expand row"
@@ -83,7 +91,13 @@ function Row(props) {
                   }
               </TableCell>
               <TableCell align={'right'}>
-                  <IconButton sx={{backgroundColor: "#1976d2"}} size={"small"} onClick={() => {
+                  <IconButton sx={{
+                      backgroundColor: "#4CAF50",
+                      '&:hover': {
+                          backgroundColor: '#45a049',
+                      },
+                      transition: 'background-color 0.2s ease'
+                  }} size={"small"} onClick={() => {
                       updateTask(row.id, {"isCompleted": true})
                         .then(r => {
                               if (r.errors.length > 0) {
@@ -114,7 +128,14 @@ function Row(props) {
                       <CheckIcon sx={{color: "white"}} fontSize={"small"}/>
                   </IconButton>
                   <IconButton
-                    sx={{backgroundColor: "#1976d2", marginLeft: "1%"}}
+                    sx={{
+                        backgroundColor: "#2196F3",
+                        marginLeft: "1%",
+                        '&:hover': {
+                            backgroundColor: '#1976D2',
+                        },
+                        transition: 'background-color 0.2s ease'
+                    }}
                     size={"small"}
                     onClick={() => {
                         setReadOnly(false);
@@ -122,12 +143,25 @@ function Row(props) {
                     }}>
                       <EditIcon sx={{color: "white"}} fontSize={"small"}/>
                   </IconButton>
-                  <IconButton sx={{backgroundColor: "#1976d2", marginLeft: "1%"}} size={"small"}>
+                  <IconButton sx={{
+                      backgroundColor: "#F44336",
+                      marginLeft: "1%",
+                      '&:hover': {
+                          backgroundColor: '#D32F2F',
+                      },
+                      transition: 'background-color 0.2s ease'
+                  }} size={"small"}>
                       <DeleteIcon sx={{color: "white"}} fontSize={"small"}/>
                   </IconButton>
               </TableCell>
           </TableRow>
-          <TableRow sx={{backgroundColor: index % 2 === 0 ? '#BFBFBF' : '#A6A6A6'}}>
+          <TableRow sx={{
+              backgroundColor: index % 2 === 0 ? '#FFFFFF' : '#F7FAFC',
+              '&:hover': {
+                  backgroundColor: '#EDF2F7',
+                  transition: 'background-color 0.2s ease'
+              }
+          }}>
               <TableCell style={{paddingBottom: 0, paddingTop: 0}} colSpan={6}>
                   <Collapse in={open} timeout="auto" unmountOnExit>
                       <Box sx={{margin: 1}}>

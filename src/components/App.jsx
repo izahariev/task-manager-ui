@@ -78,7 +78,7 @@ function App() {
 
     return (
       <div className="App">
-          <Container maxWidth="xxl" sx={{'marginBottom': '1%'}}>
+          <Container maxWidth="xxl" sx={{'marginBottom': '1%', backgroundColor: 'transparent'}}>
               {taskChanged !== null &&
                 <Fade in={showAlert} timeout={500}>
                     <Alert
@@ -130,21 +130,21 @@ function App() {
                       display: 'flex',
                       justifyContent: 'center',
                   }}>
-                      <h1 style={{color: 'gray'}}>Inactive tasks</h1>
+                      <h1 style={{color: '#718096', fontWeight: 500}}>Inactive tasks</h1>
                   </Grid>
                   <Grid size={4} sx={{
                       marginTop: '2%',
                       display: 'flex',
                       justifyContent: 'center',
                   }}>
-                      <h1>Active tasks</h1>
+                      <h1 style={{color: '#2D3748', fontWeight: 600}}>Active tasks</h1>
                   </Grid>
                   <Grid size={4} sx={{
                       marginTop: '2%',
                       display: 'flex',
                       justifyContent: 'center',
                   }}>
-                      <h1 style={{color: 'gray'}}>Completed tasks</h1>
+                      <h1 style={{color: '#718096', fontWeight: 500}}>Completed tasks</h1>
                   </Grid>
                   <Grid size={12} sx={{margin: '1%  0 0.5% 0'}}>
                       <TasksTable
@@ -159,7 +159,24 @@ function App() {
                       display: 'flex',
                       justifyContent: 'center',
                   }}>
-                      <Pagination count={10}/>
+                      <Pagination
+                        count={10}
+                        sx={{
+                            '& .MuiPaginationItem-root': {
+                                color: '#2D3748',
+                                '&.Mui-selected': {
+                                    backgroundColor: '#5B7FA6',
+                                    color: '#FFFFFF',
+                                    '&:hover': {
+                                        backgroundColor: '#4A6B8F',
+                                    }
+                                },
+                                '&:hover': {
+                                    backgroundColor: '#E0E7FF',
+                                }
+                            }
+                        }}
+                      />
                   </Grid>
                   <Grid size={6} sx={{
                       display: 'flex',
@@ -172,7 +189,14 @@ function App() {
                   }}>
                       <Button
                         variant="contained"
-                        sx={{marginRight: '1%'}}
+                        sx={{
+                            marginRight: '1%',
+                            backgroundColor: '#5B7FA6',
+                            '&:hover': {
+                                backgroundColor: '#4A6B8F',
+                            },
+                            transition: 'background-color 0.2s ease'
+                        }}
                         onClick={() => {
                             fetchUsers().then(r => {
                                 if (r.errors.length > 0) {
@@ -188,6 +212,13 @@ function App() {
                       </Button>
                       <Button
                         variant="contained"
+                        sx={{
+                            backgroundColor: '#5B7FA6',
+                            '&:hover': {
+                                backgroundColor: '#4A6B8F',
+                            },
+                            transition: 'background-color 0.2s ease'
+                        }}
                         onClick={() => {
                             fetchUsers().then(r => {
                                 if (r.errors.length > 0) {
@@ -209,8 +240,20 @@ function App() {
               onClose={() => setShowUsersPopup(false)}
               maxWidth={"xs"}
               fullWidth={true}
+              slotProps={{
+                  paper: {
+                      sx: {
+                          borderRadius: '8px',
+                          boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)'
+                      }
+                  }
+              }}
             >
-                <DialogTitle align={"center"} sx={{backgroundColor: "#A6A6A6"}}>Users</DialogTitle>
+                <DialogTitle align={"center"} sx={{
+                    backgroundColor: "#2D3748",
+                    color: "#FFFFFF",
+                    fontWeight: 600
+                }}>Users</DialogTitle>
                 <UsersPopup users={users} setUsers={setUsers}/>
             </Dialog>
           }

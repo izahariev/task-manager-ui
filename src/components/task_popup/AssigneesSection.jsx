@@ -26,10 +26,24 @@ function renderRow({index, style, data}) {
                       'aria-labelledby': index
                   }
               }}
+              sx={{
+                  color: '#5B7FA6',
+                  '&.Mui-checked': {
+                      color: '#5B7FA6',
+                  },
+                  '&.Mui-disabled': {
+                      color: '#CBD5E0',
+                  }
+              }}
             />
         }
         disablePadding
-        sx={{backgroundColor: checked.includes(index) ? "#aecce4" : ""}}
+        sx={{
+            backgroundColor: checked.includes(index) ? "#E0E7FF" : "transparent",
+            '&:hover': {
+                backgroundColor: checked.includes(index) ? "#C7D2FE" : "#F7FAFC"
+            }
+        }}
       >
           <ListItemButton>
               <ListItemText id={index} primary={`${users[index]}`} />
@@ -107,7 +121,9 @@ function AssigneesSection({readOnly, users, assignees, setAssignees}) {
                     width: '100%',
                     height: '100%',
                     maxWidth: 360,
-                    border: '1px solid #ccc'
+                    border: '1px solid #CBD5E0',
+                    borderRadius: '8px',
+                    backgroundColor: '#FFFFFF'
                 }}
               >
                   <FixedSizeList

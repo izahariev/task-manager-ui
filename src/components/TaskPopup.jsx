@@ -218,8 +218,18 @@ export default function TaskPopup(props) {
             slots={{
                 transition: Transition
             }}
+            slotProps={{
+                paper: {
+                    sx: {
+                        backgroundColor: '#F7FAFC'
+                    }
+                }
+            }}
           >
-              <AppBar sx={{position: 'relative'}}>
+              <AppBar sx={{
+                  position: 'relative',
+                  backgroundColor: '#2D3748'
+              }}>
                   <Toolbar>
                       <IconButton
                         edge="start"

@@ -100,18 +100,18 @@ function TimeSection({title, readOnly, timeValue, setTimeValue, tooltipContent})
                         value="checked" // some value you need
                         sx={{
                             ".MuiSwitch-thumb": {
-                                backgroundColor: "#1976d2"
+                                backgroundColor: "#5B7FA6"
                             },
                             ".MuiSwitch-track": {
-                                backgroundColor: "#8cbae8"
+                                backgroundColor: "#A8C4E0"
                             },
                             "& .MuiSwitch-switchBase": {
                                 "&.Mui-checked": {
                                     ".MuiSwitch-thumb": {
-                                        backgroundColor: "#1976d2"
+                                        backgroundColor: "#5B7FA6"
                                     },
                                     "+ .MuiSwitch-track": {
-                                        backgroundColor: "#8cbae8"
+                                        backgroundColor: "#A8C4E0"
                                     }
                                 }
                             }
@@ -178,7 +178,16 @@ function TimeSection({title, readOnly, timeValue, setTimeValue, tooltipContent})
               justifyContent: 'center',
               marginBottom: "3%",
           }}>
-              <Button variant="contained" onClick={
+              <Button
+                variant="contained"
+                sx={{
+                    backgroundColor: '#5B7FA6',
+                    '&:hover': {
+                        backgroundColor: '#4A6B8F',
+                    },
+                    transition: 'background-color 0.2s ease'
+                }}
+                onClick={
                   () => {
                       if (title === "Start time") {
                           setTimeValue(dayjs().format('YYYY-MM-DD').toString())

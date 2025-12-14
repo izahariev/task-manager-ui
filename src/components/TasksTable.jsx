@@ -81,24 +81,41 @@ function TasksTable({users, tasks, setTasks, setTaskChanged, setErrorMessages}) 
     }
 
     return (
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} sx={{
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+          borderRadius: '8px',
+          overflow: 'hidden'
+      }}>
           <Table aria-label="collapsible table">
               <TableHead>
-                  <TableRow sx={{backgroundColor: '#8C8C8C'}}>
+                  <TableRow sx={{
+                      backgroundColor: '#2D3748',
+                      '& .MuiTableCell-head': {
+                          color: '#FFFFFF',
+                          fontWeight: 600,
+                          fontSize: '0.95rem'
+                      }
+                  }}>
                       <TableCell sx={{width: "1%"}}/>
                       <TableCell>Priority</TableCell>
                       <TableCell>Title</TableCell>
                       <TableCell>Deadline</TableCell>
                       <TableCell>Assignees</TableCell>
                       <TableCell align={"right"} sx={{minWidth: '7%'}}>
-                          {!filterEnabled && <FilterListIcon onClick={() => setFilterEnabled(!filterEnabled)}/>}
-                          {filterEnabled && <FilterListOffIcon onClick={() => setFilterEnabled(!filterEnabled)}/>}
+                          {!filterEnabled && <FilterListIcon onClick={() => setFilterEnabled(!filterEnabled)} sx={{color: '#FFFFFF', cursor: 'pointer'}}/>}
+                          {filterEnabled && <FilterListOffIcon onClick={() => setFilterEnabled(!filterEnabled)} sx={{color: '#FFFFFF', cursor: 'pointer'}}/>}
                       </TableCell>
                   </TableRow>
               </TableHead>
               {filterEnabled &&
                 <TableHead>
-                    <TableRow sx={{backgroundColor: '#8C8C8C'}}>
+                    <TableRow sx={{
+                        backgroundColor: '#2D3748',
+                        '& .MuiTableCell-head': {
+                            color: '#FFFFFF',
+                            fontWeight: 600
+                        }
+                    }}>
                         <TableCell/>
                         <TableCell sx={{minWidth: '10%'}}>
                             <Grid container spacing={0}>
@@ -122,7 +139,14 @@ function TasksTable({users, tasks, setTasks, setTaskChanged, setErrorMessages}) 
                                 <Grid item size={6}>
                                     <Button
                                       variant="contained"
-                                      sx={{marginTop: "2%"}}
+                                      sx={{
+                                          marginTop: "2%",
+                                          backgroundColor: '#5B7FA6',
+                                          '&:hover': {
+                                              backgroundColor: '#4A6B8F',
+                                          },
+                                          transition: 'background-color 0.2s ease'
+                                      }}
                                       onClick={() => setPriorityFilterValue("")}
                                     >
                                         X
@@ -144,7 +168,14 @@ function TasksTable({users, tasks, setTasks, setTaskChanged, setErrorMessages}) 
                                 <Grid item>
                                     <Button
                                       variant="contained"
-                                      sx={{marginTop: "2%"}}
+                                      sx={{
+                                          marginTop: "2%",
+                                          backgroundColor: '#5B7FA6',
+                                          '&:hover': {
+                                              backgroundColor: '#4A6B8F',
+                                          },
+                                          transition: 'background-color 0.2s ease'
+                                      }}
                                       onClick={() => setTitleFilterValue("")}
                                     >
                                         X
@@ -166,7 +197,14 @@ function TasksTable({users, tasks, setTasks, setTaskChanged, setErrorMessages}) 
                                 <Grid item>
                                     <Button
                                       variant="contained"
-                                      sx={{marginTop: "2%"}}
+                                      sx={{
+                                          marginTop: "2%",
+                                          backgroundColor: '#5B7FA6',
+                                          '&:hover': {
+                                              backgroundColor: '#4A6B8F',
+                                          },
+                                          transition: 'background-color 0.2s ease'
+                                      }}
                                       onClick={() => setDeadlineDateFilterValue(null)}
                                     >
                                         X
@@ -191,7 +229,15 @@ function TasksTable({users, tasks, setTasks, setTaskChanged, setErrorMessages}) 
                                         >
                                             {users.map((name) => (
                                               <MenuItem key={name} value={name}>
-                                                  <Checkbox checked={assigneesFilterValues.includes(name)}/>
+                                                  <Checkbox
+                                                    checked={assigneesFilterValues.includes(name)}
+                                                    sx={{
+                                                        color: '#5B7FA6',
+                                                        '&.Mui-checked': {
+                                                            color: '#5B7FA6',
+                                                        }
+                                                    }}
+                                                  />
                                                   <ListItemText primary={name}/>
                                               </MenuItem>
                                             ))}
@@ -201,7 +247,14 @@ function TasksTable({users, tasks, setTasks, setTaskChanged, setErrorMessages}) 
                                 <Grid item>
                                     <Button
                                       variant="contained"
-                                      sx={{marginTop: "2%"}}
+                                      sx={{
+                                          marginTop: "2%",
+                                          backgroundColor: '#5B7FA6',
+                                          '&:hover': {
+                                              backgroundColor: '#4A6B8F',
+                                          },
+                                          transition: 'background-color 0.2s ease'
+                                      }}
                                       onClick={() => setAssigneesFilterValues([])}
                                     >
                                         X
@@ -212,6 +265,13 @@ function TasksTable({users, tasks, setTasks, setTaskChanged, setErrorMessages}) 
                         <TableCell sx={{minWidth: '13%'}}>
                             <Button
                               variant="contained"
+                              sx={{
+                                  backgroundColor: '#5B7FA6',
+                                  '&:hover': {
+                                      backgroundColor: '#4A6B8F',
+                                  },
+                                  transition: 'background-color 0.2s ease'
+                              }}
                               onClick={() => {
                                   setPriorityFilterValue("");
                                   setTitleFilterValue("");
@@ -221,7 +281,20 @@ function TasksTable({users, tasks, setTasks, setTaskChanged, setErrorMessages}) 
                             >
                                 Clear all
                             </Button>
-                            <Button variant="contained" sx={{marginLeft: '5%'}} onClick={handleApplyFilterClick}>Apply</Button>
+                            <Button
+                              variant="contained"
+                              sx={{
+                                  marginLeft: '5%',
+                                  backgroundColor: '#5B7FA6',
+                                  '&:hover': {
+                                      backgroundColor: '#4A6B8F',
+                                  },
+                                  transition: 'background-color 0.2s ease'
+                              }}
+                              onClick={handleApplyFilterClick}
+                            >
+                                Apply
+                            </Button>
                         </TableCell>
                     </TableRow>
                 </TableHead>}

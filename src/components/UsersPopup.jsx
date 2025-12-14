@@ -103,7 +103,11 @@ export default function UsersPopup(props) {
     };
 
     return (
-      <List dense sx={{width: '100%', bgcolor: '#BFBFBF'}}>
+      <List dense sx={{
+          width: '100%',
+          bgcolor: '#F7FAFC',
+          minHeight: '200px'
+      }}>
           {deleteUser != "" &&
             <Alert variant="filled" severity="info" sx={{marginBottom: "2%"}}>
                 <Grid container>
@@ -130,7 +134,13 @@ export default function UsersPopup(props) {
                             <Grid container spacing={0.5}>
                                 <Grid size={6}>
                                     <IconButton
-                                      sx={{backgroundColor: "#1976d2"}}
+                                      sx={{
+                                          backgroundColor: "#2196F3",
+                                          '&:hover': {
+                                              backgroundColor: '#1976D2',
+                                          },
+                                          transition: 'background-color 0.2s ease'
+                                      }}
                                       size={"small"}
                                       onClick={() => {
                                           setEditedUser(user)
@@ -143,7 +153,13 @@ export default function UsersPopup(props) {
                                 </Grid>
                                 <Grid size={6}>
                                     <IconButton
-                                      sx={{backgroundColor: "#1976d2"}}
+                                      sx={{
+                                          backgroundColor: "#F44336",
+                                          '&:hover': {
+                                              backgroundColor: '#D32F2F',
+                                          },
+                                          transition: 'background-color 0.2s ease'
+                                      }}
                                       size={"small"}
                                       onClick={() => {
                                           setDeleteUser(user)
@@ -169,7 +185,13 @@ export default function UsersPopup(props) {
                             <Grid container spacing={0.5}>
                                 <Grid size={6}>
                                     <IconButton
-                                      sx={{backgroundColor: "#1976d2"}}
+                                      sx={{
+                                          backgroundColor: "#5B7FA6",
+                                          '&:hover': {
+                                              backgroundColor: '#4A6B8F',
+                                          },
+                                          transition: 'background-color 0.2s ease'
+                                      }}
                                       size={"small"}
                                       onClick={handleSaveEdit}
                                     >
@@ -178,7 +200,13 @@ export default function UsersPopup(props) {
                                 </Grid>
                                 <Grid size={6}>
                                     <IconButton
-                                      sx={{backgroundColor: "#1976d2"}}
+                                      sx={{
+                                          backgroundColor: "#5B7FA6",
+                                          '&:hover': {
+                                              backgroundColor: '#4A6B8F',
+                                          },
+                                          transition: 'background-color 0.2s ease'
+                                      }}
                                       size={"small"}
                                       onClick={() => setEditedUser("")}
                                     >
@@ -205,7 +233,13 @@ export default function UsersPopup(props) {
                             <Grid container spacing={0.5}>
                                 <Grid size={6}>
                                     <IconButton
-                                      sx={{backgroundColor: "#bf2419"}}
+                                      sx={{
+                                          backgroundColor: "#C85A5A",
+                                          '&:hover': {
+                                              backgroundColor: '#B04848',
+                                          },
+                                          transition: 'background-color 0.2s ease'
+                                      }}
                                       size={"small"}
                                       onClick={handleDeleteUserClick}
                                     >
@@ -214,7 +248,13 @@ export default function UsersPopup(props) {
                                 </Grid>
                                 <Grid size={6}>
                                     <IconButton
-                                      sx={{backgroundColor: "#1976d2"}}
+                                      sx={{
+                                          backgroundColor: "#5B7FA6",
+                                          '&:hover': {
+                                              backgroundColor: '#4A6B8F',
+                                          },
+                                          transition: 'background-color 0.2s ease'
+                                      }}
                                       size={"small"}
                                       onClick={() => {
                                           setDeleteUser("")
@@ -225,7 +265,12 @@ export default function UsersPopup(props) {
                                 </Grid>
                             </Grid>
                         }
-                        sx={{backgroundColor: "#A6A6A6"}}
+                        sx={{
+                            backgroundColor: "#EDF2F7",
+                            '&:hover': {
+                                backgroundColor: "#E2E8F0"
+                            }
+                        }}
                         disablePadding
                       >
                           <ListItemButton>
@@ -251,7 +296,21 @@ export default function UsersPopup(props) {
             onKeyDown={(e) => e.key === "Enter" && handleAddUser()}
             value={newUser}
           />
-          <Button variant="contained" sx={{marginTop: "3%", marginLeft: "2%"}} onClick={handleAddUser}>Add User</Button>
+          <Button
+            variant="contained"
+            sx={{
+                marginTop: "3%",
+                marginLeft: "2%",
+                backgroundColor: '#5B7FA6',
+                '&:hover': {
+                    backgroundColor: '#4A6B8F',
+                },
+                transition: 'background-color 0.2s ease'
+            }}
+            onClick={handleAddUser}
+          >
+              Add User
+          </Button>
           {errorMessages.length !== 0 &&
             <Alert variant="filled" severity="error" sx={{marginTop: '2%'}}>
                 <Grid container>
