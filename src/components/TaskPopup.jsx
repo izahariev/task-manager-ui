@@ -104,7 +104,7 @@ export default function TaskPopup(props) {
                   setErrorMessages([...errors]);
               });
         }
-    }, [taskId])
+    }, [customReadOnly, taskId])
 
     const handleSaveClick = () => {
         const errors = [];

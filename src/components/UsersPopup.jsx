@@ -108,7 +108,7 @@ export default function UsersPopup(props) {
           bgcolor: '#F7FAFC',
           minHeight: '200px'
       }}>
-          {deleteUser != "" &&
+          {deleteUser !== "" &&
             <Alert variant="filled" severity="info" sx={{marginBottom: "2%"}}>
                 <Grid container>
                     <Grid size={12} sx={{
@@ -287,7 +287,7 @@ export default function UsersPopup(props) {
             sx={{marginLeft: "4%", width: "69%"}}
             onChange={(e) => setNewUser(e.target.value)}
             onClick={() => {
-                if (editedUser != "") {
+                if (editedUser !== "") {
                     setErrorMessages([])
                 }
                 setEditedUser("")

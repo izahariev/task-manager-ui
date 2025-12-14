@@ -222,6 +222,7 @@ function TasksTable({users, tasks, setTasks, setTaskChanged, setErrorMessages}) 
                                           id="demo-multiple-checkbox"
                                           multiple
                                           value={assigneesFilterValues}
+                                          variant="outlined"
                                           onChange={handleAssigneesFilterChange}
                                           input={<OutlinedInput/>}
                                           renderValue={(selected) => selected.join(', ')}
