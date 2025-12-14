@@ -1,5 +1,5 @@
 import '../css/App.css'
-import {Alert, Container, Dialog, DialogTitle, Pagination} from "@mui/material";
+import {Alert, Container, Dialog, DialogTitle, Fade, Pagination} from "@mui/material";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid2";
 import React from "react";
@@ -14,7 +14,9 @@ function App() {
     const [users, setUsers] = React.useState([]);
     const [tasks, setTasks] = React.useState([])
     const [taskChanged, setTaskChanged] = React.useState(null);
+    const [showAlert, setShowAlert] = React.useState(false);
     const [errorMessages, setErrorMessages] = React.useState([])
+    const removeTimerRef = React.useRef(null);
 
     React.useEffect(() => {
         //TODO: Increase abstraction. Try not to repeat code
@@ -33,7 +35,7 @@ function App() {
               })
               setErrorMessages([...errors]);
           });
-    },[])
+    }, [])
 
     //TODO: Check fetch tasks logic. Should fetch only one page (9-10 tasks) everywhere
     React.useEffect(() => {
@@ -52,29 +54,56 @@ function App() {
               })
               setErrorMessages([...errors]);
           });
-    },[])
+    }, [])
+
+    React.useEffect(() => {
+        if (taskChanged !== null) {
+            setShowAlert(true);
+            const timer = setTimeout(() => {
+                setShowAlert(false);
+                // Wait for fade-out animation to complete (500ms) before removing from DOM
+                removeTimerRef.current = setTimeout(() => {
+                    setTaskChanged(null);
+                }, 500);
+            }, 5000);
+            return () => {
+                clearTimeout(timer);
+                if (removeTimerRef.current) {
+                    clearTimeout(removeTimerRef.current);
+                    removeTimerRef.current = null;
+                }
+            };
+        }
+    }, [taskChanged])
 
     return (
       <div className="App">
           <Container maxWidth="xxl" sx={{'marginBottom': '1%'}}>
               {taskChanged !== null &&
-                <Alert
-                  variant="filled"
-                  severity="success"
-                  sx={{marginTop: '0.5%'}}
-                  onClose={() => setTaskChanged(null)}
-                >
-                    <Grid container>
-                        <Grid size={12} sx={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                        }}>
-                            <div style={{display: 'flex', justifyContent: 'space-around'}}>
-                                Task &#34;{taskChanged.title}&#34; {taskChanged.change}
-                            </div>
+                <Fade in={showAlert} timeout={500}>
+                    <Alert
+                      variant="filled"
+                      severity="success"
+                      sx={{marginTop: '0.5%'}}
+                      onClose={() => {
+                          setShowAlert(false);
+                          setTimeout(() => {
+                              setTaskChanged(null);
+                          }, 500);
+                      }}
+                    >
+                        <Grid container>
+                            <Grid size={12} sx={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                            }}>
+                                <div style={{display: 'flex', justifyContent: 'space-around'}}>
+                                    Task &#34;{taskChanged.title}&#34; {taskChanged.change}
+                                </div>
+                            </Grid>
                         </Grid>
-                    </Grid>
-                </Alert>
+                    </Alert>
+                </Fade>
               }
               {errorMessages.length !== 0 &&
                 <Alert variant="filled" severity="error" onClose={() => setErrorMessages([])}>
