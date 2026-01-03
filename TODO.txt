@@ -1,0 +1,4 @@
+Filter active tasks
+Enable subtasks
+Enable inactive tasks
+Enable completed tasks
