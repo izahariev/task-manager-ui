@@ -1,3 +1,4 @@
+import AddIcon from '@mui/icons-material/Add';
 import CheckIcon from '@mui/icons-material/Check';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
@@ -74,16 +75,32 @@ function Row(props) {
                   </IconButton>
               </TableCell>
               <TableCell onClick={() => {
-                  setViewTaskPopup(true)
+                  if (open) {
+                      setOpen(false);
+                  } else {
+                      setViewTaskPopup(true);
+                  }
               }}>{row.priority}</TableCell>
               <TableCell onClick={() => {
-                  setViewTaskPopup(true)
+                  if (open) {
+                      setOpen(false);
+                  } else {
+                      setViewTaskPopup(true);
+                  }
               }}>{row.title}</TableCell>
               <TableCell onClick={() => {
-                  setViewTaskPopup(true)
+                  if (open) {
+                      setOpen(false);
+                  } else {
+                      setViewTaskPopup(true);
+                  }
               }}>{row.deadline}</TableCell>
               <TableCell onClick={() => {
-                  setViewTaskPopup(true)
+                  if (open) {
+                      setOpen(false);
+                  } else {
+                      setViewTaskPopup(true);
+                  }
               }}>
                   {row.assignees.length > 0 ?
                     row.assignees.join(", ") :
@@ -165,9 +182,23 @@ function Row(props) {
               <TableCell style={{paddingBottom: 0, paddingTop: 0}} colSpan={6}>
                   <Collapse in={open} timeout="auto" unmountOnExit>
                       <Box sx={{margin: 1}}>
-                          <Typography variant="h6" gutterBottom component="div">
-                              Subtasks
-                          </Typography>
+                          <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2}}>
+                              <Typography variant="h6" component="div">
+                                  Subtasks
+                              </Typography>
+                              <IconButton
+                                sx={{
+                                    backgroundColor: '#5B7FA6',
+                                    '&:hover': {
+                                        backgroundColor: '#4A6B8F',
+                                    },
+                                    transition: 'background-color 0.2s ease'
+                                }}
+                                size="small"
+                              >
+                                  <AddIcon sx={{color: "white"}} fontSize={"small"}/>
+                              </IconButton>
+                          </Box>
                           <Table size="small" aria-label="purchases">
                               <TableHead>
                                   <TableRow>
