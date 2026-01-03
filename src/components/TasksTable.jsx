@@ -63,7 +63,8 @@ function TasksTable({users, tasks, setTasks, setTaskChanged, setErrorMessages}) 
     };
 
     const handleApplyFilterClick = () => {
-        fetchTasks(priorityFilterValue, titleFilterValue, deadlineDateFilterValue, assigneesFilterValues, 1, 10)
+        fetchTasks(priorityFilterValue, titleFilterValue, deadlineDateFilterValue, false,
+          assigneesFilterValues, 1, 10)
           .then(r => {
               if (r.errors.length > 0) {
                   setErrorMessages([...r.errors]);

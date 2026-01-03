@@ -3,7 +3,7 @@ import {Alert, Container, Dialog, DialogTitle, Fade, Pagination} from "@mui/mate
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid2";
 import React from "react";
-import {fetchAllTasks, fetchUsers} from "../js/BackendApis.js";
+import {fetchTasks, fetchUsers} from "../js/BackendApis.js";
 import TaskPopup from "./TaskPopup.jsx";
 import TasksTable from "./TasksTable.jsx";
 import UsersPopup from "./UsersPopup.jsx";
@@ -39,7 +39,7 @@ function App() {
 
     //TODO: Check fetch tasks logic. Should fetch only one page (9-10 tasks) everywhere
     React.useEffect(() => {
-        fetchAllTasks()
+        fetchTasks(null, null, null, false, null, 1, 10)
           .then(r => {
               if (r.errors.length > 0) {
                   setErrorMessages([...r.errors]);

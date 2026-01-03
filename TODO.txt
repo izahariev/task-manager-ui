@@ -1,4 +1,6 @@
-Filter active tasks
 Enable subtasks
+Enable pagination
 Enable inactive tasks
 Enable completed tasks
+Fix repeating API calls
+Fix console errors

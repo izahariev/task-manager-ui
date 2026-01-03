@@ -19,7 +19,7 @@ export async function fetchAllTasks(page, size) {
     return  response.data;
 }
 
-export async function fetchTasks(priority, title, deadline, assignees, page, size) {
+export async function fetchTasks(priority, title, deadline, isCompleted, assignees, page, size) {
     const params = {
         page,
         size
@@ -28,17 +28,24 @@ export async function fetchTasks(priority, title, deadline, assignees, page, siz
     if (priority) {
         params.priority = priority;
     }
+
     if (title) {
         params.title = title;
     }
+
     if (deadline) {
         params.deadline = deadline.format('YYYY-MM-DD').toString();
     }
+
+    if (isCompleted !== null) {
+        params.isCompleted = isCompleted;
+    }
+
     if (assignees && assignees.length > 0) {
         params.assignees = assignees;
     }
 
-    const response = await axios.get("http://localhost:8080/tasks/get", {
+    const response = await axios.get("http://localhost:8080/tasks/list", {
         params,
         paramsSerializer: {
             serialize: p => qs.stringify(p, { arrayFormat: "repeat" })
