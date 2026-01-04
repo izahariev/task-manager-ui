@@ -128,7 +128,7 @@ export default function TaskPopup(props) {
                   if (r.errors.length > 0) {
                       setErrorMessages([...r.errors]);
                   } else {
-                      if (parentTaskId !== null) {
+                      if (parentTaskId == null) {
                           fetchTasks(null, null, null, null, false,
                             null, 1, 10)
                             .then(r => {
@@ -147,6 +147,9 @@ export default function TaskPopup(props) {
                                 })
                                 setErrorMessages([...errors]);
                             });
+                      } else {
+                          setErrorMessages([]);
+                          setTaskChanged({title: currentTask.title, change: "created"});
                       }
                       setOpen(false);
                   }

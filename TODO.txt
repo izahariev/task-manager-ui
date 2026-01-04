@@ -1,3 +1,5 @@
+Subtask change message
+Update subtasks on change
 Enable subtasks
 Enable pagination
 Enable inactive tasks
