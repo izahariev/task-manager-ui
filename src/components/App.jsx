@@ -13,7 +13,7 @@ function App() {
     const [addTaskPopup, setAddTaskPopup] = React.useState(false);
     const [users, setUsers] = React.useState([]);
     const [tasks, setTasks] = React.useState([])
-    const [taskChanged, setTaskChanged] = React.useState(null);
+    const [taskChangedMessage, setTaskChangedMessage] = React.useState(null);
     const [showAlert, setShowAlert] = React.useState(false);
     const [errorMessages, setErrorMessages] = React.useState([])
     const removeTimerRef = React.useRef(null);
@@ -58,13 +58,13 @@ function App() {
     }, [])
 
     React.useEffect(() => {
-        if (taskChanged !== null) {
+        if (taskChangedMessage !== null) {
             setShowAlert(true);
             const timer = setTimeout(() => {
                 setShowAlert(false);
                 // Wait for fade-out animation to complete (500ms) before removing from DOM
                 removeTimerRef.current = setTimeout(() => {
-                    setTaskChanged(null);
+                    setTaskChangedMessage(null);
                 }, 500);
             }, 5000);
             return () => {
@@ -75,12 +75,12 @@ function App() {
                 }
             };
         }
-    }, [taskChanged])
+    }, [taskChangedMessage])
 
     return (
       <div className="App">
           <Container maxWidth="xxl" sx={{'marginBottom': '1%', backgroundColor: 'transparent'}}>
-              {taskChanged !== null &&
+              {taskChangedMessage !== null &&
                 <Fade in={showAlert} timeout={500}>
                     <Alert
                       variant="filled"
@@ -89,7 +89,7 @@ function App() {
                       onClose={() => {
                           setShowAlert(false);
                           setTimeout(() => {
-                              setTaskChanged(null);
+                              setTaskChangedMessage(null);
                           }, 500);
                       }}
                     >
@@ -99,7 +99,7 @@ function App() {
                                 justifyContent: 'center',
                             }}>
                                 <div style={{display: 'flex', justifyContent: 'space-around'}}>
-                                    Task &#34;{taskChanged.title}&#34; {taskChanged.change}
+                                    {taskChangedMessage}
                                 </div>
                             </Grid>
                         </Grid>
@@ -152,7 +152,7 @@ function App() {
                         users={users}
                         tasks={tasks}
                         setTasks={setTasks}
-                        setTaskChanged={setTaskChanged}
+                        setTaskChanged={setTaskChangedMessage}
                         setErrorMessages={setErrorMessages}
                       />
                   </Grid>
@@ -263,7 +263,7 @@ function App() {
               open={addTaskPopup}
               setOpen={setAddTaskPopup}
               users={["Any", ...users]}
-              setTaskChanged={setTaskChanged}
+              setTaskChanged={setTaskChangedMessage}
               setTasks={setTasks}
             />
           }

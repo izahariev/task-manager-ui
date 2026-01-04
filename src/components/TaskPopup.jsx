@@ -137,7 +137,7 @@ export default function TaskPopup(props) {
                                 } else {
                                     setTasks(r.content.elements)
                                     setErrorMessages([]);
-                                    setTaskChanged({title: currentTask.title, change: "created"});
+                                    setTaskChanged(`Task "${currentTask.title}" created`);
                                 }
                             })
                             .catch(error => {
@@ -149,7 +149,7 @@ export default function TaskPopup(props) {
                             });
                       } else {
                           setErrorMessages([]);
-                          setTaskChanged({title: currentTask.title, change: "created"});
+                          setTaskChanged(`Subtask "${currentTask.title}" for task "${parentTask}" created`);
                       }
                       setOpen(false);
                   }

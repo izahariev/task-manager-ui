@@ -13,7 +13,7 @@ import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
 import PropTypes from "prop-types";
 import React from "react";
-import {fetchAllTasks, fetchTasks, updateTask} from "../js/BackendApis.js";
+import {fetchTasks, updateTask} from "../js/BackendApis.js";
 import TaskPopup from "./TaskPopup.jsx";
 
 
@@ -138,14 +138,15 @@ function Row(props) {
                               if (r.errors.length > 0) {
                                   setErrorMessages([...r.errors]);
                               } else {
-                                  fetchAllTasks(1, 10).then(r => {
+                                  fetchTasks(null, null, null, null, false,
+                                    null, 1, 10).then(r => {
                                       if (r.errors.length > 0) {
                                           setErrorMessages([...r.errors]);
                                       } else {
                                           setTasks(r.content.elements)
                                           setErrorMessages([]);
                                           setOpen(false);
-                                          setTaskChanged({title: row.title, change: "completed"});
+                                          setTaskChanged(`Task "${row.title}" completed`);
                                       }
                                   })
                               }
