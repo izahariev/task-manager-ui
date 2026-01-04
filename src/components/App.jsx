@@ -39,7 +39,8 @@ function App() {
 
     //TODO: Check fetch tasks logic. Should fetch only one page (9-10 tasks) everywhere
     React.useEffect(() => {
-        fetchTasks(null, null, null, false, null, 1, 10)
+        fetchTasks(null, null, null, null, false, null,
+          1, 10)
           .then(r => {
               if (r.errors.length > 0) {
                   setErrorMessages([...r.errors]);

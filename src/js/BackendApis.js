@@ -19,11 +19,16 @@ export async function fetchAllTasks(page, size) {
     return  response.data;
 }
 
-export async function fetchTasks(priority, title, deadline, isCompleted, assignees, page, size) {
+export async function fetchTasks(parentTaskId, priority, title, deadline, isCompleted, assignees,
+                                 page, size) {
     const params = {
         page,
         size
     };
+
+    if (parentTaskId) {
+        params.parentTaskId = parentTaskId;
+    }
 
     if (priority) {
         params.priority = priority;
@@ -57,7 +62,7 @@ export async function fetchTasks(priority, title, deadline, isCompleted, assigne
 export async function addTask(task) {
     const response = await axios.post(
       'http://localhost:8080/tasks/create',
-      {title: task.title, description: task.description, priority: task.priority,
+      {parentTaskId: task.parentTaskId, title: task.title, description: task.description, priority: task.priority,
           start: task.start, deadline: task.deadline, repeat: task.repeat, assignees: task.assignees}
     )
     return  response.data;

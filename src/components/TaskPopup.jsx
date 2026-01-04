@@ -7,7 +7,7 @@ import Typography from "@mui/material/Typography";
 import dayjs from "dayjs";
 import PropTypes from "prop-types";
 import React from "react";
-import {addTask, fetchAllTasks, fetchTask, updateTask} from "../js/BackendApis.js";
+import {addTask, fetchAllTasks, fetchTask, fetchTasks, updateTask} from "../js/BackendApis.js";
 import AssigneesSection from "./task_popup/AssigneesSection.jsx";
 import PrioritySection from "./task_popup/PrioritySection.jsx";
 import TimeSection from "./task_popup/TimeSection.jsx";
@@ -15,6 +15,8 @@ import TimeSection from "./task_popup/TimeSection.jsx";
 TaskPopup.propTypes = {
     open: PropTypes.bool,
     setOpen: PropTypes.func,
+    parentTaskId: PropTypes.string,
+    parentTask: PropTypes.string,
     users: PropTypes.array,
     setTaskChanged: PropTypes.func,
     taskId: PropTypes.string,
@@ -41,6 +43,8 @@ export default function TaskPopup(props) {
     const {
         open,
         setOpen,
+        parentTaskId,
+        parentTask,
         users,
         setTaskChanged,
         taskId,
@@ -48,6 +52,7 @@ export default function TaskPopup(props) {
         customReadOnly
     } = props;
     const [currentTask, setCurrentTask] = React.useState({
+        parentTaskId: parentTaskId,
         title: "",
         description: "",
         priority: "P3",
@@ -123,16 +128,27 @@ export default function TaskPopup(props) {
                   if (r.errors.length > 0) {
                       setErrorMessages([...r.errors]);
                   } else {
-                      fetchAllTasks(1, 10).then(r => {
-                          if (r.errors.length > 0) {
-                              setErrorMessages([...r.errors]);
-                          } else {
-                              setTasks(r.content.elements)
-                              setErrorMessages([]);
-                              setOpen(false);
-                              setTaskChanged({title: currentTask.title, change: "created"});
-                          }
-                      })
+                      if (parentTaskId !== null) {
+                          fetchTasks(null, null, null, null, false,
+                            null, 1, 10)
+                            .then(r => {
+                                if (r.errors.length > 0) {
+                                    setErrorMessages([...r.errors]);
+                                } else {
+                                    setTasks(r.content.elements)
+                                    setErrorMessages([]);
+                                    setTaskChanged({title: currentTask.title, change: "created"});
+                                }
+                            })
+                            .catch(error => {
+                                const errors = []
+                                error.response.data['errors'].forEach((error) => {
+                                    errors.push(error['description']);
+                                })
+                                setErrorMessages([...errors]);
+                            });
+                      }
+                      setOpen(false);
                   }
               }).catch(error => {
                 const errors = []
@@ -311,6 +327,24 @@ export default function TaskPopup(props) {
                     </Alert>
                   }
                   <Grid container sx={{marginBottom: "2%"}}>
+                      {parentTask &&
+                        <>
+                            <Grid size={12} sx={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                marginBottom: "1%"
+                            }}>
+                                <h2>Parent task</h2>
+                            </Grid>
+                            <Grid size={12} sx={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                marginBottom: "1%"
+                            }}>
+                                <h2 style={{color: '#7C3AED'}}>{parentTask}</h2>
+                            </Grid>
+                        </>
+                      }
                       <Grid size={12} sx={{
                           display: 'flex',
                           justifyContent: 'center',

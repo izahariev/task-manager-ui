@@ -4,20 +4,22 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import {Box, Collapse, IconButton, styled} from "@mui/material";
+import {Box, Collapse, IconButton} from "@mui/material";
 import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
 import PropTypes from "prop-types";
 import React from "react";
-import {fetchAllTasks, updateTask} from "../js/BackendApis.js";
+import {fetchAllTasks, fetchTasks, updateTask} from "../js/BackendApis.js";
 import TaskPopup from "./TaskPopup.jsx";
 
 
 Row.propTypes = {
     row: PropTypes.shape({
+        parentTaskId: PropTypes.string,
         id: PropTypes.string,
         title: PropTypes.string,
         description: PropTypes.string,
@@ -25,15 +27,7 @@ Row.propTypes = {
         start: PropTypes.string,
         deadline: PropTypes.string,
         repeat: PropTypes.string,
-        assignees: PropTypes.string,
-        subtasks: PropTypes.arrayOf(
-          PropTypes.shape({
-              priority: PropTypes.string,
-              title: PropTypes.string,
-              deadline: PropTypes.string,
-              assignees: PropTypes.string,
-          }),
-        ),
+        assignees: PropTypes.string
     }),
     index: PropTypes.number,
     users: PropTypes.array,
@@ -46,7 +40,9 @@ function Row(props) {
     const {row, index, users, setTasks, setTaskChanged, setErrorMessages} = props;
     const [open, setOpen] = React.useState(false);
     const [viewTaskPopup, setViewTaskPopup] = React.useState(false);
+    const [openAddSubtaskPopup, setOpenAddSubtaskPopup] = React.useState(false);
     const [readOnly, setReadOnly] = React.useState(true);
+    const [subtasks, setSubtasks] = React.useState([]);
 
     React.useEffect(() => {
         if (open === false) {
@@ -69,7 +65,29 @@ function Row(props) {
                   <IconButton
                     aria-label="expand row"
                     size="small"
-                    onClick={() => setOpen(!open)}
+                    onClick={
+                        () => {
+                            if (!open) {
+                                fetchTasks(row.id, null, null, null, false,
+                                  null, 1, 10)
+                                  .then(r => {
+                                      if (r.errors.length > 0) {
+                                          setErrorMessages([...r.errors]);
+                                      } else {
+                                          setSubtasks(r.content.elements)
+                                      }
+                                  })
+                                  .catch(error => {
+                                      const errors = []
+                                      error.response.data['errors'].forEach((error) => {
+                                          errors.push(error['description']);
+                                      })
+                                      setErrorMessages([...errors]);
+                                  });
+                            }
+                            setOpen(!open)
+                        }
+                    }
                   >
                       {open ? <KeyboardArrowUpIcon/> : <KeyboardArrowDownIcon/>}
                   </IconButton>
@@ -182,7 +200,12 @@ function Row(props) {
               <TableCell style={{paddingBottom: 0, paddingTop: 0}} colSpan={6}>
                   <Collapse in={open} timeout="auto" unmountOnExit>
                       <Box sx={{margin: 1}}>
-                          <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2}}>
+                          <Box sx={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                              marginBottom: 2
+                          }}>
                               <Typography variant="h6" component="div">
                                   Subtasks
                               </Typography>
@@ -195,6 +218,9 @@ function Row(props) {
                                     transition: 'background-color 0.2s ease'
                                 }}
                                 size="small"
+                                onClick={() => {
+                                    setOpenAddSubtaskPopup(true);
+                                }}
                               >
                                   <AddIcon sx={{color: "white"}} fontSize={"small"}/>
                               </IconButton>
@@ -209,33 +235,62 @@ function Row(props) {
                                       <TableCell/>
                                   </TableRow>
                               </TableHead>
-                              {/*<TableBody>*/}
-                              {/*    {row.subtasks.map((subtaskRow) => (*/}
-                              {/*      <StyledTableRow key={subtaskRow.title}>*/}
-                              {/*          <TableCell>{subtaskRow.priority}</TableCell>*/}
-                              {/*          <TableCell>{subtaskRow.title}</TableCell>*/}
-                              {/*          <TableCell>{subtaskRow.deadline}</TableCell>*/}
-                              {/*          <TableCell>{subtaskRow.assignees}</TableCell>*/}
-                              {/*          <TableCell align={'right'}>*/}
-                              {/*              <IconButton sx={{backgroundColor: "#1976d2"}} size={"small"}>*/}
-                              {/*                  <CheckIcon sx={{color: "white"}} fontSize={"small"}/>*/}
-                              {/*              </IconButton>*/}
-                              {/*              <IconButton*/}
-                              {/*                sx={{backgroundColor: "#1976d2", marginLeft: "1%"}}*/}
-                              {/*                size={"small"}*/}
-                              {/*              >*/}
-                              {/*                  <EditIcon sx={{color: "white"}} fontSize={"small"}/>*/}
-                              {/*              </IconButton>*/}
-                              {/*              <IconButton*/}
-                              {/*                sx={{backgroundColor: "#1976d2", marginLeft: "1%"}}*/}
-                              {/*                size={"small"}*/}
-                              {/*              >*/}
-                              {/*                  <DeleteIcon sx={{color: "white"}} fontSize={"small"}/>*/}
-                              {/*              </IconButton>*/}
-                              {/*          </TableCell>*/}
-                              {/*      </StyledTableRow>*/}
-                              {/*    ))}*/}
-                              {/*</TableBody>*/}
+                              <TableBody>
+                                  {subtasks.map((subtaskRow, subtaskIndex) => (
+                                    <TableRow 
+                                      key={subtaskRow.title}
+                                      sx={{
+                                          backgroundColor: subtaskIndex % 2 === 0 ? '#FFFFFF' : '#F7FAFC',
+                                          '&:hover': {
+                                              backgroundColor: '#EDF2F7',
+                                              transition: 'background-color 0.2s ease'
+                                          }
+                                      }}
+                                    >
+                                        <TableCell>{subtaskRow.priority}</TableCell>
+                                        <TableCell>{subtaskRow.title}</TableCell>
+                                        <TableCell>{subtaskRow.deadline}</TableCell>
+                                        <TableCell>{subtaskRow.assignees}</TableCell>
+                                        <TableCell align={'right'}>
+                                            <IconButton sx={{
+                                                backgroundColor: "#4CAF50",
+                                                '&:hover': {
+                                                    backgroundColor: '#45a049',
+                                                },
+                                                transition: 'background-color 0.2s ease'
+                                            }} size={"small"}>
+                                                <CheckIcon sx={{color: "white"}} fontSize={"small"}/>
+                                            </IconButton>
+                                            <IconButton
+                                              sx={{
+                                                  backgroundColor: "#2196F3",
+                                                  marginLeft: "1%",
+                                                  '&:hover': {
+                                                      backgroundColor: '#1976D2',
+                                                  },
+                                                  transition: 'background-color 0.2s ease'
+                                              }}
+                                              size={"small"}
+                                            >
+                                                <EditIcon sx={{color: "white"}} fontSize={"small"}/>
+                                            </IconButton>
+                                            <IconButton
+                                              sx={{
+                                                  backgroundColor: "#F44336",
+                                                  marginLeft: "1%",
+                                                  '&:hover': {
+                                                      backgroundColor: '#D32F2F',
+                                                  },
+                                                  transition: 'background-color 0.2s ease'
+                                              }}
+                                              size={"small"}
+                                            >
+                                                <DeleteIcon sx={{color: "white"}} fontSize={"small"}/>
+                                            </IconButton>
+                                        </TableCell>
+                                    </TableRow>
+                                  ))}
+                              </TableBody>
                           </Table>
                       </Box>
                   </Collapse>
@@ -252,17 +307,19 @@ function Row(props) {
               customReadOnly={readOnly}
             />
           }
+          {openAddSubtaskPopup &&
+            <TaskPopup
+              open={openAddSubtaskPopup}
+              setOpen={setOpenAddSubtaskPopup}
+              users={["Any", ...users]}
+              setTaskChanged={setTaskChanged}
+              setTasks={setTasks}
+              parentTaskId={row.id}
+              parentTask={row.title}
+            />
+          }
       </React.Fragment>
     );
 }
-
-const StyledTableRow = styled(TableRow)(() => ({
-    '&:nth-of-type(odd)': {
-        backgroundColor: "#8C5E58",
-    },
-    '&:nth-of-type(even)': {
-        backgroundColor: "#A67F76",
-    },
-}));
 
 export default Row;
