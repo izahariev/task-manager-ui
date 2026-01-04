@@ -21,6 +21,7 @@ TaskPopup.propTypes = {
     setTaskChanged: PropTypes.func,
     taskId: PropTypes.string,
     setTasks: PropTypes.func,
+    setSubtasks: PropTypes.func,
     customReadOnly: PropTypes.bool,
 }
 
@@ -49,6 +50,7 @@ export default function TaskPopup(props) {
         setTaskChanged,
         taskId,
         setTasks,
+        setSubtasks,
         customReadOnly
     } = props;
     const [currentTask, setCurrentTask] = React.useState({
@@ -148,8 +150,24 @@ export default function TaskPopup(props) {
                                 setErrorMessages([...errors]);
                             });
                       } else {
-                          setErrorMessages([]);
-                          setTaskChanged(`Subtask "${currentTask.title}" for task "${parentTask}" created`);
+                          fetchTasks(parentTaskId, null, null, null, false,
+                            null, 1, 10)
+                            .then(r => {
+                                if (r.errors.length > 0) {
+                                    setErrorMessages([...r.errors]);
+                                } else {
+                                    setSubtasks(r.content.elements)
+                                    setErrorMessages([]);
+                                    setTaskChanged(`Subtask "${currentTask.title}" for task "${parentTask}" created`);
+                                }
+                            })
+                            .catch(error => {
+                                const errors = []
+                                error.response.data['errors'].forEach((error) => {
+                                    errors.push(error['description']);
+                                })
+                                setErrorMessages([...errors]);
+                            });
                       }
                       setOpen(false);
                   }

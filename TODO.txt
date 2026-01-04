@@ -1,8 +1,8 @@
-Update subtasks on change
 Enable pagination
 Enable subtasks filtering
 Enable subtasks pagination
 Enable inactive tasks
 Enable completed tasks
+Simplify task fetching
 Fix repeating API calls
 Fix console errors

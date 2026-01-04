@@ -315,6 +315,7 @@ function Row(props) {
               users={["Any", ...users]}
               setTaskChanged={setTaskChanged}
               setTasks={setTasks}
+              setSubtasks={setSubtasks}
               parentTaskId={row.id}
               parentTask={row.title}
             />
