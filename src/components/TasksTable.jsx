@@ -31,10 +31,12 @@ TasksTable.propTypes = {
     tasks: PropTypes.array,
     setTasks: PropTypes.func,
     setTaskChanged: PropTypes.func,
+    currentPage: PropTypes.number,
+    setPageCount: PropTypes.func,
     setErrorMessages: PropTypes.func
 }
 
-function TasksTable({users, tasks, setTasks, setTaskChanged, setErrorMessages}) {
+function TasksTable({users, tasks, setTasks, setTaskChanged, currentPage, setPageCount, setErrorMessages}) {
     const [priorityFilterValue, setPriorityFilterValue] = React.useState('');
     const [titleFilterValue, setTitleFilterValue] = React.useState('');
     const [assigneesFilterValues, setAssigneesFilterValues] = React.useState([]);
@@ -64,12 +66,13 @@ function TasksTable({users, tasks, setTasks, setTaskChanged, setErrorMessages}) 
 
     const handleApplyFilterClick = () => {
         fetchTasks(null, priorityFilterValue, titleFilterValue, deadlineDateFilterValue, false,
-          assigneesFilterValues, 1, 10)
+          assigneesFilterValues, currentPage, 10)
           .then(r => {
               if (r.errors.length > 0) {
                   setErrorMessages([...r.errors]);
               } else {
                   setTasks(r.content.elements)
+                  setPageCount(r.content.totalPageCount)
                   setErrorMessages([]);
               }
           }).catch(error => {
@@ -310,6 +313,7 @@ function TasksTable({users, tasks, setTasks, setTaskChanged, setErrorMessages}) 
                       setTasks={setTasks}
                       setTaskChanged={setTaskChanged}
                       setErrorMessages={setErrorMessages}
+                      currentPage={currentPage}
                     />
                   ))}
               </TableBody>

@@ -33,11 +33,13 @@ Row.propTypes = {
     users: PropTypes.array,
     setTasks: PropTypes.func,
     setTaskChanged: PropTypes.func,
-    setErrorMessages: PropTypes.func
+    setPageCount: PropTypes.func,
+    setErrorMessages: PropTypes.func,
+    currentPage: PropTypes.number
 };
 
 function Row(props) {
-    const {row, index, users, setTasks, setTaskChanged, setErrorMessages} = props;
+    const {row, index, users, setTasks, setTaskChanged, setPageCount, setErrorMessages, currentPage} = props;
     const [open, setOpen] = React.useState(false);
     const [viewTaskPopup, setViewTaskPopup] = React.useState(false);
     const [openAddSubtaskPopup, setOpenAddSubtaskPopup] = React.useState(false);
@@ -139,11 +141,12 @@ function Row(props) {
                                   setErrorMessages([...r.errors]);
                               } else {
                                   fetchTasks(null, null, null, null, false,
-                                    null, 1, 10).then(r => {
+                                    null, currentPage, 10).then(r => {
                                       if (r.errors.length > 0) {
                                           setErrorMessages([...r.errors]);
                                       } else {
                                           setTasks(r.content.elements)
+                                          setPageCount(r.content.totalPageCount)
                                           setErrorMessages([]);
                                           setOpen(false);
                                           setTaskChanged(`Task "${row.title}" completed`);
@@ -306,6 +309,7 @@ function Row(props) {
               taskId={row.id}
               setTasks={setTasks}
               customReadOnly={readOnly}
+              currentPage={currentPage}
             />
           }
           {openAddSubtaskPopup &&

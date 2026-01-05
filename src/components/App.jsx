@@ -17,6 +17,8 @@ function App() {
     const [showAlert, setShowAlert] = React.useState(false);
     const [errorMessages, setErrorMessages] = React.useState([])
     const removeTimerRef = React.useRef(null);
+    const [currentPage, setCurrentPage] = React.useState(1);
+    const [pageCount, setPageCount] = React.useState(0);
 
     React.useEffect(() => {
         //TODO: Increase abstraction. Try not to repeat code
@@ -37,15 +39,18 @@ function App() {
           });
     }, [])
 
-    //TODO: Check fetch tasks logic. Should fetch only one page (9-10 tasks) everywhere
+    /**
+     * @typedef {{ elements: any[], totalPageCount: number, totalElementsCount: number }} Page
+     */
     React.useEffect(() => {
         fetchTasks(null, null, null, null, false, null,
-          1, 10)
+          currentPage, 10)
           .then(r => {
               if (r.errors.length > 0) {
                   setErrorMessages([...r.errors]);
               } else {
                   setTasks(r.content.elements)
+                  setPageCount(r.content.totalPageCount)
               }
           })
           .catch(error => {
@@ -76,6 +81,27 @@ function App() {
             };
         }
     }, [taskChangedMessage])
+
+    function getTasksPage(event, page) {
+        setCurrentPage(page);
+        fetchTasks(null, null, null, null, false, null,
+          page, 10)
+          .then(r => {
+              if (r.errors.length > 0) {
+                  setErrorMessages([...r.errors]);
+              } else {
+                  setTasks(r.content.elements)
+                  setPageCount(r.content.totalPageCount)
+              }
+          })
+          .catch(error => {
+              const errors = []
+              error.response.data['errors'].forEach((error) => {
+                  errors.push(error['description']);
+              })
+              setErrorMessages([...errors]);
+          });
+    }
 
     return (
       <div className="App">
@@ -154,6 +180,7 @@ function App() {
                         setTasks={setTasks}
                         setTaskChanged={setTaskChangedMessage}
                         setErrorMessages={setErrorMessages}
+                        currentPage={currentPage}
                       />
                   </Grid>
                   <Grid size={12} sx={{
@@ -161,7 +188,7 @@ function App() {
                       justifyContent: 'center',
                   }}>
                       <Pagination
-                        count={10}
+                        count={pageCount}
                         sx={{
                             '& .MuiPaginationItem-root': {
                                 color: '#2D3748',
@@ -177,6 +204,8 @@ function App() {
                                 }
                             }
                         }}
+                        showFirstButton showLastButton
+                        onChange={getTasksPage}
                       />
                   </Grid>
                   <Grid size={6} sx={{
@@ -265,6 +294,7 @@ function App() {
               users={["Any", ...users]}
               setTaskChanged={setTaskChangedMessage}
               setTasks={setTasks}
+              currentPage={currentPage}
             />
           }
       </div>

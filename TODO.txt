@@ -1,8 +1,10 @@
-Enable pagination
+Use page for fetching tasks usage
 Enable subtasks filtering
 Enable subtasks pagination
+Enable subtasks current page on add
 Enable inactive tasks
 Enable completed tasks
+Fix unique task names
 Simplify task fetching
 Fix repeating API calls
 Fix console errors

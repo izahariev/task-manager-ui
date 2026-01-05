@@ -22,7 +22,9 @@ TaskPopup.propTypes = {
     taskId: PropTypes.string,
     setTasks: PropTypes.func,
     setSubtasks: PropTypes.func,
-    customReadOnly: PropTypes.bool,
+    setPageCount: PropTypes.func,
+    currentPage: PropTypes.number,
+    customReadOnly: PropTypes.bool
 }
 
 const Transition = React.forwardRef(
@@ -51,6 +53,8 @@ export default function TaskPopup(props) {
         taskId,
         setTasks,
         setSubtasks,
+        setPageCount,
+        currentPage,
         customReadOnly
     } = props;
     const [currentTask, setCurrentTask] = React.useState({
@@ -132,12 +136,13 @@ export default function TaskPopup(props) {
                   } else {
                       if (parentTaskId == null) {
                           fetchTasks(null, null, null, null, false,
-                            null, 1, 10)
+                            null, currentPage, 10)
                             .then(r => {
                                 if (r.errors.length > 0) {
                                     setErrorMessages([...r.errors]);
                                 } else {
                                     setTasks(r.content.elements)
+                                    setPageCount(r.content.totalPageCount)
                                     setErrorMessages([]);
                                     setTaskChanged(`Task "${currentTask.title}" created`);
                                 }
@@ -193,6 +198,7 @@ export default function TaskPopup(props) {
                         } else {
                             fetchAllTasks(1, 10).then(r => {
                                 setTasks(r.content.elements)
+                                setPageCount(r.content.totalPageCount)
                                 setErrorMessages([]);
                                 setOpen(false);
                                 setTaskChanged({title: currentTask.title, change: "updated"});
@@ -297,6 +303,7 @@ export default function TaskPopup(props) {
                                                     setErrorMessages([...r.errors]);
                                                 } else {
                                                     setTasks(r.content.elements)
+                                                    setPageCount(r.content.totalPageCount)
                                                     setErrorMessages([]);
                                                     setOpen(false);
                                                     setTaskChanged({title: currentTask.title, change: "updated"});
