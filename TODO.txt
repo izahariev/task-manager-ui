@@ -1,5 +1,3 @@
-Use page for fetching tasks usage
-Enable subtasks filtering
 Enable subtasks pagination
 Enable subtasks current page on add
 Enable inactive tasks

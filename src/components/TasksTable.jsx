@@ -107,7 +107,30 @@ function TasksTable({users, tasks, setTasks, setTaskChanged, currentPage, setPag
                       <TableCell>Assignees</TableCell>
                       <TableCell align={"right"} sx={{minWidth: '7%'}}>
                           {!filterEnabled && <FilterListIcon onClick={() => setFilterEnabled(!filterEnabled)} sx={{color: '#FFFFFF', cursor: 'pointer'}}/>}
-                          {filterEnabled && <FilterListOffIcon onClick={() => setFilterEnabled(!filterEnabled)} sx={{color: '#FFFFFF', cursor: 'pointer'}}/>}
+                          {filterEnabled &&
+                            <FilterListOffIcon
+                              onClick={() => {
+                                  setFilterEnabled(!filterEnabled);
+                                  fetchTasks(null, null, null, null, false,
+                                    null, currentPage, 10)
+                                    .then(r => {
+                                        if (r.errors.length > 0) {
+                                            setErrorMessages([...r.errors]);
+                                        } else {
+                                            setTasks(r.content.elements)
+                                            setPageCount(r.content.totalPageCount)
+                                            setErrorMessages([]);
+                                        }
+                                    }).catch(error => {
+                                      const errors = []
+                                      error.response.data['errors'].forEach((error) => {
+                                          errors.push(error['description']);
+                                      })
+                                      setErrorMessages([...errors]);
+                                  });
+                              }}
+                              sx={{color: '#FFFFFF', cursor: 'pointer'}}/>
+                          }
                       </TableCell>
                   </TableRow>
               </TableHead>
@@ -131,7 +154,7 @@ function TasksTable({users, tasks, setTasks, setTaskChanged, currentPage, setPag
                                       onChange={handlePriorityFilterValueChange}
                                       variant={"outlined"}
                                       size={"small"}
-                                      sx={{width: '90%'}}
+                                      sx={{width: '90%', backgroundColor: '#FFFFFF'}}
                                     >
                                         <MenuItem value={"P0"}>P0</MenuItem>
                                         <MenuItem value={"P1"}>P1</MenuItem>
@@ -167,7 +190,9 @@ function TasksTable({users, tasks, setTasks, setTaskChanged, currentPage, setPag
                                       fullWidth={true}
                                       size={"small"}
                                       value={titleFilterValue}
-                                      onChange={handleTitleFilterValueChange}/>
+                                      onChange={handleTitleFilterValueChange}
+                                      sx={{backgroundColor: '#FFFFFF'}}
+                                    />
                                 </Grid>
                                 <Grid item>
                                     <Button
@@ -195,6 +220,7 @@ function TasksTable({users, tasks, setTasks, setTaskChanged, currentPage, setPag
                                           value={deadlineDateFilterValue}
                                           onChange={handleDateFilterChange}
                                           slotProps={{textField: {size: 'small'}}}
+                                          sx={{backgroundColor: '#FFFFFF'}}
                                         />
                                     </LocalizationProvider>
                                 </Grid>
@@ -231,6 +257,7 @@ function TasksTable({users, tasks, setTasks, setTaskChanged, currentPage, setPag
                                           input={<OutlinedInput/>}
                                           renderValue={(selected) => selected.join(', ')}
                                           size={"small"}
+                                          sx={{backgroundColor: '#FFFFFF'}}
                                         >
                                             {users.map((name) => (
                                               <MenuItem key={name} value={name}>

@@ -2,15 +2,33 @@ import AddIcon from '@mui/icons-material/Add';
 import CheckIcon from '@mui/icons-material/Check';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import FilterListIcon from '@mui/icons-material/FilterList';
+import FilterListOffIcon from '@mui/icons-material/FilterListOff';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import {Box, Collapse, IconButton} from "@mui/material";
+import {
+    Box,
+    Checkbox,
+    Collapse,
+    FormControl,
+    IconButton,
+    InputLabel,
+    ListItemText,
+    MenuItem,
+    OutlinedInput,
+    Select,
+    TextField
+} from "@mui/material";
+import Button from "@mui/material/Button";
+import Grid from "@mui/material/Grid2";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
+import {DatePicker, LocalizationProvider} from "@mui/x-date-pickers";
+import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import PropTypes from "prop-types";
 import React from "react";
 import {fetchTasks, updateTask} from "../js/BackendApis.js";
@@ -45,12 +63,62 @@ function Row(props) {
     const [openAddSubtaskPopup, setOpenAddSubtaskPopup] = React.useState(false);
     const [readOnly, setReadOnly] = React.useState(true);
     const [subtasks, setSubtasks] = React.useState([]);
+    const [priorityFilterValue, setPriorityFilterValue] = React.useState('');
+    const [titleFilterValue, setTitleFilterValue] = React.useState('');
+    const [assigneesFilterValues, setAssigneesFilterValues] = React.useState([]);
+    const [filterEnabled, setFilterEnabled] = React.useState(false);
+    const [deadlineDateFilterValue, setDeadlineDateFilterValue] = React.useState(null);
 
     React.useEffect(() => {
         if (open === false) {
             setReadOnly(true);
+            setFilterEnabled(false);
+            setPriorityFilterValue("");
+            setTitleFilterValue("");
+            setDeadlineDateFilterValue(null);
+            setAssigneesFilterValues([]);
         }
     }, [open, readOnly])
+
+    const handlePriorityFilterValueChange = (event) => {
+        setPriorityFilterValue(event.target.value);
+    };
+
+    const handleTitleFilterValueChange = (event) => {
+        setTitleFilterValue(event.target.value);
+    };
+
+    const handleDateFilterChange = (newValue) => {
+        setDeadlineDateFilterValue(newValue);
+    };
+
+    const handleAssigneesFilterChange = (event) => {
+        const {
+            target: {value},
+        } = event;
+        setAssigneesFilterValues(
+          typeof value === 'string' ? value.split(',') : value,
+        );
+    };
+
+    const handleApplyFilterClick = () => {
+        fetchTasks(row.id, priorityFilterValue, titleFilterValue, deadlineDateFilterValue, false,
+          assigneesFilterValues, 1, 10)
+          .then(r => {
+              if (r.errors.length > 0) {
+                  setErrorMessages([...r.errors]);
+              } else {
+                  setSubtasks(r.content.elements)
+                  setErrorMessages([]);
+              }
+          }).catch(error => {
+            const errors = []
+            error.response.data['errors'].forEach((error) => {
+                errors.push(error['description']);
+            })
+            setErrorMessages([...errors]);
+        });
+    }
 
     return (
       <React.Fragment>
@@ -236,9 +304,229 @@ function Row(props) {
                                       <TableCell>Title</TableCell>
                                       <TableCell>Deadline</TableCell>
                                       <TableCell>Assignees</TableCell>
-                                      <TableCell/>
+                                      <TableCell align={"right"} sx={{minWidth: '7%'}}>
+                                          {!filterEnabled && <FilterListIcon onClick={() => setFilterEnabled(!filterEnabled)} sx={{color: '#2D3748', cursor: 'pointer'}}/>}
+                                          {filterEnabled &&
+                                            <FilterListOffIcon
+                                              onClick={() => {
+                                                  setFilterEnabled(!filterEnabled);
+                                                  fetchTasks(row.id, null, null, null,
+                                                    false, null, 1, 10)
+                                                    .then(r => {
+                                                        if (r.errors.length > 0) {
+                                                            setErrorMessages([...r.errors]);
+                                                        } else {
+                                                            setSubtasks(r.content.elements)
+                                                        }
+                                                    })
+                                                    .catch(error => {
+                                                        const errors = []
+                                                        error.response.data['errors'].forEach((error) => {
+                                                            errors.push(error['description']);
+                                                        })
+                                                        setErrorMessages([...errors]);
+                                                    });
+                                              }}
+                                              sx={{color: '#2D3748', cursor: 'pointer'}}/>
+                                          }
+                                      </TableCell>
                                   </TableRow>
                               </TableHead>
+                              {filterEnabled &&
+                                <TableHead>
+                                    <TableRow sx={{
+                                        backgroundColor: '#FFFFFF',
+                                        '& .MuiTableCell-head': {
+                                            color: '#2D3748',
+                                            fontWeight: 600
+                                        }
+                                    }}>
+                                        <TableCell sx={{minWidth: '10%'}}>
+                                            <Grid container spacing={0}>
+                                                <Grid item size={6}>
+                                                    <Select
+                                                      labelId="subtask-priority-select-label"
+                                                      id="subtask-priority-select"
+                                                      value={priorityFilterValue}
+                                                      onChange={handlePriorityFilterValueChange}
+                                                      variant={"outlined"}
+                                                      size={"small"}
+                                                      sx={{width: '90%', backgroundColor: '#FFFFFF'}}
+                                                    >
+                                                        <MenuItem value={"P0"}>P0</MenuItem>
+                                                        <MenuItem value={"P1"}>P1</MenuItem>
+                                                        <MenuItem value={"P2"}>P2</MenuItem>
+                                                        <MenuItem value={"P3"}>P3</MenuItem>
+                                                        <MenuItem value={"P4"}>P4</MenuItem>
+                                                    </Select>
+                                                </Grid>
+                                                <Grid item size={6}>
+                                                    <Button
+                                                      variant="contained"
+                                                      sx={{
+                                                          marginTop: "2%",
+                                                          backgroundColor: '#5B7FA6',
+                                                          '&:hover': {
+                                                              backgroundColor: '#4A6B8F',
+                                                          },
+                                                          transition: 'background-color 0.2s ease'
+                                                      }}
+                                                      onClick={() => setPriorityFilterValue("")}
+                                                    >
+                                                        X
+                                                    </Button>
+                                                </Grid>
+                                            </Grid>
+                                        </TableCell>
+                                        <TableCell>
+                                            <Grid container spacing={1}>
+                                                <Grid item size={10}>
+                                                    <TextField
+                                                      id="subtask-title-filter"
+                                                      variant="outlined"
+                                                      fullWidth={true}
+                                                      size={"small"}
+                                                      value={titleFilterValue}
+                                                      onChange={handleTitleFilterValueChange}
+                                                      sx={{backgroundColor: '#FFFFFF'}}
+                                                    />
+                                                </Grid>
+                                                <Grid item>
+                                                    <Button
+                                                      variant="contained"
+                                                      sx={{
+                                                          marginTop: "2%",
+                                                          backgroundColor: '#5B7FA6',
+                                                          '&:hover': {
+                                                              backgroundColor: '#4A6B8F',
+                                                          },
+                                                          transition: 'background-color 0.2s ease'
+                                                      }}
+                                                      onClick={() => setTitleFilterValue("")}
+                                                    >
+                                                        X
+                                                    </Button>
+                                                </Grid>
+                                            </Grid>
+                                        </TableCell>
+                                        <TableCell sx={{minWidth: '21%'}}>
+                                            <Grid container spacing={1}>
+                                                <Grid item>
+                                                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                                        <DatePicker
+                                                          value={deadlineDateFilterValue}
+                                                          onChange={handleDateFilterChange}
+                                                          slotProps={{textField: {size: 'small'}}}
+                                                          sx={{backgroundColor: '#FFFFFF'}}
+                                                        />
+                                                    </LocalizationProvider>
+                                                </Grid>
+                                                <Grid item>
+                                                    <Button
+                                                      variant="contained"
+                                                      sx={{
+                                                          marginTop: "2%",
+                                                          backgroundColor: '#5B7FA6',
+                                                          '&:hover': {
+                                                              backgroundColor: '#4A6B8F',
+                                                          },
+                                                          transition: 'background-color 0.2s ease'
+                                                      }}
+                                                      onClick={() => setDeadlineDateFilterValue(null)}
+                                                    >
+                                                        X
+                                                    </Button>
+                                                </Grid>
+                                            </Grid>
+                                        </TableCell>
+                                        <TableCell sx={{minWidth: '15%'}}>
+                                            <Grid container spacing={1}>
+                                                <Grid item size={8}>
+                                                    <FormControl fullWidth={true}>
+                                                        <InputLabel id="subtask-assignees-checkbox-label"></InputLabel>
+                                                        <Select
+                                                          labelId="subtask-assignees-checkbox-label"
+                                                          id="subtask-assignees-checkbox"
+                                                          multiple
+                                                          value={assigneesFilterValues}
+                                                          variant="outlined"
+                                                          onChange={handleAssigneesFilterChange}
+                                                          input={<OutlinedInput/>}
+                                                          renderValue={(selected) => selected.join(', ')}
+                                                          size={"small"}
+                                                          sx={{backgroundColor: '#FFFFFF'}}
+                                                        >
+                                                            {users.map((name) => (
+                                                              <MenuItem key={name} value={name}>
+                                                                  <Checkbox
+                                                                    checked={assigneesFilterValues.includes(name)}
+                                                                    sx={{
+                                                                        color: '#5B7FA6',
+                                                                        '&.Mui-checked': {
+                                                                            color: '#5B7FA6',
+                                                                        }
+                                                                    }}
+                                                                  />
+                                                                  <ListItemText primary={name}/>
+                                                              </MenuItem>
+                                                            ))}
+                                                        </Select>
+                                                    </FormControl>
+                                                </Grid>
+                                                <Grid item>
+                                                    <Button
+                                                      variant="contained"
+                                                      sx={{
+                                                          marginTop: "2%",
+                                                          backgroundColor: '#5B7FA6',
+                                                          '&:hover': {
+                                                              backgroundColor: '#4A6B8F',
+                                                          },
+                                                          transition: 'background-color 0.2s ease'
+                                                      }}
+                                                      onClick={() => setAssigneesFilterValues([])}
+                                                    >
+                                                        X
+                                                    </Button>
+                                                </Grid>
+                                            </Grid>
+                                        </TableCell>
+                                        <TableCell sx={{minWidth: '13%'}}>
+                                            <Button
+                                              variant="contained"
+                                              sx={{
+                                                  backgroundColor: '#5B7FA6',
+                                                  '&:hover': {
+                                                      backgroundColor: '#4A6B8F',
+                                                  },
+                                                  transition: 'background-color 0.2s ease'
+                                              }}
+                                              onClick={() => {
+                                                  setPriorityFilterValue("");
+                                                  setTitleFilterValue("");
+                                                  setDeadlineDateFilterValue(null);
+                                                  setAssigneesFilterValues([]);
+                                              }}
+                                            >
+                                                Clear all
+                                            </Button>
+                                            <Button
+                                              variant="contained"
+                                              sx={{
+                                                  marginLeft: '5%',
+                                                  backgroundColor: '#5B7FA6',
+                                                  '&:hover': {
+                                                      backgroundColor: '#4A6B8F',
+                                                  },
+                                                  transition: 'background-color 0.2s ease'
+                                              }}
+                                              onClick={handleApplyFilterClick}
+                                            >
+                                                Apply
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                </TableHead>}
                               <TableBody>
                                   {subtasks.map((subtaskRow, subtaskIndex) => (
                                     <TableRow 
