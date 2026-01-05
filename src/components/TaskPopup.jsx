@@ -7,7 +7,7 @@ import Typography from "@mui/material/Typography";
 import dayjs from "dayjs";
 import PropTypes from "prop-types";
 import React from "react";
-import {addTask, fetchAllTasks, fetchTask, fetchTasks, updateTask} from "../js/BackendApis.js";
+import {addTask, fetchTask, fetchTasks, updateTask} from "../js/BackendApis.js";
 import AssigneesSection from "./task_popup/AssigneesSection.jsx";
 import PrioritySection from "./task_popup/PrioritySection.jsx";
 import TimeSection from "./task_popup/TimeSection.jsx";
@@ -196,20 +196,22 @@ export default function TaskPopup(props) {
                         if (r.errors.length > 0) {
                             setErrorMessages([...r.errors]);
                         } else {
-                            fetchAllTasks(1, 10).then(r => {
-                                setTasks(r.content.elements)
-                                setPageCount(r.content.totalPageCount)
-                                setErrorMessages([]);
-                                setOpen(false);
-                                setTaskChanged({title: currentTask.title, change: "updated"});
-                            }).catch(error => {
+                            fetchTasks(null, null, null, null, false,
+                              null, currentPage, 10)
+                              .then(r => {
+                                  setTasks(r.content.elements)
+                                  setPageCount(r.content.totalPageCount)
+                                  setErrorMessages([]);
+                                  setOpen(false);
+                                  setTaskChanged(`Task "${currentTask.title}" updated`);
+                              })
+                              .catch(error => {
                                   const errors = []
                                   error.response.data['errors'].forEach((error) => {
                                       errors.push(error['description']);
                                   })
                                   setErrorMessages([...errors]);
-                              }
-                            )
+                              });
                         }
                     }
                   )
@@ -298,17 +300,22 @@ export default function TaskPopup(props) {
                                         if (r.errors.length > 0) {
                                             setErrorMessages([...r.errors]);
                                         } else {
-                                            fetchAllTasks(1, 10).then(r => {
-                                                if (r.errors.length > 0) {
-                                                    setErrorMessages([...r.errors]);
-                                                } else {
-                                                    setTasks(r.content.elements)
-                                                    setPageCount(r.content.totalPageCount)
-                                                    setErrorMessages([]);
-                                                    setOpen(false);
-                                                    setTaskChanged({title: currentTask.title, change: "updated"});
-                                                }
-                                            })
+                                            fetchTasks(null, null, null, null,
+                                              false, null, currentPage, 10)
+                                              .then(r => {
+                                                  setTasks(r.content.elements)
+                                                  setPageCount(r.content.totalPageCount)
+                                                  setErrorMessages([]);
+                                                  setOpen(false);
+                                                  setTaskChanged(`Task "${currentTask.title}" updated`);
+                                              })
+                                              .catch(error => {
+                                                  const errors = []
+                                                  error.response.data['errors'].forEach((error) => {
+                                                      errors.push(error['description']);
+                                                  })
+                                                  setErrorMessages([...errors]);
+                                              });
                                         }
                                     }
                                   )

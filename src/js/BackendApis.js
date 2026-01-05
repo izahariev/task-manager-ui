@@ -11,14 +11,6 @@ export async function fetchTask(id) {
     return  response.data;
 }
 
-export async function fetchAllTasks(page, size) {
-    const response = await axios.get(
-      'http://localhost:8080/tasks/list',
-      {params: {page: page, size: size}}
-    )
-    return  response.data;
-}
-
 export async function fetchTasks(parentTaskId, priority, title, deadline, isCompleted, assignees,
                                  page, size) {
     const params = {
