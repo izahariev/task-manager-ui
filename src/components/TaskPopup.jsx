@@ -7,6 +7,7 @@ import Typography from "@mui/material/Typography";
 import dayjs from "dayjs";
 import PropTypes from "prop-types";
 import React from "react";
+import {useTasks} from "../contexts/TasksContext.jsx";
 import {addTask, fetchTask, fetchTasks, updateTask} from "../js/BackendApis.js";
 import AssigneesSection from "./task_popup/AssigneesSection.jsx";
 import PrioritySection from "./task_popup/PrioritySection.jsx";
@@ -51,10 +52,7 @@ export default function TaskPopup(props) {
         users,
         setTaskChanged,
         taskId,
-        setTasks,
         setSubtasks,
-        setPageCount,
-        currentPage,
         customReadOnly
     } = props;
     const [currentTask, setCurrentTask] = React.useState({
@@ -67,6 +65,7 @@ export default function TaskPopup(props) {
         repeat: "",
         assignees: []
     });
+    const {refreshTasks} = useTasks();
     const [initialTask, setInitialTask] = React.useState(null)
     const [readOnly, setReadOnly] = React.useState(false)
     const [isEdit, setIsEdit] = React.useState(false)
@@ -135,25 +134,8 @@ export default function TaskPopup(props) {
                       setErrorMessages([...r.errors]);
                   } else {
                       if (parentTaskId == null) {
-                          fetchTasks(null, null, null, null, false,
-                            null, currentPage, 10)
-                            .then(r => {
-                                if (r.errors.length > 0) {
-                                    setErrorMessages([...r.errors]);
-                                } else {
-                                    setTasks(r.content.elements)
-                                    setPageCount(r.content.totalPageCount)
-                                    setErrorMessages([]);
-                                    setTaskChanged(`Task "${currentTask.title}" created`);
-                                }
-                            })
-                            .catch(error => {
-                                const errors = []
-                                error.response.data['errors'].forEach((error) => {
-                                    errors.push(error['description']);
-                                })
-                                setErrorMessages([...errors]);
-                            });
+                          refreshTasks();
+                          setTaskChanged(`Task "${currentTask.title}" created`);
                       } else {
                           fetchTasks(parentTaskId, null, null, null, false,
                             null, 1, 10)
@@ -196,22 +178,9 @@ export default function TaskPopup(props) {
                         if (r.errors.length > 0) {
                             setErrorMessages([...r.errors]);
                         } else {
-                            fetchTasks(null, null, null, null, false,
-                              null, currentPage, 10)
-                              .then(r => {
-                                  setTasks(r.content.elements)
-                                  setPageCount(r.content.totalPageCount)
-                                  setErrorMessages([]);
-                                  setOpen(false);
-                                  setTaskChanged(`Task "${currentTask.title}" updated`);
-                              })
-                              .catch(error => {
-                                  const errors = []
-                                  error.response.data['errors'].forEach((error) => {
-                                      errors.push(error['description']);
-                                  })
-                                  setErrorMessages([...errors]);
-                              });
+                            refreshTasks();
+                            setOpen(false);
+                            setTaskChanged(`Task "${currentTask.title}" updated`);
                         }
                     }
                   )
@@ -300,22 +269,9 @@ export default function TaskPopup(props) {
                                         if (r.errors.length > 0) {
                                             setErrorMessages([...r.errors]);
                                         } else {
-                                            fetchTasks(null, null, null, null,
-                                              false, null, currentPage, 10)
-                                              .then(r => {
-                                                  setTasks(r.content.elements)
-                                                  setPageCount(r.content.totalPageCount)
-                                                  setErrorMessages([]);
-                                                  setOpen(false);
-                                                  setTaskChanged(`Task "${currentTask.title}" updated`);
-                                              })
-                                              .catch(error => {
-                                                  const errors = []
-                                                  error.response.data['errors'].forEach((error) => {
-                                                      errors.push(error['description']);
-                                                  })
-                                                  setErrorMessages([...errors]);
-                                              });
+                                            refreshTasks();
+                                            setOpen(false);
+                                            setTaskChanged(`Task "${currentTask.title}" updated`);
                                         }
                                     }
                                   )

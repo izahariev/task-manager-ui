@@ -23,25 +23,29 @@ import {DatePicker, LocalizationProvider} from "@mui/x-date-pickers";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import PropTypes from "prop-types";
 import React from "react";
-import {fetchTasks} from "../js/BackendApis.js";
+import {useTasks} from "../contexts/TasksContext.jsx";
 import Row from "./Row.jsx";
 
 TasksTable.propTypes = {
     users: PropTypes.array,
-    tasks: PropTypes.array,
-    setTasks: PropTypes.func,
     setTaskChanged: PropTypes.func,
-    currentPage: PropTypes.number,
-    setPageCount: PropTypes.func,
     setErrorMessages: PropTypes.func
 }
 
-function TasksTable({users, tasks, setTasks, setTaskChanged, currentPage, setPageCount, setErrorMessages}) {
+function TasksTable({users, setTaskChanged, setErrorMessages}) {
+    const {tasks, refreshTasks} = useTasks();
     const [priorityFilterValue, setPriorityFilterValue] = React.useState('');
     const [titleFilterValue, setTitleFilterValue] = React.useState('');
     const [assigneesFilterValues, setAssigneesFilterValues] = React.useState([]);
     const [filterEnabled, setFilterEnabled] = React.useState(false);
     const [deadlineDateFilterValue, setDeadlineDateFilterValue] = React.useState(null);
+
+    /**
+     * @typedef {{ elements: any[], totalPageCount: number, totalElementsCount: number }} Page
+     */
+    React.useEffect(() => {
+        refreshTasks();
+    }, [refreshTasks])
 
     const handlePriorityFilterValueChange = (event) => {
         setPriorityFilterValue(event.target.value);
@@ -65,23 +69,15 @@ function TasksTable({users, tasks, setTasks, setTaskChanged, currentPage, setPag
     };
 
     const handleApplyFilterClick = () => {
-        fetchTasks(null, priorityFilterValue, titleFilterValue, deadlineDateFilterValue, false,
-          assigneesFilterValues, currentPage, 10)
-          .then(r => {
-              if (r.errors.length > 0) {
-                  setErrorMessages([...r.errors]);
-              } else {
-                  setTasks(r.content.elements)
-                  setPageCount(r.content.totalPageCount)
-                  setErrorMessages([]);
-              }
-          }).catch(error => {
-            const errors = []
-            error.response.data['errors'].forEach((error) => {
-                errors.push(error['description']);
-            })
-            setErrorMessages([...errors]);
-        });
+        refreshTasks(
+          {
+              priority: priorityFilterValue,
+              title: titleFilterValue,
+              deadline: deadlineDateFilterValue,
+              assignees: assigneesFilterValues
+          }
+        );
+
     }
 
     return (
@@ -111,23 +107,7 @@ function TasksTable({users, tasks, setTasks, setTaskChanged, currentPage, setPag
                             <FilterListOffIcon
                               onClick={() => {
                                   setFilterEnabled(!filterEnabled);
-                                  fetchTasks(null, null, null, null, false,
-                                    null, currentPage, 10)
-                                    .then(r => {
-                                        if (r.errors.length > 0) {
-                                            setErrorMessages([...r.errors]);
-                                        } else {
-                                            setTasks(r.content.elements)
-                                            setPageCount(r.content.totalPageCount)
-                                            setErrorMessages([]);
-                                        }
-                                    }).catch(error => {
-                                      const errors = []
-                                      error.response.data['errors'].forEach((error) => {
-                                          errors.push(error['description']);
-                                      })
-                                      setErrorMessages([...errors]);
-                                  });
+                                  refreshTasks();
                               }}
                               sx={{color: '#FFFFFF', cursor: 'pointer'}}/>
                           }
@@ -337,10 +317,8 @@ function TasksTable({users, tasks, setTasks, setTaskChanged, currentPage, setPag
                       row={row}
                       index={index}
                       users={users}
-                      setTasks={setTasks}
                       setTaskChanged={setTaskChanged}
                       setErrorMessages={setErrorMessages}
-                      currentPage={currentPage}
                     />
                   ))}
               </TableBody>

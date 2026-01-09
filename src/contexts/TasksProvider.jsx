@@ -23,7 +23,7 @@ export function TasksProvider({ children }) {
             isCompleted = false,
             assignees = null,
             page = currentPageRef.current,
-            size = 10,
+            size = 9,
         } = filters;
 
         return fetchTasks(parentTaskId, priority, title, deadline, isCompleted, assignees, page, size)
@@ -50,6 +50,7 @@ export function TasksProvider({ children }) {
     const value = React.useMemo(
       () => ({
           tasks,
+          setTasks,
           currentPage,
           pageCount,
           errorMessages,

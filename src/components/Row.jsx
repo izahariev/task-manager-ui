@@ -31,6 +31,7 @@ import {DatePicker, LocalizationProvider} from "@mui/x-date-pickers";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import PropTypes from "prop-types";
 import React from "react";
+import {useTasks} from "../contexts/TasksContext.jsx";
 import {fetchTasks, updateTask} from "../js/BackendApis.js";
 import TaskPopup from "./TaskPopup.jsx";
 
@@ -49,15 +50,13 @@ Row.propTypes = {
     }),
     index: PropTypes.number,
     users: PropTypes.array,
-    setTasks: PropTypes.func,
     setTaskChanged: PropTypes.func,
-    setPageCount: PropTypes.func,
     setErrorMessages: PropTypes.func,
-    currentPage: PropTypes.number
 };
 
 function Row(props) {
-    const {row, index, users, setTasks, setTaskChanged, setPageCount, setErrorMessages, currentPage} = props;
+    const {setTasks, currentPage, refreshTasks} = useTasks();
+    const {row, index, users, setTaskChanged, setErrorMessages} = props;
     const [open, setOpen] = React.useState(false);
     const [viewTaskPopup, setViewTaskPopup] = React.useState(false);
     const [openAddSubtaskPopup, setOpenAddSubtaskPopup] = React.useState(false);
@@ -208,18 +207,9 @@ function Row(props) {
                               if (r.errors.length > 0) {
                                   setErrorMessages([...r.errors]);
                               } else {
-                                  fetchTasks(null, null, null, null, false,
-                                    null, currentPage, 10).then(r => {
-                                      if (r.errors.length > 0) {
-                                          setErrorMessages([...r.errors]);
-                                      } else {
-                                          setTasks(r.content.elements)
-                                          setPageCount(r.content.totalPageCount)
-                                          setErrorMessages([]);
-                                          setOpen(false);
-                                          setTaskChanged(`Task "${row.title}" completed`);
-                                      }
-                                  })
+                                  refreshTasks();
+                                  setOpen(false);
+                                  setTaskChanged(`Task "${row.title}" completed`);
                               }
                           }
                         )
@@ -305,7 +295,9 @@ function Row(props) {
                                       <TableCell>Deadline</TableCell>
                                       <TableCell>Assignees</TableCell>
                                       <TableCell align={"right"} sx={{minWidth: '7%'}}>
-                                          {!filterEnabled && <FilterListIcon onClick={() => setFilterEnabled(!filterEnabled)} sx={{color: '#2D3748', cursor: 'pointer'}}/>}
+                                          {!filterEnabled &&
+                                            <FilterListIcon onClick={() => setFilterEnabled(!filterEnabled)}
+                                                            sx={{color: '#2D3748', cursor: 'pointer'}}/>}
                                           {filterEnabled &&
                                             <FilterListOffIcon
                                               onClick={() => {
@@ -529,7 +521,7 @@ function Row(props) {
                                 </TableHead>}
                               <TableBody>
                                   {subtasks.map((subtaskRow, subtaskIndex) => (
-                                    <TableRow 
+                                    <TableRow
                                       key={subtaskRow.title}
                                       sx={{
                                           backgroundColor: subtaskIndex % 2 === 0 ? '#FFFFFF' : '#F7FAFC',

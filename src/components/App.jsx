@@ -3,22 +3,21 @@ import {Alert, Container, Dialog, DialogTitle, Fade, Pagination} from "@mui/mate
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid2";
 import React from "react";
-import {fetchTasks, fetchUsers} from "../js/BackendApis.js";
+import {useTasks} from "../contexts/TasksContext.jsx";
+import {fetchUsers} from "../js/BackendApis.js";
 import TaskPopup from "./TaskPopup.jsx";
 import TasksTable from "./TasksTable.jsx";
 import UsersPopup from "./UsersPopup.jsx";
 
 function App() {
+    const {setTasks, currentPage, pageCount, refreshTasks} = useTasks();
     const [showUsersPopup, setShowUsersPopup] = React.useState(false);
     const [addTaskPopup, setAddTaskPopup] = React.useState(false);
     const [users, setUsers] = React.useState([]);
-    const [tasks, setTasks] = React.useState([])
     const [taskChangedMessage, setTaskChangedMessage] = React.useState(null);
     const [showAlert, setShowAlert] = React.useState(false);
     const [errorMessages, setErrorMessages] = React.useState([])
     const removeTimerRef = React.useRef(null);
-    const [currentPage, setCurrentPage] = React.useState(1);
-    const [pageCount, setPageCount] = React.useState(0);
 
     React.useEffect(() => {
         //TODO: Increase abstraction. Try not to repeat code
@@ -28,29 +27,6 @@ function App() {
                   setErrorMessages([...r.errors]);
               } else {
                   setUsers(r.content.elements)
-              }
-          })
-          .catch(error => {
-              const errors = []
-              error.response.data['errors'].forEach((error) => {
-                  errors.push(error['description']);
-              })
-              setErrorMessages([...errors]);
-          });
-    }, [])
-
-    /**
-     * @typedef {{ elements: any[], totalPageCount: number, totalElementsCount: number }} Page
-     */
-    React.useEffect(() => {
-        fetchTasks(null, null, null, null, false, null,
-          currentPage, 10)
-          .then(r => {
-              if (r.errors.length > 0) {
-                  setErrorMessages([...r.errors]);
-              } else {
-                  setTasks(r.content.elements)
-                  setPageCount(r.content.totalPageCount)
               }
           })
           .catch(error => {
@@ -83,24 +59,7 @@ function App() {
     }, [taskChangedMessage])
 
     function getTasksPage(event, page) {
-        setCurrentPage(page);
-        fetchTasks(null, null, null, null, false, null,
-          page, 10)
-          .then(r => {
-              if (r.errors.length > 0) {
-                  setErrorMessages([...r.errors]);
-              } else {
-                  setTasks(r.content.elements)
-                  setPageCount(r.content.totalPageCount)
-              }
-          })
-          .catch(error => {
-              const errors = []
-              error.response.data['errors'].forEach((error) => {
-                  errors.push(error['description']);
-              })
-              setErrorMessages([...errors]);
-          });
+        refreshTasks({page: page});
     }
 
     return (
@@ -176,11 +135,8 @@ function App() {
                   <Grid size={12} sx={{margin: '1%  0 0.5% 0'}}>
                       <TasksTable
                         users={users}
-                        tasks={tasks}
-                        setTasks={setTasks}
                         setTaskChanged={setTaskChangedMessage}
                         setErrorMessages={setErrorMessages}
-                        currentPage={currentPage}
                       />
                   </Grid>
                   <Grid size={12} sx={{

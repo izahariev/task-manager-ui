@@ -7,3 +7,4 @@ Fix unique task names
 Simplify task fetching
 Fix repeating API calls
 Fix console errors
+Check all workflows
