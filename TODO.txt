@@ -1,9 +1,17 @@
+Use ErrorMessages context
+Create and use users context
+Check if subtasks context is needed
+Fix complete subtasks
+Fix edit subtasks
 Check API calls and fix them
 Enable subtasks pagination
 Enable subtasks current page on add
+Fix delete tasks
+Fix delete subtasks
 Enable inactive tasks
 Enable completed tasks
 Fix unique task names
+Fix user management error alerts
 Simplify task fetching
 Fix repeating API calls
 Fix console errors

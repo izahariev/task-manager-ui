@@ -28,11 +28,10 @@ import Row from "./Row.jsx";
 
 TasksTable.propTypes = {
     users: PropTypes.array,
-    setTaskChanged: PropTypes.func,
-    setErrorMessages: PropTypes.func
+    setTaskChanged: PropTypes.func
 }
 
-function TasksTable({users, setTaskChanged, setErrorMessages}) {
+function TasksTable({users, setTaskChanged}) {
     const {tasks, refreshTasks} = useTasks();
     const [priorityFilterValue, setPriorityFilterValue] = React.useState('');
     const [titleFilterValue, setTitleFilterValue] = React.useState('');
@@ -318,7 +317,6 @@ function TasksTable({users, setTaskChanged, setErrorMessages}) {
                       index={index}
                       users={users}
                       setTaskChanged={setTaskChanged}
-                      setErrorMessages={setErrorMessages}
                     />
                   ))}
               </TableBody>

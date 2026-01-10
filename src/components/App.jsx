@@ -4,6 +4,7 @@ import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid2";
 import React from "react";
 import {useTasks} from "../contexts/TasksContext.jsx";
+import {useErrors} from "../contexts/ErrorMessagesContext.jsx";
 import {fetchUsers} from "../js/BackendApis.js";
 import TaskPopup from "./TaskPopup.jsx";
 import TasksTable from "./TasksTable.jsx";
@@ -11,12 +12,12 @@ import UsersPopup from "./UsersPopup.jsx";
 
 function App() {
     const {setTasks, currentPage, pageCount, refreshTasks} = useTasks();
+    const {errorMessages, addErrors, clearErrors} = useErrors();
     const [showUsersPopup, setShowUsersPopup] = React.useState(false);
     const [addTaskPopup, setAddTaskPopup] = React.useState(false);
     const [users, setUsers] = React.useState([]);
     const [taskChangedMessage, setTaskChangedMessage] = React.useState(null);
     const [showAlert, setShowAlert] = React.useState(false);
-    const [errorMessages, setErrorMessages] = React.useState([])
     const removeTimerRef = React.useRef(null);
 
     React.useEffect(() => {
@@ -24,7 +25,7 @@ function App() {
         fetchUsers()
           .then(r => {
               if (r.errors.length > 0) {
-                  setErrorMessages([...r.errors]);
+                  addErrors(r.errors);
               } else {
                   setUsers(r.content.elements)
               }
@@ -34,9 +35,9 @@ function App() {
               error.response.data['errors'].forEach((error) => {
                   errors.push(error['description']);
               })
-              setErrorMessages([...errors]);
+              addErrors(errors);
           });
-    }, [])
+    }, [addErrors])
 
     React.useEffect(() => {
         if (taskChangedMessage !== null) {
@@ -92,7 +93,7 @@ function App() {
                 </Fade>
               }
               {errorMessages.length !== 0 &&
-                <Alert variant="filled" severity="error" onClose={() => setErrorMessages([])}>
+                <Alert variant="filled" severity="error" onClose={clearErrors}>
                     <Grid container>
                         <Grid size={12} sx={{
                             display: 'flex',
@@ -136,7 +137,6 @@ function App() {
                       <TasksTable
                         users={users}
                         setTaskChanged={setTaskChangedMessage}
-                        setErrorMessages={setErrorMessages}
                       />
                   </Grid>
                   <Grid size={12} sx={{
@@ -186,7 +186,7 @@ function App() {
                         onClick={() => {
                             fetchUsers().then(r => {
                                 if (r.errors.length > 0) {
-                                    setErrorMessages([...r.errors]);
+                                    addErrors(r.errors);
                                 } else {
                                     setUsers(r.content.elements)
                                 }
@@ -208,7 +208,7 @@ function App() {
                         onClick={() => {
                             fetchUsers().then(r => {
                                 if (r.errors.length > 0) {
-                                    setErrorMessages([...r.errors]);
+                                    addErrors(r.errors);
                                 } else {
                                     setUsers(r.content.elements)
                                     setAddTaskPopup(!addTaskPopup)

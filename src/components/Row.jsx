@@ -32,6 +32,7 @@ import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import PropTypes from "prop-types";
 import React from "react";
 import {useTasks} from "../contexts/TasksContext.jsx";
+import {useErrors} from "../contexts/ErrorMessagesContext.jsx";
 import {fetchTasks, updateTask} from "../js/BackendApis.js";
 import TaskPopup from "./TaskPopup.jsx";
 
@@ -51,12 +52,12 @@ Row.propTypes = {
     index: PropTypes.number,
     users: PropTypes.array,
     setTaskChanged: PropTypes.func,
-    setErrorMessages: PropTypes.func,
 };
 
 function Row(props) {
     const {setTasks, currentPage, refreshTasks} = useTasks();
-    const {row, index, users, setTaskChanged, setErrorMessages} = props;
+    const {addErrors, clearErrors} = useErrors();
+    const {row, index, users, setTaskChanged} = props;
     const [open, setOpen] = React.useState(false);
     const [viewTaskPopup, setViewTaskPopup] = React.useState(false);
     const [openAddSubtaskPopup, setOpenAddSubtaskPopup] = React.useState(false);
@@ -105,17 +106,17 @@ function Row(props) {
           assigneesFilterValues, 1, 10)
           .then(r => {
               if (r.errors.length > 0) {
-                  setErrorMessages([...r.errors]);
+                  addErrors(r.errors);
               } else {
                   setSubtasks(r.content.elements)
-                  setErrorMessages([]);
+                  clearErrors();
               }
           }).catch(error => {
             const errors = []
             error.response.data['errors'].forEach((error) => {
                 errors.push(error['description']);
             })
-            setErrorMessages([...errors]);
+            addErrors(errors);
         });
     }
 
@@ -141,7 +142,7 @@ function Row(props) {
                                   null, 1, 10)
                                   .then(r => {
                                       if (r.errors.length > 0) {
-                                          setErrorMessages([...r.errors]);
+                                          addErrors(r.errors);
                                       } else {
                                           setSubtasks(r.content.elements)
                                       }
@@ -151,7 +152,7 @@ function Row(props) {
                                       error.response.data['errors'].forEach((error) => {
                                           errors.push(error['description']);
                                       })
-                                      setErrorMessages([...errors]);
+                                      addErrors(errors);
                                   });
                             }
                             setOpen(!open)
@@ -205,7 +206,7 @@ function Row(props) {
                       updateTask(row.id, {"isCompleted": true})
                         .then(r => {
                               if (r.errors.length > 0) {
-                                  setErrorMessages([...r.errors]);
+                                  addErrors(r.errors);
                               } else {
                                   refreshTasks();
                                   setOpen(false);
@@ -218,7 +219,7 @@ function Row(props) {
                               error.response.data['errors'].forEach((error) => {
                                   errors.push(error['description']);
                               })
-                              setErrorMessages([...errors]);
+                              addErrors(errors);
                           }
                         );
                   }}>
@@ -306,7 +307,7 @@ function Row(props) {
                                                     false, null, 1, 10)
                                                     .then(r => {
                                                         if (r.errors.length > 0) {
-                                                            setErrorMessages([...r.errors]);
+                                                            addErrors(r.errors);
                                                         } else {
                                                             setSubtasks(r.content.elements)
                                                         }
@@ -316,7 +317,7 @@ function Row(props) {
                                                         error.response.data['errors'].forEach((error) => {
                                                             errors.push(error['description']);
                                                         })
-                                                        setErrorMessages([...errors]);
+                                                        addErrors(errors);
                                                     });
                                               }}
                                               sx={{color: '#2D3748', cursor: 'pointer'}}/>
