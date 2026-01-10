@@ -31,7 +31,6 @@ export function UsersProvider({ children }) {
     const value = React.useMemo(
       () => ({
           users,
-          setUsers,
           refreshUsers,
       }),
       [users, refreshUsers]

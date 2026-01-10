@@ -7,14 +7,17 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import {ErrorMessagesProvider} from "../contexts/ErrorMessagesProvider.jsx";
 import {TasksProvider} from "../contexts/TasksProvider.jsx";
+import {UsersProvider} from "../contexts/UsersProvider.jsx";
 import App from './App.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
       <ErrorMessagesProvider>
-          <TasksProvider>
-              <App/>
-          </TasksProvider>
+          <UsersProvider>
+              <TasksProvider>
+                  <App/>
+              </TasksProvider>
+          </UsersProvider>
       </ErrorMessagesProvider>
   </StrictMode>,
 )

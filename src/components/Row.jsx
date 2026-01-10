@@ -31,8 +31,9 @@ import {DatePicker, LocalizationProvider} from "@mui/x-date-pickers";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import PropTypes from "prop-types";
 import React from "react";
-import {useTasks} from "../contexts/TasksContext.jsx";
 import {useErrors} from "../contexts/ErrorMessagesContext.jsx";
+import {useTasks} from "../contexts/TasksContext.jsx";
+import {useUsers} from "../contexts/UsersContext.jsx";
 import {fetchTasks, updateTask} from "../js/BackendApis.js";
 import TaskPopup from "./TaskPopup.jsx";
 
@@ -50,14 +51,14 @@ Row.propTypes = {
         assignees: PropTypes.string
     }),
     index: PropTypes.number,
-    users: PropTypes.array,
     setTaskChanged: PropTypes.func,
 };
 
 function Row(props) {
     const {setTasks, currentPage, refreshTasks} = useTasks();
     const {addErrors, clearErrors} = useErrors();
-    const {row, index, users, setTaskChanged} = props;
+    const {users, refreshUsers} = useUsers();
+    const {row, index, setTaskChanged} = props;
     const [open, setOpen] = React.useState(false);
     const [viewTaskPopup, setViewTaskPopup] = React.useState(false);
     const [openAddSubtaskPopup, setOpenAddSubtaskPopup] = React.useState(false);
@@ -297,8 +298,13 @@ function Row(props) {
                                       <TableCell>Assignees</TableCell>
                                       <TableCell align={"right"} sx={{minWidth: '7%'}}>
                                           {!filterEnabled &&
-                                            <FilterListIcon onClick={() => setFilterEnabled(!filterEnabled)}
-                                                            sx={{color: '#2D3748', cursor: 'pointer'}}/>}
+                                            <FilterListIcon
+                                              onClick={() => {
+                                                  setFilterEnabled(!filterEnabled)
+                                                  refreshUsers();
+                                              }}
+                                              sx={{color: '#2D3748', cursor: 'pointer'}}/>
+                                          }
                                           {filterEnabled &&
                                             <FilterListOffIcon
                                               onClick={() => {
@@ -585,7 +591,6 @@ function Row(props) {
             <TaskPopup
               open={viewTaskPopup}
               setOpen={setViewTaskPopup}
-              users={["Any", ...users]}
               setTaskChanged={setTaskChanged}
               taskId={row.id}
               setTasks={setTasks}
@@ -597,7 +602,6 @@ function Row(props) {
             <TaskPopup
               open={openAddSubtaskPopup}
               setOpen={setOpenAddSubtaskPopup}
-              users={["Any", ...users]}
               setTaskChanged={setTaskChanged}
               setTasks={setTasks}
               setSubtasks={setSubtasks}

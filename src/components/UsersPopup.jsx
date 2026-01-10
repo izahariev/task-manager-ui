@@ -10,17 +10,11 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import axios from "axios";
-import PropTypes from "prop-types";
 import * as React from 'react';
-import {fetchUsers} from "../js/BackendApis.js";
+import {useUsers} from "../contexts/UsersContext.jsx";
 
-UsersPopup.propTypes = {
-    users: PropTypes.array,
-    setUsers: PropTypes.func
-}
-
-export default function UsersPopup(props) {
-    const {users, setUsers} = props;
+export default function UsersPopup() {
+    const {users, refreshUsers} = useUsers();
     const [newUser, setNewUser] = React.useState("");
     const [editedUser, setEditedUser] = React.useState("");
     const [editedUserNewName, setEditedUserNewName] = React.useState("");
@@ -35,11 +29,10 @@ export default function UsersPopup(props) {
         }
         axios.post('http://localhost:8080/users/create', null, {params: {name: newUser}})
           .then(() => {
-              fetchUsers().then(r => {
+              refreshUsers().then(r => {
                   if (r.errors.length > 0) {
                       setErrorMessages([...r.errors]);
                   } else {
-                      setUsers(r.content.elements)
                       setNewUser("");
                       setErrorMessages([]);
                   }
@@ -61,11 +54,10 @@ export default function UsersPopup(props) {
             }
         })
           .then(() => {
-            fetchUsers().then(r => {
+            refreshUsers().then(r => {
                 if (r.errors.length > 0) {
                     setErrorMessages([...r.errors]);
                 } else {
-                    setUsers(r.content.elements)
                     setEditedUser("");
                     setEditedUserNewName("");
                     setErrorMessages([]);
@@ -84,11 +76,10 @@ export default function UsersPopup(props) {
     const handleDeleteUserClick = () => {
         axios.delete('http://localhost:8080/users/remove', {params: {name: deleteUser}})
           .then(() => {
-              fetchUsers().then(r => {
+              refreshUsers().then(r => {
                   if (r.errors.length > 0) {
                       setErrorMessages([...r.errors]);
                   } else {
-                      setUsers(r.content.elements)
                       setDeleteUser('');
                   }
               });

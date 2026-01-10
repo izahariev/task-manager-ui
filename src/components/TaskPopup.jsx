@@ -8,6 +8,7 @@ import dayjs from "dayjs";
 import PropTypes from "prop-types";
 import React from "react";
 import {useTasks} from "../contexts/TasksContext.jsx";
+import {useUsers} from "../contexts/UsersContext.jsx";
 import {addTask, fetchTask, fetchTasks, updateTask} from "../js/BackendApis.js";
 import AssigneesSection from "./task_popup/AssigneesSection.jsx";
 import PrioritySection from "./task_popup/PrioritySection.jsx";
@@ -18,7 +19,6 @@ TaskPopup.propTypes = {
     setOpen: PropTypes.func,
     parentTaskId: PropTypes.string,
     parentTask: PropTypes.string,
-    users: PropTypes.array,
     setTaskChanged: PropTypes.func,
     taskId: PropTypes.string,
     setTasks: PropTypes.func,
@@ -49,7 +49,6 @@ export default function TaskPopup(props) {
         setOpen,
         parentTaskId,
         parentTask,
-        users,
         setTaskChanged,
         taskId,
         setSubtasks,
@@ -66,6 +65,7 @@ export default function TaskPopup(props) {
         assignees: []
     });
     const {refreshTasks} = useTasks();
+    const {users, refreshUsers} = useUsers();
     const [initialTask, setInitialTask] = React.useState(null)
     const [readOnly, setReadOnly] = React.useState(false)
     const [isEdit, setIsEdit] = React.useState(false)
@@ -114,7 +114,8 @@ export default function TaskPopup(props) {
                   setErrorMessages([...errors]);
               });
         }
-    }, [customReadOnly, taskId])
+        refreshUsers();
+    }, [customReadOnly, refreshUsers, taskId])
 
     const handleSaveClick = () => {
         const errors = [];
@@ -485,7 +486,7 @@ export default function TaskPopup(props) {
                       }}>
                           <AssigneesSection
                             readOnly={readOnly}
-                            users={users}
+                            users={["Any", ...users]}
                             assignees={currentTask.assignees}
                             setAssignees={(a) =>
                               setCurrentTask((currentTask) => ({...currentTask, assignees: a}))}

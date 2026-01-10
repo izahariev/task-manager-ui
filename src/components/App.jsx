@@ -3,41 +3,20 @@ import {Alert, Container, Dialog, DialogTitle, Fade, Pagination} from "@mui/mate
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid2";
 import React from "react";
-import {useTasks} from "../contexts/TasksContext.jsx";
 import {useErrors} from "../contexts/ErrorMessagesContext.jsx";
-import {fetchUsers} from "../js/BackendApis.js";
+import {useTasks} from "../contexts/TasksContext.jsx";
 import TaskPopup from "./TaskPopup.jsx";
 import TasksTable from "./TasksTable.jsx";
 import UsersPopup from "./UsersPopup.jsx";
 
 function App() {
     const {setTasks, currentPage, pageCount, refreshTasks} = useTasks();
-    const {errorMessages, addErrors, clearErrors} = useErrors();
+    const {errorMessages, clearErrors} = useErrors();
     const [showUsersPopup, setShowUsersPopup] = React.useState(false);
     const [addTaskPopup, setAddTaskPopup] = React.useState(false);
-    const [users, setUsers] = React.useState([]);
     const [taskChangedMessage, setTaskChangedMessage] = React.useState(null);
     const [showAlert, setShowAlert] = React.useState(false);
     const removeTimerRef = React.useRef(null);
-
-    React.useEffect(() => {
-        //TODO: Increase abstraction. Try not to repeat code
-        fetchUsers()
-          .then(r => {
-              if (r.errors.length > 0) {
-                  addErrors(r.errors);
-              } else {
-                  setUsers(r.content.elements)
-              }
-          })
-          .catch(error => {
-              const errors = []
-              error.response.data['errors'].forEach((error) => {
-                  errors.push(error['description']);
-              })
-              addErrors(errors);
-          });
-    }, [addErrors])
 
     React.useEffect(() => {
         if (taskChangedMessage !== null) {
@@ -135,7 +114,6 @@ function App() {
                   </Grid>
                   <Grid size={12} sx={{margin: '1%  0 0.5% 0'}}>
                       <TasksTable
-                        users={users}
                         setTaskChanged={setTaskChangedMessage}
                       />
                   </Grid>
@@ -184,13 +162,6 @@ function App() {
                             transition: 'background-color 0.2s ease'
                         }}
                         onClick={() => {
-                            fetchUsers().then(r => {
-                                if (r.errors.length > 0) {
-                                    addErrors(r.errors);
-                                } else {
-                                    setUsers(r.content.elements)
-                                }
-                            });
                             setShowUsersPopup(!showUsersPopup)
                         }}
                       >
@@ -205,16 +176,7 @@ function App() {
                             },
                             transition: 'background-color 0.2s ease'
                         }}
-                        onClick={() => {
-                            fetchUsers().then(r => {
-                                if (r.errors.length > 0) {
-                                    addErrors(r.errors);
-                                } else {
-                                    setUsers(r.content.elements)
-                                    setAddTaskPopup(!addTaskPopup)
-                                }
-                            });
-                        }}>
+                        onClick={() => {setAddTaskPopup(!addTaskPopup)}}>
                           Add Task
                       </Button>
                   </Grid>
@@ -240,14 +202,13 @@ function App() {
                     color: "#FFFFFF",
                     fontWeight: 600
                 }}>Users</DialogTitle>
-                <UsersPopup users={users} setUsers={setUsers}/>
+                <UsersPopup />
             </Dialog>
           }
           {addTaskPopup &&
             <TaskPopup
               open={addTaskPopup}
               setOpen={setAddTaskPopup}
-              users={["Any", ...users]}
               setTaskChanged={setTaskChangedMessage}
               setTasks={setTasks}
               currentPage={currentPage}

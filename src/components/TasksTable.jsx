@@ -24,15 +24,16 @@ import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import PropTypes from "prop-types";
 import React from "react";
 import {useTasks} from "../contexts/TasksContext.jsx";
+import {useUsers} from "../contexts/UsersContext.jsx";
 import Row from "./Row.jsx";
 
 TasksTable.propTypes = {
-    users: PropTypes.array,
     setTaskChanged: PropTypes.func
 }
 
-function TasksTable({users, setTaskChanged}) {
+function TasksTable({setTaskChanged}) {
     const {tasks, refreshTasks} = useTasks();
+    const {users, refreshUsers} = useUsers();
     const [priorityFilterValue, setPriorityFilterValue] = React.useState('');
     const [titleFilterValue, setTitleFilterValue] = React.useState('');
     const [assigneesFilterValues, setAssigneesFilterValues] = React.useState([]);
@@ -76,7 +77,6 @@ function TasksTable({users, setTaskChanged}) {
               assignees: assigneesFilterValues
           }
         );
-
     }
 
     return (
@@ -107,6 +107,7 @@ function TasksTable({users, setTaskChanged}) {
                               onClick={() => {
                                   setFilterEnabled(!filterEnabled);
                                   refreshTasks();
+                                  refreshUsers();
                               }}
                               sx={{color: '#FFFFFF', cursor: 'pointer'}}/>
                           }
@@ -315,7 +316,6 @@ function TasksTable({users, setTaskChanged}) {
                       key={row.title}
                       row={row}
                       index={index}
-                      users={users}
                       setTaskChanged={setTaskChanged}
                     />
                   ))}
