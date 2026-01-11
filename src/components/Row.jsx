@@ -434,6 +434,14 @@ function Row(props) {
                                                           renderValue={(selected) => selected.join(', ')}
                                                           size={"small"}
                                                           sx={{backgroundColor: '#FFFFFF'}}
+                                                          MenuProps={{
+                                                            PaperProps: {
+                                                              style: {
+                                                                maxHeight: 300,
+                                                                width: 'auto',
+                                                              },
+                                                            },
+                                                          }}
                                                         >
                                                             {users.map((name) => (
                                                               <MenuItem key={name} value={name}>
