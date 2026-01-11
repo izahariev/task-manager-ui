@@ -16,6 +16,7 @@ import {
     ListItemText,
     MenuItem,
     OutlinedInput,
+    Pagination,
     Select,
     TextField
 } from "@mui/material";
@@ -68,6 +69,8 @@ function Row(props) {
     const [readOnly, setReadOnly] = React.useState(true);
     const [subtaskReadOnly, setSubtaskReadOnly] = React.useState(true);
     const [subtasks, setSubtasks] = React.useState([]);
+    const [subtaskCurrentPage, setSubtaskCurrentPage] = React.useState(1);
+    const [subtaskPageCount, setSubtaskPageCount] = React.useState(0);
     const [priorityFilterValue, setPriorityFilterValue] = React.useState('');
     const [titleFilterValue, setTitleFilterValue] = React.useState('');
     const [assigneesFilterValues, setAssigneesFilterValues] = React.useState([]);
@@ -81,6 +84,7 @@ function Row(props) {
             setTitleFilterValue("");
             setDeadlineDateFilterValue(null);
             setAssigneesFilterValues([]);
+            setSubtaskCurrentPage(1);
         }
     }, [open])
 
@@ -105,13 +109,15 @@ function Row(props) {
         );
     };
 
-    const refreshSubtasks = (priority = null, title = null, deadline = null, assignees = null) => {
-        fetchTasks(row.id, priority, title, deadline, false, assignees, 1, 5)
+    const refreshSubtasks = (priority = null, title = null, deadline = null, assignees = null, page = subtaskCurrentPage) => {
+        fetchTasks(row.id, priority, title, deadline, false, assignees, page, 5)
           .then(r => {
               if (r.errors.length > 0) {
                   addErrors(r.errors);
               } else {
-                  setSubtasks(r.content.elements)
+                  setSubtasks(r.content.elements);
+                  setSubtaskPageCount(r.content.totalPageCount);
+                  setSubtaskCurrentPage(page);
                   clearErrors();
               }
           }).catch(error => {
@@ -141,7 +147,7 @@ function Row(props) {
                     onClick={
                         () => {
                             if (!open) {
-                                refreshSubtasks();
+                                refreshSubtasks(1);
                             }
                             setOpen(!open)
                         }
@@ -305,7 +311,7 @@ function Row(props) {
                                             <FilterListOffIcon
                                               onClick={() => {
                                                   setFilterEnabled(!filterEnabled);
-                                                  refreshSubtasks();
+                                                  refreshSubtasks(1);
                                               }}
                                               sx={{color: '#2D3748', cursor: 'pointer'}}/>
                                           }
@@ -510,7 +516,7 @@ function Row(props) {
                                               }}
                                               onClick={() => {
                                                   refreshSubtasks(priorityFilterValue, titleFilterValue,
-                                                    deadlineDateFilterValue, assigneesFilterValues);
+                                                    deadlineDateFilterValue, assigneesFilterValues, 1);
                                               }}
                                             >
                                                 Apply
@@ -572,10 +578,11 @@ function Row(props) {
                                                                     priorityFilterValue || null,
                                                                     titleFilterValue || null,
                                                                     deadlineDateFilterValue || null,
-                                                                    assigneesFilterValues.length > 0 ? assigneesFilterValues : null
+                                                                    assigneesFilterValues.length > 0 ? assigneesFilterValues : null,
+                                                                    subtaskCurrentPage
                                                                 );
                                                             } else {
-                                                                refreshSubtasks();
+                                                                refreshSubtasks(subtaskCurrentPage);
                                                             }
                                                             setTaskChangedMessage(`Subtask "${subtaskRow.title}" completed`);
                                                         }
@@ -627,6 +634,45 @@ function Row(props) {
                                   ))}
                               </TableBody>
                           </Table>
+                          {subtaskPageCount > 0 &&
+                            <Box sx={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                marginTop: 2,
+                                marginBottom: 1
+                            }}>
+                                <Pagination
+                                  count={subtaskPageCount}
+                                  page={subtaskCurrentPage}
+                                  sx={{
+                                      '& .MuiPaginationItem-root': {
+                                          color: '#2D3748',
+                                          '&.Mui-selected': {
+                                              backgroundColor: '#5B7FA6',
+                                              color: '#FFFFFF',
+                                              '&:hover': {
+                                                  backgroundColor: '#4A6B8F',
+                                              }
+                                          },
+                                          '&:hover': {
+                                              backgroundColor: '#E0E7FF',
+                                          }
+                                      }
+                                  }}
+                                  showFirstButton
+                                  showLastButton
+                                  onChange={(event, page) => {
+                                      refreshSubtasks(
+                                          filterEnabled ? priorityFilterValue || null : null,
+                                          filterEnabled ? titleFilterValue || null : null,
+                                          filterEnabled ? deadlineDateFilterValue || null : null,
+                                          filterEnabled && assigneesFilterValues.length > 0 ? assigneesFilterValues : null,
+                                          page
+                                      );
+                                  }}
+                                />
+                            </Box>
+                          }
                       </Box>
                   </Collapse>
               </TableCell>
