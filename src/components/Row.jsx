@@ -66,6 +66,7 @@ function Row(props) {
     const [viewSubtaskPopup, setViewSubtaskPopup] = React.useState(false);
     const [selectedSubtaskId, setSelectedSubtaskId] = React.useState(null);
     const [readOnly, setReadOnly] = React.useState(true);
+    const [subtaskReadOnly, setSubtaskReadOnly] = React.useState(true);
     const [subtasks, setSubtasks] = React.useState([]);
     const [priorityFilterValue, setPriorityFilterValue] = React.useState('');
     const [titleFilterValue, setTitleFilterValue] = React.useState('');
@@ -532,21 +533,25 @@ function Row(props) {
                                         <TableCell onClick={(e) => {
                                             e.stopPropagation();
                                             setSelectedSubtaskId(subtaskRow.id);
+                                            setSubtaskReadOnly(true);
                                             setViewSubtaskPopup(true);
                                         }} sx={{cursor: 'pointer'}}>{subtaskRow.priority}</TableCell>
                                         <TableCell onClick={(e) => {
                                             e.stopPropagation();
                                             setSelectedSubtaskId(subtaskRow.id);
+                                            setSubtaskReadOnly(true);
                                             setViewSubtaskPopup(true);
                                         }} sx={{cursor: 'pointer'}}>{subtaskRow.title}</TableCell>
                                         <TableCell onClick={(e) => {
                                             e.stopPropagation();
                                             setSelectedSubtaskId(subtaskRow.id);
+                                            setSubtaskReadOnly(true);
                                             setViewSubtaskPopup(true);
                                         }} sx={{cursor: 'pointer'}}>{subtaskRow.deadline}</TableCell>
                                         <TableCell onClick={(e) => {
                                             e.stopPropagation();
                                             setSelectedSubtaskId(subtaskRow.id);
+                                            setSubtaskReadOnly(true);
                                             setViewSubtaskPopup(true);
                                         }} sx={{cursor: 'pointer'}}>{subtaskRow.assignees}</TableCell>
                                         <TableCell align={'right'}>
@@ -595,6 +600,12 @@ function Row(props) {
                                                   transition: 'background-color 0.2s ease'
                                               }}
                                               size={"small"}
+                                              onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  setSelectedSubtaskId(subtaskRow.id);
+                                                  setSubtaskReadOnly(false);
+                                                  setViewSubtaskPopup(true);
+                                              }}
                                             >
                                                 <EditIcon sx={{color: "white"}} fontSize={"small"}/>
                                             </IconButton>
@@ -648,7 +659,7 @@ function Row(props) {
               taskId={selectedSubtaskId}
               parentTaskId={row.id}
               parentTask={row.title}
-              customReadOnly={true}
+              customReadOnly={subtaskReadOnly}
               refreshSubtasks={refreshSubtasks}
             />
           }
