@@ -32,6 +32,7 @@ import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import PropTypes from "prop-types";
 import React from "react";
 import {useErrors} from "../contexts/ErrorMessagesContext.jsx";
+import {useTaskChangedMessage} from "../contexts/TaskChangedMessageContext.jsx";
 import {useTasks} from "../contexts/TasksContext.jsx";
 import {useUsers} from "../contexts/UsersContext.jsx";
 import {fetchTasks, updateTask} from "../js/BackendApis.js";
@@ -51,14 +52,14 @@ Row.propTypes = {
         assignees: PropTypes.string
     }),
     index: PropTypes.number,
-    setTaskChanged: PropTypes.func,
 };
 
 function Row(props) {
     const {setTasks, currentPage, refreshTasks} = useTasks();
     const {addErrors, clearErrors} = useErrors();
     const {users, refreshUsers} = useUsers();
-    const {row, index, setTaskChanged} = props;
+    const {setTaskChangedMessage} = useTaskChangedMessage();
+    const {row, index} = props;
     const [open, setOpen] = React.useState(false);
     const [viewTaskPopup, setViewTaskPopup] = React.useState(false);
     const [openAddSubtaskPopup, setOpenAddSubtaskPopup] = React.useState(false);
@@ -72,14 +73,13 @@ function Row(props) {
 
     React.useEffect(() => {
         if (open === false) {
-            setReadOnly(true);
             setFilterEnabled(false);
             setPriorityFilterValue("");
             setTitleFilterValue("");
             setDeadlineDateFilterValue(null);
             setAssigneesFilterValues([]);
         }
-    }, [open, readOnly])
+    }, [open])
 
     const handlePriorityFilterValueChange = (event) => {
         setPriorityFilterValue(event.target.value);
@@ -147,31 +147,39 @@ function Row(props) {
                       {open ? <KeyboardArrowUpIcon/> : <KeyboardArrowDownIcon/>}
                   </IconButton>
               </TableCell>
-              <TableCell onClick={() => {
+              <TableCell onClick={(e) => {
                   if (open) {
                       setOpen(false);
                   } else {
+                      e.stopPropagation();
+                      setReadOnly(true);
                       setViewTaskPopup(true);
                   }
               }}>{row.priority}</TableCell>
-              <TableCell onClick={() => {
+              <TableCell onClick={(e) => {
                   if (open) {
                       setOpen(false);
                   } else {
+                      e.stopPropagation();
+                      setReadOnly(true);
                       setViewTaskPopup(true);
                   }
               }}>{row.title}</TableCell>
-              <TableCell onClick={() => {
+              <TableCell onClick={(e) => {
                   if (open) {
                       setOpen(false);
                   } else {
+                      e.stopPropagation();
+                      setReadOnly(true);
                       setViewTaskPopup(true);
                   }
               }}>{row.deadline}</TableCell>
-              <TableCell onClick={() => {
+              <TableCell onClick={(e) => {
                   if (open) {
                       setOpen(false);
                   } else {
+                      e.stopPropagation();
+                      setReadOnly(true);
                       setViewTaskPopup(true);
                   }
               }}>
@@ -195,7 +203,7 @@ function Row(props) {
                               } else {
                                   refreshTasks();
                                   setOpen(false);
-                                  setTaskChanged(`Task "${row.title}" completed`);
+                                  setTaskChangedMessage(`Task "${row.title}" completed`);
                               }
                           }
                         )
@@ -220,7 +228,8 @@ function Row(props) {
                         transition: 'background-color 0.2s ease'
                     }}
                     size={"small"}
-                    onClick={() => {
+                    onClick={(e) => {
+                        e.stopPropagation();
                         setReadOnly(false);
                         setViewTaskPopup(true);
                     }}>
@@ -563,7 +572,6 @@ function Row(props) {
             <TaskPopup
               open={viewTaskPopup}
               setOpen={setViewTaskPopup}
-              setTaskChanged={setTaskChanged}
               taskId={row.id}
               setTasks={setTasks}
               customReadOnly={readOnly}
@@ -574,7 +582,6 @@ function Row(props) {
             <TaskPopup
               open={openAddSubtaskPopup}
               setOpen={setOpenAddSubtaskPopup}
-              setTaskChanged={setTaskChanged}
               setTasks={setTasks}
               setSubtasks={setSubtasks}
               parentTaskId={row.id}

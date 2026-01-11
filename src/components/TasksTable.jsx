@@ -21,17 +21,12 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import {DatePicker, LocalizationProvider} from "@mui/x-date-pickers";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
-import PropTypes from "prop-types";
 import React from "react";
 import {useTasks} from "../contexts/TasksContext.jsx";
 import {useUsers} from "../contexts/UsersContext.jsx";
 import Row from "./Row.jsx";
 
-TasksTable.propTypes = {
-    setTaskChanged: PropTypes.func
-}
-
-function TasksTable({setTaskChanged}) {
+function TasksTable() {
     const {tasks, refreshTasks} = useTasks();
     const {users, refreshUsers} = useUsers();
     const [priorityFilterValue, setPriorityFilterValue] = React.useState('');
@@ -316,7 +311,6 @@ function TasksTable({setTaskChanged}) {
                       key={row.title}
                       row={row}
                       index={index}
-                      setTaskChanged={setTaskChanged}
                     />
                   ))}
               </TableBody>

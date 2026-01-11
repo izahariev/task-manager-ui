@@ -1,8 +1,7 @@
-Check if subtasks context is needed or extract subtasks management logic
-Check if setTasksChanged context is needed
+Fix user management error alerts and imporve UI
+Fix view details subtasks
 Fix complete subtasks
 Fix edit subtasks
-Check API calls and fix them
 Enable subtasks pagination
 Enable subtasks current page on add
 Fix delete tasks
@@ -10,8 +9,6 @@ Fix delete subtasks
 Enable inactive tasks
 Enable completed tasks
 Fix unique task names
-Fix user management error alerts
-Simplify task fetching
 Fix repeating API calls
 Fix console errors
 Check all workflows

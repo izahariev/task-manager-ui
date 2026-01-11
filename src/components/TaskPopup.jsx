@@ -7,25 +7,13 @@ import Typography from "@mui/material/Typography";
 import dayjs from "dayjs";
 import PropTypes from "prop-types";
 import React from "react";
+import {useTaskChangedMessage} from "../contexts/TaskChangedMessageContext.jsx";
 import {useTasks} from "../contexts/TasksContext.jsx";
 import {useUsers} from "../contexts/UsersContext.jsx";
 import {addTask, fetchTask, updateTask} from "../js/BackendApis.js";
 import AssigneesSection from "./task_popup/AssigneesSection.jsx";
 import PrioritySection from "./task_popup/PrioritySection.jsx";
 import TimeSection from "./task_popup/TimeSection.jsx";
-
-TaskPopup.propTypes = {
-    open: PropTypes.bool,
-    setOpen: PropTypes.func,
-    parentTaskId: PropTypes.string,
-    parentTask: PropTypes.string,
-    setTaskChanged: PropTypes.func,
-    taskId: PropTypes.string,
-    setPageCount: PropTypes.func,
-    currentPage: PropTypes.number,
-    customReadOnly: PropTypes.bool,
-    refreshSubtasks: PropTypes.func
-}
 
 const Transition = React.forwardRef(
   function Transition(props, ref) {
@@ -48,11 +36,11 @@ export default function TaskPopup(props) {
         setOpen,
         parentTaskId,
         parentTask,
-        setTaskChanged,
         taskId,
         customReadOnly,
         refreshSubtasks
     } = props;
+    const {setTaskChangedMessage} = useTaskChangedMessage();
     const [currentTask, setCurrentTask] = React.useState({
         parentTaskId: parentTaskId,
         title: "",
@@ -66,9 +54,17 @@ export default function TaskPopup(props) {
     const {refreshTasks} = useTasks();
     const {users, refreshUsers} = useUsers();
     const [initialTask, setInitialTask] = React.useState(null)
-    const [readOnly, setReadOnly] = React.useState(false)
+    const [readOnly, setReadOnly] = React.useState(customReadOnly)
     const [isEdit, setIsEdit] = React.useState(false)
     const [errorMessages, setErrorMessages] = React.useState([]);
+
+    // React.useEffect(() => {
+    //     if (customReadOnly !== undefined) {
+    //         setReadOnly(customReadOnly);
+    //     } else if (taskId !== undefined) {
+    //         setReadOnly(true);
+    //     }
+    // }, [customReadOnly, taskId]);
 
     React.useEffect(() => {
         if (taskId !== undefined) {
@@ -98,11 +94,6 @@ export default function TaskPopup(props) {
                             assignees: [...task.assignees]
                         }
                       )
-                      if (customReadOnly !== undefined) {
-                          setReadOnly(customReadOnly)
-                      } else {
-                          setReadOnly(true)
-                      }
                   }
               })
               .catch(error => {
@@ -114,7 +105,7 @@ export default function TaskPopup(props) {
               });
         }
         refreshUsers();
-    }, [customReadOnly, refreshUsers, taskId])
+    }, [refreshUsers, taskId])
 
     const handleSaveClick = () => {
         const errors = [];
@@ -136,11 +127,11 @@ export default function TaskPopup(props) {
                       if (parentTaskId == null) {
                           refreshTasks();
                           setErrorMessages([]);
-                          setTaskChanged(`Task "${currentTask.title}" created`);
+                          setTaskChangedMessage(`Task "${currentTask.title}" created`);
                       } else {
                           refreshSubtasks();
                           setErrorMessages([]);
-                          setTaskChanged(`Subtask "${currentTask.title}" for task "${parentTask}" created`);
+                          setTaskChangedMessage(`Subtask "${currentTask.title}" for task "${parentTask}" created`);
                       }
                       setOpen(false);
                   }
@@ -166,7 +157,7 @@ export default function TaskPopup(props) {
                         } else {
                             refreshTasks();
                             setOpen(false);
-                            setTaskChanged(`Task "${currentTask.title}" updated`);
+                            setTaskChangedMessage(`Task "${currentTask.title}" updated`);
                         }
                     }
                   )
@@ -257,7 +248,7 @@ export default function TaskPopup(props) {
                                         } else {
                                             refreshTasks();
                                             setOpen(false);
-                                            setTaskChanged(`Task "${currentTask.title}" updated`);
+                                            setTaskChangedMessage(`Task "${currentTask.title}" updated`);
                                         }
                                     }
                                   )
@@ -482,4 +473,14 @@ export default function TaskPopup(props) {
           </Dialog>
       </React.Fragment>
     );
+}
+
+TaskPopup.propTypes = {
+    open: PropTypes.bool,
+    setOpen: PropTypes.func,
+    parentTaskId: PropTypes.string,
+    parentTask: PropTypes.string,
+    taskId: PropTypes.string,
+    customReadOnly: PropTypes.bool,
+    refreshSubtasks: PropTypes.func
 }

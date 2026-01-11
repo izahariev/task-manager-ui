@@ -4,6 +4,7 @@ import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid2";
 import React from "react";
 import {useErrors} from "../contexts/ErrorMessagesContext.jsx";
+import {useTaskChangedMessage} from "../contexts/TaskChangedMessageContext.jsx";
 import {useTasks} from "../contexts/TasksContext.jsx";
 import TaskPopup from "./TaskPopup.jsx";
 import TasksTable from "./TasksTable.jsx";
@@ -12,31 +13,9 @@ import UsersPopup from "./UsersPopup.jsx";
 function App() {
     const {setTasks, currentPage, pageCount, refreshTasks} = useTasks();
     const {errorMessages, clearErrors} = useErrors();
+    const {taskChangedMessage, showAlert, setShowAlert, setTaskChangedMessage} = useTaskChangedMessage();
     const [showUsersPopup, setShowUsersPopup] = React.useState(false);
     const [addTaskPopup, setAddTaskPopup] = React.useState(false);
-    const [taskChangedMessage, setTaskChangedMessage] = React.useState(null);
-    const [showAlert, setShowAlert] = React.useState(false);
-    const removeTimerRef = React.useRef(null);
-
-    React.useEffect(() => {
-        if (taskChangedMessage !== null) {
-            setShowAlert(true);
-            const timer = setTimeout(() => {
-                setShowAlert(false);
-                // Wait for fade-out animation to complete (500ms) before removing from DOM
-                removeTimerRef.current = setTimeout(() => {
-                    setTaskChangedMessage(null);
-                }, 500);
-            }, 5000);
-            return () => {
-                clearTimeout(timer);
-                if (removeTimerRef.current) {
-                    clearTimeout(removeTimerRef.current);
-                    removeTimerRef.current = null;
-                }
-            };
-        }
-    }, [taskChangedMessage])
 
     function getTasksPage(event, page) {
         refreshTasks({page: page});
@@ -113,9 +92,7 @@ function App() {
                       <h1 style={{color: '#718096', fontWeight: 500}}>Completed tasks</h1>
                   </Grid>
                   <Grid size={12} sx={{margin: '1%  0 0.5% 0'}}>
-                      <TasksTable
-                        setTaskChanged={setTaskChangedMessage}
-                      />
+                      <TasksTable />
                   </Grid>
                   <Grid size={12} sx={{
                       display: 'flex',
@@ -209,7 +186,6 @@ function App() {
             <TaskPopup
               open={addTaskPopup}
               setOpen={setAddTaskPopup}
-              setTaskChanged={setTaskChangedMessage}
               setTasks={setTasks}
               currentPage={currentPage}
             />
