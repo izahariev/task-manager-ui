@@ -1,4 +1,3 @@
-Fix user management error alerts and imporve UI
 Fix view details subtasks
 Fix complete subtasks
 Fix edit subtasks
@@ -9,6 +8,7 @@ Fix delete subtasks
 Enable inactive tasks
 Enable completed tasks
 Fix unique task names
+Fix deleting user which have tasks
 Fix repeating API calls
 Fix console errors
 Check all workflows

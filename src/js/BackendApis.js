@@ -1,9 +1,11 @@
 import axios from "axios";
 import * as qs from "qs";
 
-export async function fetchUsers() {
-    const response = await axios.get('http://localhost:8080/users/get')
-    return  response.data;
+export async function fetchUsers(page = 1, size = 10) {
+    const response = await axios.get('http://localhost:8080/users/get', {
+        params: { page, size }
+    });
+    return response.data;
 }
 
 export async function fetchTask(id) {
