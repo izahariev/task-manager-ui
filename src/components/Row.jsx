@@ -84,6 +84,9 @@ function Row(props) {
     const [deadlineDateFilterValue, setDeadlineDateFilterValue] = React.useState(null);
     const [deleteTaskId, setDeleteTaskId] = React.useState(null);
     const [deleteTaskError, setDeleteTaskError] = React.useState(null);
+    const [deleteSubtaskId, setDeleteSubtaskId] = React.useState(null);
+    const [deleteSubtaskError, setDeleteSubtaskError] = React.useState(null);
+    const [deleteSubtaskTitle, setDeleteSubtaskTitle] = React.useState('');
 
     React.useEffect(() => {
         if (open === false) {
@@ -154,6 +157,38 @@ function Row(props) {
                 ? error.response.data.errors.map((e) => e.description).join(', ')
                 : 'An error occurred while deleting the task';
               setDeleteTaskError(errorMessage);
+          });
+    };
+
+    const handleDeleteSubtaskClick = () => {
+        const subtaskTitleToDelete = deleteSubtaskTitle;
+        deleteTask(deleteSubtaskId)
+          .then(r => {
+              if (r.errors && r.errors.length > 0) {
+                  setDeleteSubtaskError(r.errors.join(', '));
+              } else {
+                  setDeleteSubtaskId(null);
+                  setDeleteSubtaskError(null);
+                  setDeleteSubtaskTitle('');
+                  if (filterEnabled) {
+                      refreshSubtasks(
+                          priorityFilterValue || null,
+                          titleFilterValue || null,
+                          deadlineDateFilterValue || null,
+                          assigneesFilterValues.length > 0 ? assigneesFilterValues : null,
+                          subtaskCurrentPage
+                      );
+                  } else {
+                      refreshSubtasks({page: subtaskCurrentPage});
+                  }
+                  setTaskChangedMessage(`Subtask "${subtaskTitleToDelete}" deleted`);
+              }
+          })
+          .catch(error => {
+              const errorMessage = error.response?.data?.errors
+                ? error.response.data.errors.map((e) => e.description).join(', ')
+                : 'An error occurred while deleting the subtask';
+              setDeleteSubtaskError(errorMessage);
           });
     };
 
@@ -659,6 +694,12 @@ function Row(props) {
                                                   transition: 'background-color 0.2s ease'
                                               }}
                                               size={"small"}
+                                              onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  setDeleteSubtaskId(subtaskRow.id);
+                                                  setDeleteSubtaskTitle(subtaskRow.title);
+                                                  setDeleteSubtaskError(null);
+                                              }}
                                             >
                                                 <DeleteIcon sx={{color: "white"}} fontSize={"small"}/>
                                             </IconButton>
@@ -777,6 +818,57 @@ function Row(props) {
                   </Button>
                   <Button
                     onClick={handleDeleteTaskClick}
+                    sx={{
+                        backgroundColor: '#F44336',
+                        color: 'white',
+                        '&:hover': {
+                            backgroundColor: '#D32F2F',
+                        },
+                        transition: 'background-color 0.2s ease'
+                    }}
+                    variant="contained"
+                  >
+                      Delete
+                  </Button>
+              </DialogActions>
+          </Dialog>
+          <Dialog
+            open={deleteSubtaskId !== null}
+            onClose={() => {
+                setDeleteSubtaskId(null);
+                setDeleteSubtaskTitle('');
+                setDeleteSubtaskError(null);
+            }}
+          >
+              <DialogTitle>Delete Subtask</DialogTitle>
+              <DialogContent>
+                  {deleteSubtaskError && (
+                      <Alert severity="error" sx={{marginBottom: 2}} onClose={() => setDeleteSubtaskError(null)}>
+                          {deleteSubtaskError}
+                      </Alert>
+                  )}
+                  <DialogContentText>
+                      Are you sure you want to delete subtask <strong>"{deleteSubtaskTitle}"</strong>?
+                  </DialogContentText>
+              </DialogContent>
+              <DialogActions>
+                  <Button
+                    onClick={() => {
+                        setDeleteSubtaskId(null);
+                        setDeleteSubtaskTitle('');
+                        setDeleteSubtaskError(null);
+                    }}
+                    sx={{
+                        color: '#5B7FA6',
+                        '&:hover': {
+                            backgroundColor: '#E0E7FF',
+                        }
+                    }}
+                  >
+                      Cancel
+                  </Button>
+                  <Button
+                    onClick={handleDeleteSubtaskClick}
                     sx={{
                         backgroundColor: '#F44336',
                         color: 'white',
