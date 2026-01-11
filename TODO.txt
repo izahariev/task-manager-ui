@@ -1,4 +1,3 @@
-Fix view details subtasks
 Fix complete subtasks
 Fix edit subtasks
 Enable subtasks pagination
