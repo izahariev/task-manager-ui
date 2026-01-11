@@ -1,4 +1,3 @@
-Fix complete subtasks
 Fix edit subtasks
 Enable subtasks pagination
 Enable subtasks current page on add

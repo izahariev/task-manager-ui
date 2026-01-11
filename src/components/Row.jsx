@@ -548,7 +548,33 @@ function Row(props) {
                                                     backgroundColor: '#45a049',
                                                 },
                                                 transition: 'background-color 0.2s ease'
-                                            }} size={"small"}>
+                                            }} size={"small"} onClick={() => {
+                                                updateTask(subtaskRow.id, {"isCompleted": true})
+                                                    .then(r => {
+                                                        if (r.errors.length > 0) {
+                                                            addErrors(r.errors);
+                                                        } else {
+                                                            if (filterEnabled) {
+                                                                refreshSubtasks(
+                                                                    priorityFilterValue || null,
+                                                                    titleFilterValue || null,
+                                                                    deadlineDateFilterValue || null,
+                                                                    assigneesFilterValues.length > 0 ? assigneesFilterValues : null
+                                                                );
+                                                            } else {
+                                                                refreshSubtasks();
+                                                            }
+                                                            setTaskChangedMessage(`Subtask "${subtaskRow.title}" completed`);
+                                                        }
+                                                    })
+                                                    .catch(error => {
+                                                        const errors = []
+                                                        error.response.data['errors'].forEach((error) => {
+                                                            errors.push(error['description']);
+                                                        })
+                                                        addErrors(errors);
+                                                    });
+                                            }}>
                                                 <CheckIcon sx={{color: "white"}} fontSize={"small"}/>
                                             </IconButton>
                                             <IconButton
