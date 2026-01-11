@@ -102,9 +102,8 @@ function Row(props) {
         );
     };
 
-    const handleApplyFilterClick = () => {
-        fetchTasks(row.id, priorityFilterValue, titleFilterValue, deadlineDateFilterValue, false,
-          assigneesFilterValues, 1, 10)
+    const refreshSubtasks = (priority = null, title = null, deadline = null, assignees = null) => {
+        fetchTasks(row.id, priority, title, deadline, false, assignees, 1, 5)
           .then(r => {
               if (r.errors.length > 0) {
                   addErrors(r.errors);
@@ -119,7 +118,7 @@ function Row(props) {
             })
             addErrors(errors);
         });
-    }
+    };
 
     return (
       <React.Fragment>
@@ -139,22 +138,7 @@ function Row(props) {
                     onClick={
                         () => {
                             if (!open) {
-                                fetchTasks(row.id, null, null, null, false,
-                                  null, 1, 10)
-                                  .then(r => {
-                                      if (r.errors.length > 0) {
-                                          addErrors(r.errors);
-                                      } else {
-                                          setSubtasks(r.content.elements)
-                                      }
-                                  })
-                                  .catch(error => {
-                                      const errors = []
-                                      error.response.data['errors'].forEach((error) => {
-                                          errors.push(error['description']);
-                                      })
-                                      addErrors(errors);
-                                  });
+                                refreshSubtasks();
                             }
                             setOpen(!open)
                         }
@@ -309,22 +293,7 @@ function Row(props) {
                                             <FilterListOffIcon
                                               onClick={() => {
                                                   setFilterEnabled(!filterEnabled);
-                                                  fetchTasks(row.id, null, null, null,
-                                                    false, null, 1, 10)
-                                                    .then(r => {
-                                                        if (r.errors.length > 0) {
-                                                            addErrors(r.errors);
-                                                        } else {
-                                                            setSubtasks(r.content.elements)
-                                                        }
-                                                    })
-                                                    .catch(error => {
-                                                        const errors = []
-                                                        error.response.data['errors'].forEach((error) => {
-                                                            errors.push(error['description']);
-                                                        })
-                                                        addErrors(errors);
-                                                    });
+                                                  refreshSubtasks();
                                               }}
                                               sx={{color: '#2D3748', cursor: 'pointer'}}/>
                                           }
@@ -519,7 +488,10 @@ function Row(props) {
                                                   },
                                                   transition: 'background-color 0.2s ease'
                                               }}
-                                              onClick={handleApplyFilterClick}
+                                              onClick={() => {
+                                                  refreshSubtasks(priorityFilterValue, titleFilterValue,
+                                                    deadlineDateFilterValue, assigneesFilterValues);
+                                              }}
                                             >
                                                 Apply
                                             </Button>
@@ -607,6 +579,7 @@ function Row(props) {
               setSubtasks={setSubtasks}
               parentTaskId={row.id}
               parentTask={row.title}
+              refreshSubtasks={refreshSubtasks}
             />
           }
       </React.Fragment>

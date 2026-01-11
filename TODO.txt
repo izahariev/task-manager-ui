@@ -1,4 +1,3 @@
-Create and use users context
 Check if subtasks context is needed or extract subtasks management logic
 Check if setTasksChanged context is needed
 Fix complete subtasks

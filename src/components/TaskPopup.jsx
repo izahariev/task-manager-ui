@@ -9,7 +9,7 @@ import PropTypes from "prop-types";
 import React from "react";
 import {useTasks} from "../contexts/TasksContext.jsx";
 import {useUsers} from "../contexts/UsersContext.jsx";
-import {addTask, fetchTask, fetchTasks, updateTask} from "../js/BackendApis.js";
+import {addTask, fetchTask, updateTask} from "../js/BackendApis.js";
 import AssigneesSection from "./task_popup/AssigneesSection.jsx";
 import PrioritySection from "./task_popup/PrioritySection.jsx";
 import TimeSection from "./task_popup/TimeSection.jsx";
@@ -21,11 +21,10 @@ TaskPopup.propTypes = {
     parentTask: PropTypes.string,
     setTaskChanged: PropTypes.func,
     taskId: PropTypes.string,
-    setTasks: PropTypes.func,
-    setSubtasks: PropTypes.func,
     setPageCount: PropTypes.func,
     currentPage: PropTypes.number,
-    customReadOnly: PropTypes.bool
+    customReadOnly: PropTypes.bool,
+    refreshSubtasks: PropTypes.func
 }
 
 const Transition = React.forwardRef(
@@ -51,8 +50,8 @@ export default function TaskPopup(props) {
         parentTask,
         setTaskChanged,
         taskId,
-        setSubtasks,
-        customReadOnly
+        customReadOnly,
+        refreshSubtasks
     } = props;
     const [currentTask, setCurrentTask] = React.useState({
         parentTaskId: parentTaskId,
@@ -136,26 +135,12 @@ export default function TaskPopup(props) {
                   } else {
                       if (parentTaskId == null) {
                           refreshTasks();
+                          setErrorMessages([]);
                           setTaskChanged(`Task "${currentTask.title}" created`);
                       } else {
-                          fetchTasks(parentTaskId, null, null, null, false,
-                            null, 1, 10)
-                            .then(r => {
-                                if (r.errors.length > 0) {
-                                    setErrorMessages([...r.errors]);
-                                } else {
-                                    setSubtasks(r.content.elements)
-                                    setErrorMessages([]);
-                                    setTaskChanged(`Subtask "${currentTask.title}" for task "${parentTask}" created`);
-                                }
-                            })
-                            .catch(error => {
-                                const errors = []
-                                error.response.data['errors'].forEach((error) => {
-                                    errors.push(error['description']);
-                                })
-                                setErrorMessages([...errors]);
-                            });
+                          refreshSubtasks();
+                          setErrorMessages([]);
+                          setTaskChanged(`Subtask "${currentTask.title}" for task "${parentTask}" created`);
                       }
                       setOpen(false);
                   }
