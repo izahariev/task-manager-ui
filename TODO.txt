@@ -1,5 +1,3 @@
-Enable subtasks current page on add
-Fix delete tasks
 Fix delete subtasks
 Enable inactive tasks
 Enable completed tasks

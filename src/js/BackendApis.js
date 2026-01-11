@@ -66,3 +66,8 @@ export async function updateTask(id, updatedFields) {
     const response = await axios.patch('http://localhost:8080/tasks/' + id, updatedFields);
     return  response.data;
 }
+
+export async function deleteTask(id) {
+    const response = await axios.delete('http://localhost:8080/tasks/' + id);
+    return response.data;
+}

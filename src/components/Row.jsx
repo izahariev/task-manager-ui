@@ -7,9 +7,15 @@ import FilterListOffIcon from '@mui/icons-material/FilterListOff';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import {
+    Alert,
     Box,
     Checkbox,
     Collapse,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
     FormControl,
     IconButton,
     InputLabel,
@@ -36,7 +42,7 @@ import {useErrors} from "../contexts/ErrorMessagesContext.jsx";
 import {useTaskChangedMessage} from "../contexts/TaskChangedMessageContext.jsx";
 import {useTasks} from "../contexts/TasksContext.jsx";
 import {useUsers} from "../contexts/UsersContext.jsx";
-import {fetchTasks, updateTask} from "../js/BackendApis.js";
+import {deleteTask, fetchTasks, updateTask} from "../js/BackendApis.js";
 import TaskPopup from "./TaskPopup.jsx";
 
 
@@ -76,6 +82,8 @@ function Row(props) {
     const [assigneesFilterValues, setAssigneesFilterValues] = React.useState([]);
     const [filterEnabled, setFilterEnabled] = React.useState(false);
     const [deadlineDateFilterValue, setDeadlineDateFilterValue] = React.useState(null);
+    const [deleteTaskId, setDeleteTaskId] = React.useState(null);
+    const [deleteTaskError, setDeleteTaskError] = React.useState(null);
 
     React.useEffect(() => {
         if (open === false) {
@@ -129,6 +137,26 @@ function Row(props) {
         });
     };
 
+    const handleDeleteTaskClick = () => {
+        deleteTask(deleteTaskId)
+          .then(r => {
+              if (r.errors && r.errors.length > 0) {
+                  setDeleteTaskError(r.errors.join(', '));
+              } else {
+                  setDeleteTaskId(null);
+                  setDeleteTaskError(null);
+                  refreshTasks();
+                  setTaskChangedMessage(`Task "${row.title}" deleted`);
+              }
+          })
+          .catch(error => {
+              const errorMessage = error.response?.data?.errors
+                ? error.response.data.errors.map((e) => e.description).join(', ')
+                : 'An error occurred while deleting the task';
+              setDeleteTaskError(errorMessage);
+          });
+    };
+
     return (
       <React.Fragment>
           <TableRow sx={{
@@ -147,7 +175,7 @@ function Row(props) {
                     onClick={
                         () => {
                             if (!open) {
-                                refreshSubtasks(1);
+                                refreshSubtasks({page: subtaskCurrentPage});
                             }
                             setOpen(!open)
                         }
@@ -251,7 +279,12 @@ function Row(props) {
                           backgroundColor: '#D32F2F',
                       },
                       transition: 'background-color 0.2s ease'
-                  }} size={"small"}>
+                  }} size={"small"}
+                  onClick={(e) => {
+                      e.stopPropagation();
+                      setDeleteTaskId(row.id);
+                      setDeleteTaskError(null);
+                  }}>
                       <DeleteIcon sx={{color: "white"}} fontSize={"small"}/>
                   </IconButton>
               </TableCell>
@@ -311,7 +344,7 @@ function Row(props) {
                                             <FilterListOffIcon
                                               onClick={() => {
                                                   setFilterEnabled(!filterEnabled);
-                                                  refreshSubtasks(1);
+                                                  refreshSubtasks({page: subtaskCurrentPage});
                                               }}
                                               sx={{color: '#2D3748', cursor: 'pointer'}}/>
                                           }
@@ -582,7 +615,7 @@ function Row(props) {
                                                                     subtaskCurrentPage
                                                                 );
                                                             } else {
-                                                                refreshSubtasks(subtaskCurrentPage);
+                                                                refreshSubtasks({page: subtaskCurrentPage});
                                                             }
                                                             setTaskChangedMessage(`Subtask "${subtaskRow.title}" completed`);
                                                         }
@@ -709,6 +742,55 @@ function Row(props) {
               refreshSubtasks={refreshSubtasks}
             />
           }
+          <Dialog
+            open={deleteTaskId !== null}
+            onClose={() => {
+                setDeleteTaskId(null);
+                setDeleteTaskError(null);
+            }}
+          >
+              <DialogTitle>Delete Task</DialogTitle>
+              <DialogContent>
+                  {deleteTaskError && (
+                      <Alert severity="error" sx={{marginBottom: 2}} onClose={() => setDeleteTaskError(null)}>
+                          {deleteTaskError}
+                      </Alert>
+                  )}
+                  <DialogContentText>
+                      Are you sure you want to delete task <strong>"{row.title}"</strong>?
+                  </DialogContentText>
+              </DialogContent>
+              <DialogActions>
+                  <Button
+                    onClick={() => {
+                        setDeleteTaskId(null);
+                        setDeleteTaskError(null);
+                    }}
+                    sx={{
+                        color: '#5B7FA6',
+                        '&:hover': {
+                            backgroundColor: '#E0E7FF',
+                        }
+                    }}
+                  >
+                      Cancel
+                  </Button>
+                  <Button
+                    onClick={handleDeleteTaskClick}
+                    sx={{
+                        backgroundColor: '#F44336',
+                        color: 'white',
+                        '&:hover': {
+                            backgroundColor: '#D32F2F',
+                        },
+                        transition: 'background-color 0.2s ease'
+                    }}
+                    variant="contained"
+                  >
+                      Delete
+                  </Button>
+              </DialogActions>
+          </Dialog>
       </React.Fragment>
     );
 }
