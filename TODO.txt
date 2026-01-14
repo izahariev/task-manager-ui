@@ -1,4 +1,3 @@
-Fix delete subtasks
 Enable inactive tasks
 Enable completed tasks
 Fix unique task names

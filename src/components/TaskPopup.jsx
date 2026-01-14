@@ -4,7 +4,6 @@ import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid2";
 import List from "@mui/material/List";
 import Typography from "@mui/material/Typography";
-import dayjs from "dayjs";
 import PropTypes from "prop-types";
 import React from "react";
 import {useTaskChangedMessage} from "../contexts/TaskChangedMessageContext.jsx";
@@ -46,7 +45,7 @@ export default function TaskPopup(props) {
         title: "",
         description: "",
         priority: "P3",
-        startTime: dayjs().format('YYYY-MM-DD').toString(),
+        startTime: "",
         deadline: "",
         repeat: "",
         assignees: []

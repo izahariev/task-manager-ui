@@ -1,8 +1,8 @@
 import PropTypes from "prop-types";
 import React from "react";
 import {fetchTasks} from "../js/BackendApis.js";
-import {TasksContext} from "./TasksContext";
 import {useErrors} from "./ErrorMessagesContext.jsx";
+import {TasksContext} from "./TasksContext";
 
 export function TasksProvider({ children }) {
     const [tasks, setTasks] = React.useState([]);
@@ -20,6 +20,7 @@ export function TasksProvider({ children }) {
             parentTaskId = null,
             priority = null,
             title = null,
+            startDate = null,
             deadline = null,
             isCompleted = false,
             assignees = null,
@@ -27,7 +28,7 @@ export function TasksProvider({ children }) {
             size = 9,
         } = filters;
 
-        return fetchTasks(parentTaskId, priority, title, deadline, isCompleted, assignees, page, size)
+        return fetchTasks(parentTaskId, priority, title, startDate, deadline, isCompleted, assignees, page, size)
           .then((r) => {
               if (r.errors.length > 0) {
                   addErrors(r.errors);

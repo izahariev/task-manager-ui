@@ -120,8 +120,9 @@ function Row(props) {
         );
     };
 
-    const refreshSubtasks = (priority = null, title = null, deadline = null, assignees = null, page = subtaskCurrentPage) => {
-        fetchTasks(row.id, priority, title, deadline, false, assignees, page, 5)
+    const refreshSubtasks = (priority = null, title = null, startDate = null, deadline = null,
+                             assignees = null, page = subtaskCurrentPage) => {
+        fetchTasks(row.id, priority, title, startDate, deadline, false, assignees, page, 5)
           .then(r => {
               if (r.errors.length > 0) {
                   addErrors(r.errors);

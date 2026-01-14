@@ -13,7 +13,7 @@ export async function fetchTask(id) {
     return  response.data;
 }
 
-export async function fetchTasks(parentTaskId, priority, title, deadline, isCompleted, assignees,
+export async function fetchTasks(parentTaskId, priority, title, startDate, deadline, isCompleted, assignees,
                                  page, size) {
     const params = {
         page,
@@ -30,6 +30,10 @@ export async function fetchTasks(parentTaskId, priority, title, deadline, isComp
 
     if (title) {
         params.title = title;
+    }
+
+    if (startDate) {
+        params.startDate = startDate.format('YYYY-MM-DD').toString();
     }
 
     if (deadline) {
@@ -57,7 +61,7 @@ export async function addTask(task) {
     const response = await axios.post(
       'http://localhost:8080/tasks/create',
       {parentTaskId: task.parentTaskId, title: task.title, description: task.description, priority: task.priority,
-          start: task.start, deadline: task.deadline, repeat: task.repeat, assignees: task.assignees}
+          start: task.startTime, deadline: task.deadline, repeat: task.repeat, assignees: task.assignees}
     )
     return  response.data;
 }
