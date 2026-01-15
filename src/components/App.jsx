@@ -2,6 +2,7 @@ import '../css/App.css'
 import {Alert, Container, Dialog, DialogTitle, Fade, Pagination} from "@mui/material";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid2";
+import dayjs from "dayjs";
 import React from "react";
 import {useErrors} from "../contexts/ErrorMessagesContext.jsx";
 import {useTaskChangedMessage} from "../contexts/TaskChangedMessageContext.jsx";
@@ -16,9 +17,24 @@ function App() {
     const {taskChangedMessage, showAlert, setShowAlert, setTaskChangedMessage} = useTaskChangedMessage();
     const [showUsersPopup, setShowUsersPopup] = React.useState(false);
     const [addTaskPopup, setAddTaskPopup] = React.useState(false);
+    const [selectedTab, setSelectedTab] = React.useState("active");
 
     function getTasksPage(event, page) {
-        refreshTasks({page: page});
+        if (selectedTab === "inactive") {
+            refreshTasks({page: page, isCompleted: false, startDate: dayjs()});
+        } else {
+            refreshTasks({page: page});
+        }
+    }
+
+    function handleInactiveTasksClick() {
+        setSelectedTab("inactive");
+        refreshTasks({page: currentPage, isCompleted: false, startDate: dayjs()});
+    }
+
+    function handleActiveTasksClick() {
+        setSelectedTab("active");
+        refreshTasks({page: currentPage});
     }
 
     return (
@@ -75,14 +91,34 @@ function App() {
                       display: 'flex',
                       justifyContent: 'center',
                   }}>
-                      <h1 style={{color: '#718096', fontWeight: 500}}>Inactive tasks</h1>
+                      <h1 
+                        style={{
+                            color: selectedTab === "inactive" ? '#2D3748' : '#718096', 
+                            fontWeight: selectedTab === "inactive" ? 600 : 500,
+                            cursor: 'pointer',
+                            userSelect: 'none'
+                        }}
+                        onClick={handleInactiveTasksClick}
+                      >
+                          Inactive tasks
+                      </h1>
                   </Grid>
                   <Grid size={4} sx={{
                       marginTop: '2%',
                       display: 'flex',
                       justifyContent: 'center',
                   }}>
-                      <h1 style={{color: '#2D3748', fontWeight: 600}}>Active tasks</h1>
+                      <h1 
+                        style={{
+                            color: selectedTab === "active" ? '#2D3748' : '#718096', 
+                            fontWeight: selectedTab === "active" ? 600 : 500,
+                            cursor: 'pointer',
+                            userSelect: 'none'
+                        }}
+                        onClick={handleActiveTasksClick}
+                      >
+                          Active tasks
+                      </h1>
                   </Grid>
                   <Grid size={4} sx={{
                       marginTop: '2%',
