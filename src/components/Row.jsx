@@ -38,6 +38,7 @@ import {DatePicker, LocalizationProvider} from "@mui/x-date-pickers";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import PropTypes from "prop-types";
 import React from "react";
+import {useActiveTab} from "../contexts/ActiveTabContext.jsx";
 import {useErrors} from "../contexts/ErrorMessagesContext.jsx";
 import {useTaskChangedMessage} from "../contexts/TaskChangedMessageContext.jsx";
 import {useTasks} from "../contexts/TasksContext.jsx";
@@ -66,6 +67,7 @@ function Row(props) {
     const {addErrors, clearErrors} = useErrors();
     const {users, refreshUsers} = useUsers();
     const {setTaskChangedMessage} = useTaskChangedMessage();
+    const {activeTab} = useActiveTab();
     const {row, index} = props;
     const [open, setOpen] = React.useState(false);
     const [viewTaskPopup, setViewTaskPopup] = React.useState(false);
@@ -238,6 +240,17 @@ function Row(props) {
                       setViewTaskPopup(true);
                   }
               }}>{row.title}</TableCell>
+              {activeTab !== "active" && (
+                  <TableCell onClick={(e) => {
+                      if (open) {
+                          setOpen(false);
+                      } else {
+                          e.stopPropagation();
+                          setReadOnly(true);
+                          setViewTaskPopup(true);
+                      }
+                  }}>{row.start}</TableCell>
+              )}
               <TableCell onClick={(e) => {
                   if (open) {
                       setOpen(false);
@@ -332,7 +345,7 @@ function Row(props) {
                   transition: 'background-color 0.2s ease'
               }
           }}>
-              <TableCell style={{paddingBottom: 0, paddingTop: 0}} colSpan={6}>
+              <TableCell style={{paddingBottom: 0, paddingTop: 0}} colSpan={activeTab !== "active" ? 7 : 6}>
                   <Collapse in={open} timeout="auto" unmountOnExit>
                       <Box sx={{margin: 1}}>
                           <Box sx={{

@@ -22,6 +22,7 @@ import TableRow from "@mui/material/TableRow";
 import {DatePicker, LocalizationProvider} from "@mui/x-date-pickers";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import React from "react";
+import {useActiveTab} from "../contexts/ActiveTabContext.jsx";
 import {useTasks} from "../contexts/TasksContext.jsx";
 import {useUsers} from "../contexts/UsersContext.jsx";
 import Row from "./Row.jsx";
@@ -29,6 +30,7 @@ import Row from "./Row.jsx";
 function TasksTable() {
     const {tasks, refreshTasks} = useTasks();
     const {users, refreshUsers} = useUsers();
+    const {activeTab} = useActiveTab();
     const [priorityFilterValue, setPriorityFilterValue] = React.useState('');
     const [titleFilterValue, setTitleFilterValue] = React.useState('');
     const [assigneesFilterValues, setAssigneesFilterValues] = React.useState([]);
@@ -93,6 +95,7 @@ function TasksTable() {
                       <TableCell sx={{width: "1%"}}/>
                       <TableCell>Priority</TableCell>
                       <TableCell>Title</TableCell>
+                      {activeTab !== "active" && <TableCell>Start Time</TableCell>}
                       <TableCell>Deadline</TableCell>
                       <TableCell>Assignees</TableCell>
                       <TableCell align={"right"} sx={{minWidth: '7%'}}>
@@ -187,6 +190,7 @@ function TasksTable() {
                                 </Grid>
                             </Grid>
                         </TableCell>
+                        {activeTab !== "active" && <TableCell/>}
                         <TableCell sx={{minWidth: '21%'}}>
                             <Grid container spacing={1}>
                                 <Grid item>

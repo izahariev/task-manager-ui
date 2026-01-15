@@ -1,4 +1,3 @@
-Enable inactive tasks
 Enable completed tasks
 Fix unique task names
 Fix deleting user which have tasks
