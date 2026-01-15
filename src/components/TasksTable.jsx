@@ -36,6 +36,7 @@ function TasksTable() {
     const [assigneesFilterValues, setAssigneesFilterValues] = React.useState([]);
     const [filterEnabled, setFilterEnabled] = React.useState(false);
     const [deadlineDateFilterValue, setDeadlineDateFilterValue] = React.useState(null);
+    const [startTimeDateFilterValue, setStartTimeDateFilterValue] = React.useState(null);
 
     /**
      * @typedef {{ elements: any[], totalPageCount: number, totalElementsCount: number }} Page
@@ -56,6 +57,10 @@ function TasksTable() {
         setDeadlineDateFilterValue(newValue);
     };
 
+    const handleStartTimeFilterChange = (newValue) => {
+        setStartTimeDateFilterValue(newValue);
+    };
+
     const handleAssigneesFilterChange = (event) => {
         const {
             target: {value},
@@ -70,7 +75,9 @@ function TasksTable() {
           {
               priority: priorityFilterValue,
               title: titleFilterValue,
+              startDate: startTimeDateFilterValue,
               deadline: deadlineDateFilterValue,
+              startTime: startTimeDateFilterValue,
               assignees: assigneesFilterValues
           }
         );
@@ -190,7 +197,38 @@ function TasksTable() {
                                 </Grid>
                             </Grid>
                         </TableCell>
-                        {activeTab !== "active" && <TableCell/>}
+                        {activeTab !== "active" && 
+                            <TableCell sx={{minWidth: '21%'}}>
+                                <Grid container spacing={1}>
+                                    <Grid item>
+                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                            <DatePicker
+                                              value={startTimeDateFilterValue}
+                                              onChange={handleStartTimeFilterChange}
+                                              slotProps={{textField: {size: 'small'}}}
+                                              sx={{backgroundColor: '#FFFFFF'}}
+                                            />
+                                        </LocalizationProvider>
+                                    </Grid>
+                                    <Grid item>
+                                        <Button
+                                          variant="contained"
+                                          sx={{
+                                              marginTop: "2%",
+                                              backgroundColor: '#5B7FA6',
+                                              '&:hover': {
+                                                  backgroundColor: '#4A6B8F',
+                                              },
+                                              transition: 'background-color 0.2s ease'
+                                          }}
+                                          onClick={() => setStartTimeDateFilterValue(null)}
+                                        >
+                                            X
+                                        </Button>
+                                    </Grid>
+                                </Grid>
+                            </TableCell>
+                        }
                         <TableCell sx={{minWidth: '21%'}}>
                             <Grid container spacing={1}>
                                 <Grid item>
@@ -295,6 +333,7 @@ function TasksTable() {
                                   setPriorityFilterValue("");
                                   setTitleFilterValue("");
                                   setDeadlineDateFilterValue(null);
+                                  setStartTimeDateFilterValue(null);
                                   setAssigneesFilterValues([]);
                               }}
                             >
