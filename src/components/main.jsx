@@ -5,6 +5,7 @@ import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
+import {ActiveTabProvider} from "../contexts/ActiveTabProvider.jsx";
 import {ErrorMessagesProvider} from "../contexts/ErrorMessagesProvider.jsx";
 import {TaskChangedMessageProvider} from "../contexts/TaskChangedMessageProvider.jsx";
 import {TasksProvider} from "../contexts/TasksProvider.jsx";
@@ -15,11 +16,13 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
       <ErrorMessagesProvider>
           <TaskChangedMessageProvider>
-              <UsersProvider>
-                  <TasksProvider>
-                      <App/>
-                  </TasksProvider>
-              </UsersProvider>
+              <ActiveTabProvider>
+                  <UsersProvider>
+                      <TasksProvider>
+                          <App/>
+                      </TasksProvider>
+                  </UsersProvider>
+              </ActiveTabProvider>
           </TaskChangedMessageProvider>
       </ErrorMessagesProvider>
   </StrictMode>,

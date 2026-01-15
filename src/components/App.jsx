@@ -2,8 +2,8 @@ import '../css/App.css'
 import {Alert, Container, Dialog, DialogTitle, Fade, Pagination} from "@mui/material";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid2";
-import dayjs from "dayjs";
 import React from "react";
+import {useActiveTab} from "../contexts/ActiveTabContext.jsx";
 import {useErrors} from "../contexts/ErrorMessagesContext.jsx";
 import {useTaskChangedMessage} from "../contexts/TaskChangedMessageContext.jsx";
 import {useTasks} from "../contexts/TasksContext.jsx";
@@ -15,25 +15,21 @@ function App() {
     const {setTasks, currentPage, pageCount, refreshTasks} = useTasks();
     const {errorMessages, clearErrors} = useErrors();
     const {taskChangedMessage, showAlert, setShowAlert, setTaskChangedMessage} = useTaskChangedMessage();
+    const {activeTab, setActiveTab} = useActiveTab();
     const [showUsersPopup, setShowUsersPopup] = React.useState(false);
     const [addTaskPopup, setAddTaskPopup] = React.useState(false);
-    const [selectedTab, setSelectedTab] = React.useState("active");
 
     function getTasksPage(event, page) {
-        if (selectedTab === "inactive") {
-            refreshTasks({page: page, isCompleted: false, startDate: dayjs()});
-        } else {
-            refreshTasks({page: page});
-        }
+        refreshTasks({page: page});
     }
 
     function handleInactiveTasksClick() {
-        setSelectedTab("inactive");
-        refreshTasks({page: currentPage, isCompleted: false, startDate: dayjs()});
+        setActiveTab("inactive");
+        refreshTasks({page: currentPage});
     }
 
     function handleActiveTasksClick() {
-        setSelectedTab("active");
+        setActiveTab("active");
         refreshTasks({page: currentPage});
     }
 
@@ -93,8 +89,8 @@ function App() {
                   }}>
                       <h1 
                         style={{
-                            color: selectedTab === "inactive" ? '#2D3748' : '#718096', 
-                            fontWeight: selectedTab === "inactive" ? 600 : 500,
+                            color: activeTab === "inactive" ? '#2D3748' : '#718096', 
+                            fontWeight: activeTab === "inactive" ? 600 : 500,
                             cursor: 'pointer',
                             userSelect: 'none'
                         }}
@@ -110,8 +106,8 @@ function App() {
                   }}>
                       <h1 
                         style={{
-                            color: selectedTab === "active" ? '#2D3748' : '#718096', 
-                            fontWeight: selectedTab === "active" ? 600 : 500,
+                            color: activeTab === "active" ? '#2D3748' : '#718096', 
+                            fontWeight: activeTab === "active" ? 600 : 500,
                             cursor: 'pointer',
                             userSelect: 'none'
                         }}

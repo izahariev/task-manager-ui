@@ -1,6 +1,8 @@
+import dayjs from "dayjs";
 import PropTypes from "prop-types";
 import React from "react";
 import {fetchTasks} from "../js/BackendApis.js";
+import {useActiveTab} from "./ActiveTabContext.jsx";
 import {useErrors} from "./ErrorMessagesContext.jsx";
 import {TasksContext} from "./TasksContext";
 
@@ -9,6 +11,7 @@ export function TasksProvider({ children }) {
     const [currentPage, setCurrentPage] = React.useState(1);
     const [pageCount, setPageCount] = React.useState(0);
     const {addErrors, clearErrors} = useErrors();
+    const {activeTab} = useActiveTab();
     const currentPageRef = React.useRef(currentPage);
 
     React.useEffect(() => {
@@ -20,7 +23,7 @@ export function TasksProvider({ children }) {
             parentTaskId = null,
             priority = null,
             title = null,
-            startDate = null,
+            startDate = activeTab === "active" ? null : dayjs(),
             deadline = null,
             isCompleted = false,
             assignees = null,
@@ -47,7 +50,7 @@ export function TasksProvider({ children }) {
               addErrors(errors);
               return { success: false, errors };
           });
-    }, [addErrors, clearErrors]);
+    }, [addErrors, clearErrors, activeTab]);
 
     const value = React.useMemo(
       () => ({
