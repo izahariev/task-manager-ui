@@ -1,8 +1,11 @@
+import CloseIcon from '@mui/icons-material/Close';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import FilterListOffIcon from '@mui/icons-material/FilterListOff';
 import {
+    Box,
     Checkbox,
     FormControl,
+    IconButton,
     InputLabel,
     ListItemText,
     MenuItem,
@@ -13,7 +16,6 @@ import {
     TextField
 } from "@mui/material";
 import Button from "@mui/material/Button";
-import Grid from "@mui/material/Grid2";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -21,6 +23,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import {DatePicker, LocalizationProvider} from "@mui/x-date-pickers";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs from "dayjs";
 import React from "react";
 import {useActiveTab} from "../contexts/ActiveTabContext.jsx";
 import {useTasks} from "../contexts/TasksContext.jsx";
@@ -44,6 +47,12 @@ function TasksTable() {
     React.useEffect(() => {
         refreshTasks();
     }, [refreshTasks])
+
+    React.useEffect(() => {
+        if (filterEnabled) {
+            refreshUsers();
+        }
+    }, [filterEnabled, refreshUsers])
 
     const handlePriorityFilterValueChange = (event) => {
         setPriorityFilterValue(event.target.value);
@@ -75,7 +84,7 @@ function TasksTable() {
           {
               priority: priorityFilterValue,
               title: titleFilterValue,
-              startDate: startTimeDateFilterValue,
+              startDate: startTimeDateFilterValue != null ? startTimeDateFilterValue : dayjs(),
               deadline: deadlineDateFilterValue,
               startTime: startTimeDateFilterValue,
               assignees: assigneesFilterValues
@@ -122,169 +131,241 @@ function TasksTable() {
               {filterEnabled &&
                 <TableHead>
                     <TableRow sx={{
-                        backgroundColor: '#2D3748',
+                        backgroundColor: '#F7FAFC',
+                        borderBottom: '2px solid #E2E8F0',
                         '& .MuiTableCell-head': {
-                            color: '#FFFFFF',
-                            fontWeight: 600
+                            padding: '16px 8px',
+                            borderBottom: 'none'
                         }
                     }}>
-                        <TableCell/>
-                        <TableCell sx={{minWidth: '10%'}}>
-                            <Grid container spacing={0}>
-                                <Grid item size={6}>
+                        <TableCell sx={{width: "1%"}}/>
+                        <TableCell sx={{minWidth: '10%', py: 1.5}}>
+                            <Box sx={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <FormControl size="small" sx={{ flex: 1 }}>
+                                    <InputLabel id="priority-filter-label">Priority</InputLabel>
                                     <Select
-                                      labelId="demo-simple-select-label"
-                                      id="demo-simple-select"
+                                      labelId="priority-filter-label"
+                                      id="priority-filter"
                                       value={priorityFilterValue}
                                       onChange={handlePriorityFilterValueChange}
-                                      variant={"outlined"}
-                                      size={"small"}
-                                      sx={{width: '90%', backgroundColor: '#FFFFFF'}}
+                                      label="Priority"
+                                      sx={{
+                                          backgroundColor: '#FFFFFF',
+                                          '& .MuiOutlinedInput-notchedOutline': {
+                                              borderColor: '#CBD5E0'
+                                          },
+                                          '&:hover .MuiOutlinedInput-notchedOutline': {
+                                              borderColor: '#5B7FA6'
+                                          }
+                                      }}
                                     >
-                                        <MenuItem value={"P0"}>P0</MenuItem>
-                                        <MenuItem value={"P1"}>P1</MenuItem>
-                                        <MenuItem value={"P2"}>P2</MenuItem>
-                                        <MenuItem value={"P3"}>P3</MenuItem>
-                                        <MenuItem value={"P4"}>P4</MenuItem>
+                                        <MenuItem value="">All</MenuItem>
+                                        <MenuItem value="P0">P0</MenuItem>
+                                        <MenuItem value="P1">P1</MenuItem>
+                                        <MenuItem value="P2">P2</MenuItem>
+                                        <MenuItem value="P3">P3</MenuItem>
+                                        <MenuItem value="P4">P4</MenuItem>
                                     </Select>
-                                </Grid>
-                                <Grid item size={6}>
-                                    <Button
-                                      variant="contained"
-                                      sx={{
-                                          marginTop: "2%",
-                                          backgroundColor: '#5B7FA6',
-                                          '&:hover': {
-                                              backgroundColor: '#4A6B8F',
-                                          },
-                                          transition: 'background-color 0.2s ease'
+                                </FormControl>
+                                {priorityFilterValue && (
+                                    <IconButton
+                                      size="small"
+                                      onClick={(e) => {
+                                          e.stopPropagation();
+                                          setPriorityFilterValue("");
                                       }}
-                                      onClick={() => setPriorityFilterValue("")}
+                                      sx={{
+                                          color: '#718096',
+                                          flexShrink: 0,
+                                          '&:hover': {
+                                              color: '#2D3748',
+                                              backgroundColor: 'rgba(0, 0, 0, 0.04)'
+                                          }
+                                      }}
                                     >
-                                        X
-                                    </Button>
-                                </Grid>
-                            </Grid>
+                                        <CloseIcon fontSize="small" />
+                                    </IconButton>
+                                )}
+                            </Box>
                         </TableCell>
-                        <TableCell>
-                            <Grid container spacing={1}>
-                                <Grid item size={10}>
-                                    <TextField
-                                      id="outlined-basic"
-                                      variant="outlined"
-                                      fullWidth={true}
-                                      size={"small"}
-                                      value={titleFilterValue}
-                                      onChange={handleTitleFilterValueChange}
-                                      sx={{backgroundColor: '#FFFFFF'}}
-                                    />
-                                </Grid>
-                                <Grid item>
-                                    <Button
-                                      variant="contained"
-                                      sx={{
-                                          marginTop: "2%",
-                                          backgroundColor: '#5B7FA6',
-                                          '&:hover': {
-                                              backgroundColor: '#4A6B8F',
+                        <TableCell sx={{py: 1.5}}>
+                            <Box sx={{ position: 'relative' }}>
+                                <TextField
+                                  id="title-filter"
+                                  variant="outlined"
+                                  fullWidth
+                                  multiline
+                                  minRows={1}
+                                  maxRows={5}
+                                  size="small"
+                                  value={titleFilterValue}
+                                  onChange={handleTitleFilterValueChange}
+                                  placeholder="Search by title..."
+                                  sx={{
+                                      backgroundColor: '#FFFFFF',
+                                      pr: titleFilterValue ? '40px' : 1,
+                                      '& .MuiOutlinedInput-root': {
+                                          '& fieldset': {
+                                              borderColor: '#CBD5E0'
                                           },
-                                          transition: 'background-color 0.2s ease'
-                                      }}
+                                          '&:hover fieldset': {
+                                              borderColor: '#5B7FA6'
+                                          },
+                                          '&.Mui-focused fieldset': {
+                                              borderColor: '#5B7FA6'
+                                          }
+                                      }
+                                  }}
+                                />
+                                {titleFilterValue && (
+                                    <IconButton
+                                      size="small"
                                       onClick={() => setTitleFilterValue("")}
+                                      sx={{
+                                          position: 'absolute',
+                                          right: 4,
+                                          top: 8,
+                                          color: '#718096',
+                                          '&:hover': {
+                                              color: '#2D3748',
+                                              backgroundColor: 'rgba(0, 0, 0, 0.04)'
+                                          }
+                                      }}
                                     >
-                                        X
-                                    </Button>
-                                </Grid>
-                            </Grid>
+                                        <CloseIcon fontSize="small" />
+                                    </IconButton>
+                                )}
+                            </Box>
                         </TableCell>
                         {activeTab !== "active" && 
-                            <TableCell sx={{minWidth: '21%'}}>
-                                <Grid container spacing={1}>
-                                    <Grid item>
-                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                            <DatePicker
-                                              value={startTimeDateFilterValue}
-                                              onChange={handleStartTimeFilterChange}
-                                              slotProps={{textField: {size: 'small'}}}
-                                              sx={{backgroundColor: '#FFFFFF'}}
-                                            />
-                                        </LocalizationProvider>
-                                    </Grid>
-                                    <Grid item>
-                                        <Button
-                                          variant="contained"
-                                          sx={{
-                                              marginTop: "2%",
-                                              backgroundColor: '#5B7FA6',
-                                              '&:hover': {
-                                                  backgroundColor: '#4A6B8F',
-                                              },
-                                              transition: 'background-color 0.2s ease'
-                                          }}
-                                          onClick={() => setStartTimeDateFilterValue(null)}
-                                        >
-                                            X
-                                        </Button>
-                                    </Grid>
-                                </Grid>
-                            </TableCell>
-                        }
-                        <TableCell sx={{minWidth: '21%'}}>
-                            <Grid container spacing={1}>
-                                <Grid item>
+                            <TableCell sx={{minWidth: '21%', py: 1.5}}>
+                                <Box sx={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
                                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                                         <DatePicker
-                                          value={deadlineDateFilterValue}
-                                          onChange={handleDateFilterChange}
-                                          slotProps={{textField: {size: 'small'}}}
-                                          sx={{backgroundColor: '#FFFFFF'}}
+                                          value={startTimeDateFilterValue}
+                                          onChange={handleStartTimeFilterChange}
+                                          slotProps={{
+                                              textField: {
+                                                  size: 'small',
+                                                  fullWidth: true,
+                                                  sx: {
+                                                      backgroundColor: '#FFFFFF',
+                                                      pr: startTimeDateFilterValue ? '40px' : 1,
+                                                      '& .MuiOutlinedInput-root': {
+                                                          '& fieldset': {
+                                                              borderColor: '#CBD5E0'
+                                                          },
+                                                          '&:hover fieldset': {
+                                                              borderColor: '#5B7FA6'
+                                                          }
+                                                      }
+                                                  }
+                                              }
+                                          }}
                                         />
                                     </LocalizationProvider>
-                                </Grid>
-                                <Grid item>
-                                    <Button
-                                      variant="contained"
-                                      sx={{
-                                          marginTop: "2%",
-                                          backgroundColor: '#5B7FA6',
-                                          '&:hover': {
-                                              backgroundColor: '#4A6B8F',
-                                          },
-                                          transition: 'background-color 0.2s ease'
-                                      }}
-                                      onClick={() => setDeadlineDateFilterValue(null)}
-                                    >
-                                        X
-                                    </Button>
-                                </Grid>
-                            </Grid>
-                        </TableCell>
-                        <TableCell sx={{minWidth: '15%'}}>
-                            <Grid container spacing={1}>
-                                <Grid item size={8}>
-                                    <FormControl fullWidth={true}>
-                                        <InputLabel id="demo-multiple-checkbox-label"></InputLabel>
-                                        <Select
-                                          labelId="demo-multiple-checkbox-label"
-                                          id="demo-multiple-checkbox"
-                                          multiple
-                                          value={assigneesFilterValues}
-                                          variant="outlined"
-                                          onChange={handleAssigneesFilterChange}
-                                          input={<OutlinedInput/>}
-                                          renderValue={(selected) => selected.join(', ')}
-                                          size={"small"}
-                                          sx={{backgroundColor: '#FFFFFF'}}
-                                          MenuProps={{
-                                            PaperProps: {
-                                              style: {
-                                                maxHeight: 300,
-                                                width: 'auto',
-                                              },
-                                            },
+                                    {startTimeDateFilterValue && (
+                                        <IconButton
+                                          size="small"
+                                          onClick={() => setStartTimeDateFilterValue(null)}
+                                          sx={{
+                                              position: 'absolute',
+                                              right: 4,
+                                              color: '#718096',
+                                              '&:hover': {
+                                                  color: '#2D3748',
+                                                  backgroundColor: 'rgba(0, 0, 0, 0.04)'
+                                              }
                                           }}
                                         >
-                                            {users.map((name) => (
+                                            <CloseIcon fontSize="small" />
+                                        </IconButton>
+                                    )}
+                                </Box>
+                            </TableCell>
+                        }
+                        <TableCell sx={{minWidth: '21%', py: 1.5}}>
+                            <Box sx={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    <DatePicker
+                                      value={deadlineDateFilterValue}
+                                      onChange={handleDateFilterChange}
+                                      slotProps={{
+                                          textField: {
+                                              size: 'small',
+                                              fullWidth: true,
+                                              sx: {
+                                                  backgroundColor: '#FFFFFF',
+                                                  pr: deadlineDateFilterValue ? '40px' : 1,
+                                                  '& .MuiOutlinedInput-root': {
+                                                      '& fieldset': {
+                                                          borderColor: '#CBD5E0'
+                                                      },
+                                                      '&:hover fieldset': {
+                                                          borderColor: '#5B7FA6'
+                                                      }
+                                                  }
+                                              }
+                                          }
+                                      }}
+                                    />
+                                </LocalizationProvider>
+                                {deadlineDateFilterValue && (
+                                    <IconButton
+                                      size="small"
+                                      onClick={() => setDeadlineDateFilterValue(null)}
+                                      sx={{
+                                          position: 'absolute',
+                                          right: 4,
+                                          color: '#718096',
+                                          '&:hover': {
+                                              color: '#2D3748',
+                                              backgroundColor: 'rgba(0, 0, 0, 0.04)'
+                                          }
+                                      }}
+                                    >
+                                        <CloseIcon fontSize="small" />
+                                    </IconButton>
+                                )}
+                            </Box>
+                        </TableCell>
+                        <TableCell sx={{minWidth: '15%', py: 1.5}}>
+                            <Box sx={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <FormControl size="small" sx={{ flex: 1 }}>
+                                    <InputLabel id="assignees-filter-label">Assignees</InputLabel>
+                                    <Select
+                                      labelId="assignees-filter-label"
+                                      id="assignees-filter"
+                                      multiple
+                                      value={assigneesFilterValues}
+                                      onChange={handleAssigneesFilterChange}
+                                      input={<OutlinedInput label="Assignees" />}
+                                      renderValue={(selected) => selected.length > 0 ? `${selected.length} selected` : 'All'}
+                                      sx={{
+                                          backgroundColor: '#FFFFFF',
+                                          '& .MuiOutlinedInput-notchedOutline': {
+                                              borderColor: '#CBD5E0'
+                                          },
+                                          '&:hover .MuiOutlinedInput-notchedOutline': {
+                                              borderColor: '#5B7FA6'
+                                          }
+                                      }}
+                                      MenuProps={{
+                                          PaperProps: {
+                                              style: {
+                                                  maxHeight: 300,
+                                              },
+                                          },
+                                      }}
+                                    >
+                                        {users && Array.isArray(users) && users.length > 0 ? (
+                                            [...users].sort((a, b) => {
+                                                const aSelected = assigneesFilterValues.includes(a);
+                                                const bSelected = assigneesFilterValues.includes(b);
+                                                if (aSelected && !bSelected) return -1;
+                                                if (!aSelected && bSelected) return 1;
+                                                return String(a).localeCompare(String(b));
+                                            }).map((name) => (
                                               <MenuItem key={name} value={name}>
                                                   <Checkbox
                                                     checked={assigneesFilterValues.includes(name)}
@@ -295,61 +376,70 @@ function TasksTable() {
                                                         }
                                                     }}
                                                   />
-                                                  <ListItemText primary={name}/>
+                                                  <ListItemText primary={name} />
                                               </MenuItem>
-                                            ))}
-                                        </Select>
-                                    </FormControl>
-                                </Grid>
-                                <Grid item>
-                                    <Button
-                                      variant="contained"
-                                      sx={{
-                                          marginTop: "2%",
-                                          backgroundColor: '#5B7FA6',
-                                          '&:hover': {
-                                              backgroundColor: '#4A6B8F',
-                                          },
-                                          transition: 'background-color 0.2s ease'
+                                            ))
+                                        ) : (
+                                            <MenuItem disabled>No users available</MenuItem>
+                                        )}
+                                    </Select>
+                                </FormControl>
+                                {assigneesFilterValues.length > 0 && (
+                                    <IconButton
+                                      size="small"
+                                      onClick={(e) => {
+                                          e.stopPropagation();
+                                          setAssigneesFilterValues([]);
                                       }}
-                                      onClick={() => setAssigneesFilterValues([])}
+                                      sx={{
+                                          color: '#718096',
+                                          flexShrink: 0,
+                                          '&:hover': {
+                                              color: '#2D3748',
+                                              backgroundColor: 'rgba(0, 0, 0, 0.04)'
+                                          }
+                                      }}
                                     >
-                                        X
-                                    </Button>
-                                </Grid>
-                            </Grid>
+                                        <CloseIcon fontSize="small" />
+                                    </IconButton>
+                                )}
+                            </Box>
                         </TableCell>
-                        <TableCell sx={{minWidth: '13%'}}>
+                        <TableCell align="right" sx={{minWidth: '13%', py: 1.5}}>
                             <Button
-                              variant="contained"
-                              sx={{
-                                  backgroundColor: '#5B7FA6',
-                                  '&:hover': {
-                                      backgroundColor: '#4A6B8F',
-                                  },
-                                  transition: 'background-color 0.2s ease'
-                              }}
+                              variant="outlined"
                               onClick={() => {
                                   setPriorityFilterValue("");
                                   setTitleFilterValue("");
                                   setDeadlineDateFilterValue(null);
                                   setStartTimeDateFilterValue(null);
                                   setAssigneesFilterValues([]);
+                                  refreshTasks();
+                              }}
+                              sx={{
+                                  mr: 1,
+                                  borderColor: '#CBD5E0',
+                                  color: '#4A5568',
+                                  textTransform: 'none',
+                                  '&:hover': {
+                                      borderColor: '#5B7FA6',
+                                      backgroundColor: 'rgba(91, 127, 166, 0.08)',
+                                  }
                               }}
                             >
                                 Clear all
                             </Button>
                             <Button
                               variant="contained"
+                              onClick={handleApplyFilterClick}
                               sx={{
-                                  marginLeft: '5%',
                                   backgroundColor: '#5B7FA6',
+                                  textTransform: 'none',
                                   '&:hover': {
                                       backgroundColor: '#4A6B8F',
                                   },
                                   transition: 'background-color 0.2s ease'
                               }}
-                              onClick={handleApplyFilterClick}
                             >
                                 Apply
                             </Button>
