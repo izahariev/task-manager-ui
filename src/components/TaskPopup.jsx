@@ -118,7 +118,11 @@ export default function TaskPopup(props) {
         }
 
         if (initialTask === null) {
-            addTask(currentTask)
+            const taskToAdd = {...currentTask};
+            if (parentTaskId != null) {
+                delete taskToAdd.startTime;
+            }
+            addTask(taskToAdd)
               .then(r => {
                   if (r.errors.length > 0) {
                       setErrorMessages([...r.errors]);
@@ -183,6 +187,9 @@ export default function TaskPopup(props) {
         const diffs = {};
 
         for (const key of Object.keys(currentTask)) {
+            if (key === 'startTime' && parentTaskId != null) {
+                continue;
+            }
             if (currentTask[key] !== initialTask[key]) {
                 if (currentTask[key] === "" || currentTask[key].length === 0) {
                     diffs[key] = null;
@@ -374,30 +381,32 @@ export default function TaskPopup(props) {
                             readOnly={readOnly}
                           />
                       </Grid>
-                      <Grid size={2} sx={{
-                          display: 'flex',
-                          justifyContent: 'center',
-                          marginBottom: "4%"
-                      }}>
-                          <TimeSection
-                            title={"Start time"}
-                            readOnly={readOnly}
-                            timeValue={currentTask.startTime}
-                            setTimeValue={(t) =>
-                              setCurrentTask((currentTask) => ({...currentTask, startTime: t}))}
-                            tooltipContent={
-                                <div>
-                                    The time from which the task can be completed and will appear in the active
-                                    tasks table.
-                                    <br/><br/>
-                                    If date is selected the task will appear on the given date
-                                    <br/><br/>
-                                    If period is provided the task will appear after the given period have passed
-                                    from now
-                                </div>
-                            }
-                          />
-                      </Grid>
+                      {parentTaskId == null && (
+                          <Grid size={2} sx={{
+                              display: 'flex',
+                              justifyContent: 'center',
+                              marginBottom: "4%"
+                          }}>
+                              <TimeSection
+                                title={"Start time"}
+                                readOnly={readOnly}
+                                timeValue={currentTask.startTime}
+                                setTimeValue={(t) =>
+                                  setCurrentTask((currentTask) => ({...currentTask, startTime: t}))}
+                                tooltipContent={
+                                    <div>
+                                        The time from which the task can be completed and will appear in the active
+                                        tasks table.
+                                        <br/><br/>
+                                        If date is selected the task will appear on the given date
+                                        <br/><br/>
+                                        If period is provided the task will appear after the given period have passed
+                                        from now
+                                    </div>
+                                }
+                              />
+                          </Grid>
+                      )}
                       <Grid size={2} sx={{
                           display: 'flex',
                           justifyContent: 'center',

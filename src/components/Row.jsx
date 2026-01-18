@@ -84,7 +84,6 @@ function Row(props) {
     const [assigneesFilterValues, setAssigneesFilterValues] = React.useState([]);
     const [filterEnabled, setFilterEnabled] = React.useState(false);
     const [deadlineDateFilterValue, setDeadlineDateFilterValue] = React.useState(null);
-    const [startTimeDateFilterValue, setStartTimeDateFilterValue] = React.useState(null);
     const [deleteTaskId, setDeleteTaskId] = React.useState(null);
     const [deleteTaskError, setDeleteTaskError] = React.useState(null);
     const [deleteSubtaskId, setDeleteSubtaskId] = React.useState(null);
@@ -97,7 +96,6 @@ function Row(props) {
             setPriorityFilterValue("");
             setTitleFilterValue("");
             setDeadlineDateFilterValue(null);
-            setStartTimeDateFilterValue(null);
             setAssigneesFilterValues([]);
             setSubtaskCurrentPage(1);
         }
@@ -113,10 +111,6 @@ function Row(props) {
 
     const handleDateFilterChange = (newValue) => {
         setDeadlineDateFilterValue(newValue);
-    };
-
-    const handleStartTimeFilterChange = (newValue) => {
-        setStartTimeDateFilterValue(newValue);
     };
 
     const handleAssigneesFilterChange = (event) => {
@@ -184,7 +178,7 @@ function Row(props) {
                       refreshSubtasks(
                           priorityFilterValue || null,
                           titleFilterValue || null,
-                          startTimeDateFilterValue || null,
+                          null,
                           deadlineDateFilterValue || null,
                           assigneesFilterValues.length > 0 ? assigneesFilterValues : null,
                           subtaskCurrentPage
@@ -386,7 +380,6 @@ function Row(props) {
                                   <TableRow>
                                       <TableCell>Priority</TableCell>
                                       <TableCell>Title</TableCell>
-                                      {activeTab !== "active" && <TableCell>Start Time</TableCell>}
                                       <TableCell>Deadline</TableCell>
                                       <TableCell>Assignees</TableCell>
                                       <TableCell align={"right"} sx={{minWidth: '7%'}}>
@@ -486,38 +479,6 @@ function Row(props) {
                                                 </Grid>
                                             </Grid>
                                         </TableCell>
-                                        {activeTab !== "active" && (
-                                            <TableCell sx={{minWidth: '21%'}}>
-                                                <Grid container spacing={1}>
-                                                    <Grid item>
-                                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                                            <DatePicker
-                                                              value={startTimeDateFilterValue}
-                                                              onChange={handleStartTimeFilterChange}
-                                                              slotProps={{textField: {size: 'small'}}}
-                                                              sx={{backgroundColor: '#FFFFFF'}}
-                                                            />
-                                                        </LocalizationProvider>
-                                                    </Grid>
-                                                    <Grid item>
-                                                        <Button
-                                                          variant="contained"
-                                                          sx={{
-                                                              marginTop: "2%",
-                                                              backgroundColor: '#5B7FA6',
-                                                              '&:hover': {
-                                                                  backgroundColor: '#4A6B8F',
-                                                              },
-                                                              transition: 'background-color 0.2s ease'
-                                                          }}
-                                                          onClick={() => setStartTimeDateFilterValue(null)}
-                                                        >
-                                                            X
-                                                        </Button>
-                                                    </Grid>
-                                                </Grid>
-                                            </TableCell>
-                                        )}
                                         <TableCell sx={{minWidth: '21%'}}>
                                             <Grid container spacing={1}>
                                                 <Grid item>
@@ -622,7 +583,6 @@ function Row(props) {
                                                   setPriorityFilterValue("");
                                                   setTitleFilterValue("");
                                                   setDeadlineDateFilterValue(null);
-                                                  setStartTimeDateFilterValue(null);
                                                   setAssigneesFilterValues([]);
                                               }}
                                             >
@@ -640,7 +600,7 @@ function Row(props) {
                                               }}
                                               onClick={() => {
                                                   refreshSubtasks(priorityFilterValue, titleFilterValue,
-                                                    startTimeDateFilterValue, deadlineDateFilterValue, assigneesFilterValues, 1);
+                                                    null, deadlineDateFilterValue, assigneesFilterValues, 1);
                                               }}
                                             >
                                                 Apply
@@ -672,14 +632,6 @@ function Row(props) {
                                             setSubtaskReadOnly(true);
                                             setViewSubtaskPopup(true);
                                         }} sx={{cursor: 'pointer'}}>{subtaskRow.title}</TableCell>
-                                        {activeTab !== "active" && (
-                                            <TableCell onClick={(e) => {
-                                                e.stopPropagation();
-                                                setSelectedSubtaskId(subtaskRow.id);
-                                                setSubtaskReadOnly(true);
-                                                setViewSubtaskPopup(true);
-                                            }} sx={{cursor: 'pointer'}}>{subtaskRow.start}</TableCell>
-                                        )}
                                         <TableCell onClick={(e) => {
                                             e.stopPropagation();
                                             setSelectedSubtaskId(subtaskRow.id);
@@ -804,7 +756,7 @@ function Row(props) {
                                       refreshSubtasks(
                                           filterEnabled ? priorityFilterValue || null : null,
                                           filterEnabled ? titleFilterValue || null : null,
-                                          filterEnabled ? startTimeDateFilterValue || null : null,
+                                          null,
                                           filterEnabled ? deadlineDateFilterValue || null : null,
                                           filterEnabled && assigneesFilterValues.length > 0 ? assigneesFilterValues : null,
                                           page
