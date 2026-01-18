@@ -1,6 +1,8 @@
 Enable completed tasks
+Add show completed subtasks for active and inactive tasks
 Fix unique task names
 Fix deleting user which have tasks
+Check all API calls
 Fix repeating API calls
 Fix console errors
 Check all workflows

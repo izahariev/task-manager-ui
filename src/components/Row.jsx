@@ -84,6 +84,7 @@ function Row(props) {
     const [assigneesFilterValues, setAssigneesFilterValues] = React.useState([]);
     const [filterEnabled, setFilterEnabled] = React.useState(false);
     const [deadlineDateFilterValue, setDeadlineDateFilterValue] = React.useState(null);
+    const [startTimeDateFilterValue, setStartTimeDateFilterValue] = React.useState(null);
     const [deleteTaskId, setDeleteTaskId] = React.useState(null);
     const [deleteTaskError, setDeleteTaskError] = React.useState(null);
     const [deleteSubtaskId, setDeleteSubtaskId] = React.useState(null);
@@ -96,6 +97,7 @@ function Row(props) {
             setPriorityFilterValue("");
             setTitleFilterValue("");
             setDeadlineDateFilterValue(null);
+            setStartTimeDateFilterValue(null);
             setAssigneesFilterValues([]);
             setSubtaskCurrentPage(1);
         }
@@ -113,6 +115,10 @@ function Row(props) {
         setDeadlineDateFilterValue(newValue);
     };
 
+    const handleStartTimeFilterChange = (newValue) => {
+        setStartTimeDateFilterValue(newValue);
+    };
+
     const handleAssigneesFilterChange = (event) => {
         const {
             target: {value},
@@ -124,6 +130,7 @@ function Row(props) {
 
     const refreshSubtasks = (priority = null, title = null, startDate = null, deadline = null,
                              assignees = null, page = subtaskCurrentPage) => {
+
         fetchTasks(row.id, priority, title, startDate, deadline, false, assignees, page, 5)
           .then(r => {
               if (r.errors.length > 0) {
@@ -177,6 +184,7 @@ function Row(props) {
                       refreshSubtasks(
                           priorityFilterValue || null,
                           titleFilterValue || null,
+                          startTimeDateFilterValue || null,
                           deadlineDateFilterValue || null,
                           assigneesFilterValues.length > 0 ? assigneesFilterValues : null,
                           subtaskCurrentPage
@@ -345,7 +353,7 @@ function Row(props) {
                   transition: 'background-color 0.2s ease'
               }
           }}>
-              <TableCell style={{paddingBottom: 0, paddingTop: 0}} colSpan={activeTab !== "active" ? 7 : 6}>
+              <TableCell style={{paddingBottom: 0, paddingTop: 0}} colSpan={activeTab !== "active" ? 8 : 7}>
                   <Collapse in={open} timeout="auto" unmountOnExit>
                       <Box sx={{margin: 1}}>
                           <Box sx={{
@@ -378,6 +386,7 @@ function Row(props) {
                                   <TableRow>
                                       <TableCell>Priority</TableCell>
                                       <TableCell>Title</TableCell>
+                                      {activeTab !== "active" && <TableCell>Start Time</TableCell>}
                                       <TableCell>Deadline</TableCell>
                                       <TableCell>Assignees</TableCell>
                                       <TableCell align={"right"} sx={{minWidth: '7%'}}>
@@ -477,6 +486,38 @@ function Row(props) {
                                                 </Grid>
                                             </Grid>
                                         </TableCell>
+                                        {activeTab !== "active" && (
+                                            <TableCell sx={{minWidth: '21%'}}>
+                                                <Grid container spacing={1}>
+                                                    <Grid item>
+                                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                                            <DatePicker
+                                                              value={startTimeDateFilterValue}
+                                                              onChange={handleStartTimeFilterChange}
+                                                              slotProps={{textField: {size: 'small'}}}
+                                                              sx={{backgroundColor: '#FFFFFF'}}
+                                                            />
+                                                        </LocalizationProvider>
+                                                    </Grid>
+                                                    <Grid item>
+                                                        <Button
+                                                          variant="contained"
+                                                          sx={{
+                                                              marginTop: "2%",
+                                                              backgroundColor: '#5B7FA6',
+                                                              '&:hover': {
+                                                                  backgroundColor: '#4A6B8F',
+                                                              },
+                                                              transition: 'background-color 0.2s ease'
+                                                          }}
+                                                          onClick={() => setStartTimeDateFilterValue(null)}
+                                                        >
+                                                            X
+                                                        </Button>
+                                                    </Grid>
+                                                </Grid>
+                                            </TableCell>
+                                        )}
                                         <TableCell sx={{minWidth: '21%'}}>
                                             <Grid container spacing={1}>
                                                 <Grid item>
@@ -581,6 +622,7 @@ function Row(props) {
                                                   setPriorityFilterValue("");
                                                   setTitleFilterValue("");
                                                   setDeadlineDateFilterValue(null);
+                                                  setStartTimeDateFilterValue(null);
                                                   setAssigneesFilterValues([]);
                                               }}
                                             >
@@ -598,7 +640,7 @@ function Row(props) {
                                               }}
                                               onClick={() => {
                                                   refreshSubtasks(priorityFilterValue, titleFilterValue,
-                                                    deadlineDateFilterValue, assigneesFilterValues, 1);
+                                                    startTimeDateFilterValue, deadlineDateFilterValue, assigneesFilterValues, 1);
                                               }}
                                             >
                                                 Apply
@@ -630,6 +672,14 @@ function Row(props) {
                                             setSubtaskReadOnly(true);
                                             setViewSubtaskPopup(true);
                                         }} sx={{cursor: 'pointer'}}>{subtaskRow.title}</TableCell>
+                                        {activeTab !== "active" && (
+                                            <TableCell onClick={(e) => {
+                                                e.stopPropagation();
+                                                setSelectedSubtaskId(subtaskRow.id);
+                                                setSubtaskReadOnly(true);
+                                                setViewSubtaskPopup(true);
+                                            }} sx={{cursor: 'pointer'}}>{subtaskRow.start}</TableCell>
+                                        )}
                                         <TableCell onClick={(e) => {
                                             e.stopPropagation();
                                             setSelectedSubtaskId(subtaskRow.id);
@@ -654,18 +704,19 @@ function Row(props) {
                                                     .then(r => {
                                                         if (r.errors.length > 0) {
                                                             addErrors(r.errors);
-                                                        } else {
-                                                            if (filterEnabled) {
-                                                                refreshSubtasks(
-                                                                    priorityFilterValue || null,
-                                                                    titleFilterValue || null,
-                                                                    deadlineDateFilterValue || null,
-                                                                    assigneesFilterValues.length > 0 ? assigneesFilterValues : null,
-                                                                    subtaskCurrentPage
-                                                                );
-                                                            } else {
-                                                                refreshSubtasks({page: subtaskCurrentPage});
-                                                            }
+                  } else {
+                      if (filterEnabled) {
+                          refreshSubtasks(
+                              priorityFilterValue || null,
+                              titleFilterValue || null,
+                              startTimeDateFilterValue || null,
+                              deadlineDateFilterValue || null,
+                              assigneesFilterValues.length > 0 ? assigneesFilterValues : null,
+                              subtaskCurrentPage
+                          );
+                      } else {
+                          refreshSubtasks({page: subtaskCurrentPage});
+                      }
                                                             setTaskChangedMessage(`Subtask "${subtaskRow.title}" completed`);
                                                         }
                                                     })
@@ -753,6 +804,7 @@ function Row(props) {
                                       refreshSubtasks(
                                           filterEnabled ? priorityFilterValue || null : null,
                                           filterEnabled ? titleFilterValue || null : null,
+                                          filterEnabled ? startTimeDateFilterValue || null : null,
                                           filterEnabled ? deadlineDateFilterValue || null : null,
                                           filterEnabled && assigneesFilterValues.length > 0 ? assigneesFilterValues : null,
                                           page
