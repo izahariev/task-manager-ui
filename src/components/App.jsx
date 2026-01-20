@@ -1,5 +1,5 @@
 import '../css/App.css'
-import {Alert, Container, Dialog, DialogTitle, Fade, Pagination} from "@mui/material";
+import {Alert, Box, Container, Dialog, DialogTitle, Fade, Pagination} from "@mui/material";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid2";
 import React from "react";
@@ -40,53 +40,55 @@ function App() {
 
     return (
       <div className="App">
-          <Container maxWidth="xxl" sx={{'marginBottom': '1%', backgroundColor: 'transparent'}}>
-              {taskChangedMessage !== null &&
-                <Fade in={showAlert} timeout={500}>
-                    <Alert
-                      variant="filled"
-                      severity="success"
-                      sx={{marginTop: '0.5%'}}
-                      onClose={() => {
-                          setShowAlert(false);
-                          setTimeout(() => {
-                              setTaskChangedMessage(null);
-                          }, 500);
-                      }}
-                    >
+          <Container maxWidth="xxl" sx={{'marginBottom': '1%', backgroundColor: 'transparent', position: 'relative'}}>
+              <Box sx={{position: 'fixed', top: '1%', left: '50%', transform: 'translateX(-50%)', zIndex: 1400, width: '100%', maxWidth: 'xl'}}>
+                  {taskChangedMessage !== null &&
+                    <Fade in={showAlert} timeout={500}>
+                        <Alert
+                          variant="filled"
+                          severity="success"
+                          sx={{marginBottom: '1%'}}
+                          onClose={() => {
+                              setShowAlert(false);
+                              setTimeout(() => {
+                                  setTaskChangedMessage(null);
+                              }, 500);
+                          }}
+                        >
+                            <Grid container>
+                                <Grid size={12} sx={{
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                }}>
+                                    <div style={{display: 'flex', justifyContent: 'space-around'}}>
+                                        {taskChangedMessage}
+                                    </div>
+                                </Grid>
+                            </Grid>
+                        </Alert>
+                    </Fade>
+                  }
+                  {errorMessages.length !== 0 &&
+                    <Alert variant="filled" severity="error" onClose={clearErrors} sx={{marginBottom: '1%'}}>
                         <Grid container>
                             <Grid size={12} sx={{
                                 display: 'flex',
                                 justifyContent: 'center',
                             }}>
                                 <div style={{display: 'flex', justifyContent: 'space-around'}}>
-                                    {taskChangedMessage}
+                                    <ul style={{flexGrow: '0', listStyleType: 'none'}}>
+                                        {errorMessages && errorMessages.map((errorMessage, index) => (
+                                          <li key={index}>
+                                              {errorMessage}
+                                          </li>))}
+                                    </ul>
                                 </div>
                             </Grid>
                         </Grid>
                     </Alert>
-                </Fade>
-              }
-              {errorMessages.length !== 0 &&
-                <Alert variant="filled" severity="error" onClose={clearErrors}>
-                    <Grid container>
-                        <Grid size={12} sx={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                        }}>
-                            <div style={{display: 'flex', justifyContent: 'space-around'}}>
-                                <ul style={{flexGrow: '0', listStyleType: 'none'}}>
-                                    {errorMessages && errorMessages.map((errorMessage, index) => (
-                                      <li key={index}>
-                                          {errorMessage}
-                                      </li>))}
-                                </ul>
-                            </div>
-                        </Grid>
-                    </Grid>
-                </Alert>
-              }
-              <Grid container>
+                  }
+              </Box>
+              <Grid container sx={{marginTop: '2%'}}>
                   <Grid size={4} sx={{
                       marginTop: '2%',
                       display: 'flex',
