@@ -23,15 +23,17 @@ export function TasksProvider({ children }) {
             parentTaskId = null,
             priority = null,
             title = null,
-            startDate = activeTab === "active" ? null : dayjs(),
+            startDate = activeTab === "active" || activeTab === "completed" ? null : dayjs(),
             deadline = null,
-            isCompleted = false,
+            isCompleted = activeTab === "completed",
             assignees = null,
             page = currentPageRef.current,
             size = 9,
+            completionDate = null,
         } = filters;
 
-        return fetchTasks(parentTaskId, priority, title, startDate, deadline, isCompleted, assignees, page, size)
+        return fetchTasks(parentTaskId, priority, title, startDate, deadline, completionDate, isCompleted, assignees,
+          page, size)
           .then((r) => {
               if (r.errors.length > 0) {
                   addErrors(r.errors);

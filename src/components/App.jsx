@@ -25,12 +25,17 @@ function App() {
 
     function handleInactiveTasksClick() {
         setActiveTab("inactive");
-        refreshTasks({page: currentPage});
+        refreshTasks({page: currentPage, isCompleted: false});
     }
 
     function handleActiveTasksClick() {
         setActiveTab("active");
-        refreshTasks({page: currentPage});
+        refreshTasks({page: currentPage, isCompleted: false});
+    }
+
+    function handleCompletedTasksClick() {
+        setActiveTab("completed");
+        refreshTasks({page: currentPage, isCompleted: true});
     }
 
     return (
@@ -121,7 +126,17 @@ function App() {
                       display: 'flex',
                       justifyContent: 'center',
                   }}>
-                      <h1 style={{color: '#718096', fontWeight: 500}}>Completed tasks</h1>
+                      <h1 
+                        style={{
+                            color: activeTab === "completed" ? '#2D3748' : '#718096', 
+                            fontWeight: activeTab === "completed" ? 600 : 500,
+                            cursor: 'pointer',
+                            userSelect: 'none'
+                        }}
+                        onClick={handleCompletedTasksClick}
+                      >
+                          Completed tasks
+                      </h1>
                   </Grid>
                   <Grid size={12} sx={{margin: '1%  0 0.5% 0'}}>
                       <TasksTable />

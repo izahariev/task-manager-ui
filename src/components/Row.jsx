@@ -56,6 +56,7 @@ Row.propTypes = {
         priority: PropTypes.string,
         start: PropTypes.string,
         deadline: PropTypes.string,
+        completionDate: PropTypes.string,
         repeat: PropTypes.string,
         assignees: PropTypes.string
     }),
@@ -123,9 +124,10 @@ function Row(props) {
     };
 
     const refreshSubtasks = (priority = null, title = null, startDate = null, deadline = null,
-                             assignees = null, page = subtaskCurrentPage) => {
+                             completionDate = null, assignees = null, page = subtaskCurrentPage) => {
 
-        fetchTasks(row.id, priority, title, startDate, deadline, false, assignees, page, 5)
+        fetchTasks(row.id, priority, title, startDate, deadline, completionDate, false, assignees,
+          page, 5)
           .then(r => {
               if (r.errors.length > 0) {
                   addErrors(r.errors);
@@ -242,7 +244,18 @@ function Row(props) {
                       setViewTaskPopup(true);
                   }
               }}>{row.title}</TableCell>
-              {activeTab !== "active" && (
+              {activeTab === "completed" && (
+                  <TableCell onClick={(e) => {
+                      if (open) {
+                          setOpen(false);
+                      } else {
+                          e.stopPropagation();
+                          setReadOnly(true);
+                          setViewTaskPopup(true);
+                      }
+                  }}>{row.completionDate}</TableCell>
+              )}
+              {activeTab !== "active" && activeTab !== "completed" && (
                   <TableCell onClick={(e) => {
                       if (open) {
                           setOpen(false);
@@ -277,52 +290,56 @@ function Row(props) {
                   }
               </TableCell>
               <TableCell align={'right'}>
-                  <IconButton sx={{
-                      backgroundColor: "#4CAF50",
-                      '&:hover': {
-                          backgroundColor: '#45a049',
-                      },
-                      transition: 'background-color 0.2s ease'
-                  }} size={"small"} onClick={() => {
-                      updateTask(row.id, {"isCompleted": true})
-                        .then(r => {
-                              if (r.errors.length > 0) {
-                                  addErrors(r.errors);
-                              } else {
-                                  refreshTasks();
-                                  setOpen(false);
-                                  setTaskChangedMessage(`Task "${row.title}" completed`);
+                  {activeTab !== "completed" && (
+                      <IconButton sx={{
+                          backgroundColor: "#4CAF50",
+                          '&:hover': {
+                              backgroundColor: '#45a049',
+                          },
+                          transition: 'background-color 0.2s ease'
+                      }} size={"small"} onClick={() => {
+                          updateTask(row.id, {"isCompleted": true})
+                            .then(r => {
+                                  if (r.errors.length > 0) {
+                                      addErrors(r.errors);
+                                  } else {
+                                      refreshTasks();
+                                      setOpen(false);
+                                      setTaskChangedMessage(`Task "${row.title}" completed`);
+                                  }
                               }
-                          }
-                        )
-                        .catch(error => {
-                              const errors = []
-                              error.response.data['errors'].forEach((error) => {
-                                  errors.push(error['description']);
-                              })
-                              addErrors(errors);
-                          }
-                        );
-                  }}>
-                      <CheckIcon sx={{color: "white"}} fontSize={"small"}/>
-                  </IconButton>
-                  <IconButton
-                    sx={{
-                        backgroundColor: "#2196F3",
-                        marginLeft: "1%",
-                        '&:hover': {
-                            backgroundColor: '#1976D2',
-                        },
-                        transition: 'background-color 0.2s ease'
-                    }}
-                    size={"small"}
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        setReadOnly(false);
-                        setViewTaskPopup(true);
-                    }}>
-                      <EditIcon sx={{color: "white"}} fontSize={"small"}/>
-                  </IconButton>
+                            )
+                            .catch(error => {
+                                  const errors = []
+                                  error.response.data['errors'].forEach((error) => {
+                                      errors.push(error['description']);
+                                  })
+                                  addErrors(errors);
+                              }
+                            );
+                      }}>
+                          <CheckIcon sx={{color: "white"}} fontSize={"small"}/>
+                      </IconButton>
+                  )}
+                  {activeTab !== "completed" && (
+                      <IconButton
+                        sx={{
+                            backgroundColor: "#2196F3",
+                            marginLeft: "1%",
+                            '&:hover': {
+                                backgroundColor: '#1976D2',
+                            },
+                            transition: 'background-color 0.2s ease'
+                        }}
+                        size={"small"}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setReadOnly(false);
+                            setViewTaskPopup(true);
+                        }}>
+                          <EditIcon sx={{color: "white"}} fontSize={"small"}/>
+                      </IconButton>
+                  )}
                   <IconButton sx={{
                       backgroundColor: "#F44336",
                       marginLeft: "1%",
@@ -347,7 +364,7 @@ function Row(props) {
                   transition: 'background-color 0.2s ease'
               }
           }}>
-              <TableCell style={{paddingBottom: 0, paddingTop: 0}} colSpan={activeTab !== "active" ? 8 : 7}>
+              <TableCell style={{paddingBottom: 0, paddingTop: 0}} colSpan={activeTab === "active" ? 7 : 8}>
                   <Collapse in={open} timeout="auto" unmountOnExit>
                       <Box sx={{margin: 1}}>
                           <Box sx={{

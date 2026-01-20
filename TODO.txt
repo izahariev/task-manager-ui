@@ -1,4 +1,3 @@
-Enable completed tasks
 Add show completed subtasks for active and inactive tasks
 Fix unique task names
 Fix deleting user which have tasks

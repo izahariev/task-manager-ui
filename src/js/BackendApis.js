@@ -13,8 +13,8 @@ export async function fetchTask(id) {
     return  response.data;
 }
 
-export async function fetchTasks(parentTaskId, priority, title, startDate, deadline, isCompleted, assignees,
-                                 page, size) {
+export async function fetchTasks(parentTaskId, priority, title, startDate, deadline, completionDate, isCompleted,
+                                 assignees, page, size) {
     const params = {
         page,
         size
@@ -46,6 +46,10 @@ export async function fetchTasks(parentTaskId, priority, title, startDate, deadl
 
     if (assignees && assignees.length > 0) {
         params.assignees = assignees;
+    }
+
+    if (completionDate) {
+        params.completionDate = completionDate.format('YYYY-MM-DD').toString();
     }
 
     const response = await axios.get("http://localhost:8080/tasks/list", {

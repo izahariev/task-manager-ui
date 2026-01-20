@@ -40,6 +40,7 @@ function TasksTable() {
     const [filterEnabled, setFilterEnabled] = React.useState(false);
     const [deadlineDateFilterValue, setDeadlineDateFilterValue] = React.useState(null);
     const [startTimeDateFilterValue, setStartTimeDateFilterValue] = React.useState(null);
+    const [completionDateFilterValue, setCompletionDateFilterValue] = React.useState(null);
 
     /**
      * @typedef {{ elements: any[], totalPageCount: number, totalElementsCount: number }} Page
@@ -70,6 +71,10 @@ function TasksTable() {
         setStartTimeDateFilterValue(newValue);
     };
 
+    const handleCompletionDateFilterChange = (newValue) => {
+        setCompletionDateFilterValue(newValue);
+    };
+
     const handleAssigneesFilterChange = (event) => {
         const {
             target: {value},
@@ -80,16 +85,18 @@ function TasksTable() {
     };
 
     const handleApplyFilterClick = () => {
-        refreshTasks(
-          {
-              priority: priorityFilterValue,
-              title: titleFilterValue,
-              startDate: startTimeDateFilterValue != null ? startTimeDateFilterValue : dayjs(),
-              deadline: deadlineDateFilterValue,
-              startTime: startTimeDateFilterValue,
-              assignees: assigneesFilterValues
-          }
-        );
+        const filters = {
+            priority: priorityFilterValue,
+            title: titleFilterValue,
+            startDate: startTimeDateFilterValue !== null ?
+              startTimeDateFilterValue :
+              activeTab === "inactive" ? dayjs() : null,
+            deadline: deadlineDateFilterValue,
+            completionDate: completionDateFilterValue,
+            assignees: assigneesFilterValues
+        };
+        
+        refreshTasks(filters);
     }
 
     return (
@@ -111,7 +118,8 @@ function TasksTable() {
                       <TableCell sx={{width: "1%"}}/>
                       <TableCell>Priority</TableCell>
                       <TableCell>Title</TableCell>
-                      {activeTab !== "active" && <TableCell>Start Time</TableCell>}
+                      {activeTab === "completed" && <TableCell>Completed Time</TableCell>}
+                      {activeTab === "inactive" && <TableCell>Start Time</TableCell>}
                       <TableCell>Deadline</TableCell>
                       <TableCell>Assignees</TableCell>
                       <TableCell align={"right"} sx={{minWidth: '7%'}}>
@@ -237,7 +245,54 @@ function TasksTable() {
                                 )}
                             </Box>
                         </TableCell>
-                        {activeTab !== "active" && 
+                        {activeTab === "completed" &&
+                          <TableCell sx={{minWidth: '21%', py: 1.5}}>
+                              <Box sx={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                      <DatePicker
+                                        value={completionDateFilterValue}
+                                        onChange={handleCompletionDateFilterChange}
+                                        slotProps={{
+                                            textField: {
+                                                size: 'small',
+                                                fullWidth: true,
+                                                sx: {
+                                                    backgroundColor: '#FFFFFF',
+                                                    pr: completionDateFilterValue ? '40px' : 1,
+                                                    '& .MuiOutlinedInput-root': {
+                                                        '& fieldset': {
+                                                            borderColor: '#CBD5E0'
+                                                        },
+                                                        '&:hover fieldset': {
+                                                            borderColor: '#5B7FA6'
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }}
+                                      />
+                                  </LocalizationProvider>
+                                  {completionDateFilterValue && (
+                                    <IconButton
+                                      size="small"
+                                      onClick={() => setCompletionDateFilterValue(null)}
+                                      sx={{
+                                          position: 'absolute',
+                                          right: 4,
+                                          color: '#718096',
+                                          '&:hover': {
+                                              color: '#2D3748',
+                                              backgroundColor: 'rgba(0, 0, 0, 0.04)'
+                                          }
+                                      }}
+                                    >
+                                        <CloseIcon fontSize="small" />
+                                    </IconButton>
+                                  )}
+                              </Box>
+                          </TableCell>
+                        }
+                        {activeTab === "inactive" &&
                             <TableCell sx={{minWidth: '21%', py: 1.5}}>
                                 <Box sx={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
                                     <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -413,6 +468,7 @@ function TasksTable() {
                                   setTitleFilterValue("");
                                   setDeadlineDateFilterValue(null);
                                   setStartTimeDateFilterValue(null);
+                                  setCompletionDateFilterValue(null);
                                   setAssigneesFilterValues([]);
                                   refreshTasks();
                               }}
