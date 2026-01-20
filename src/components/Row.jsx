@@ -7,6 +7,7 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import FilterListOffIcon from '@mui/icons-material/FilterListOff';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import ReplayIcon from '@mui/icons-material/Replay';
 import {
     Alert,
     Box,
@@ -404,6 +405,38 @@ function Row(props) {
                         <EditIcon sx={{color: "white"}} fontSize={"small"}/>
                     </IconButton>
                   )}
+                  {activeTab === "completed" && (
+                    <IconButton sx={{
+                        backgroundColor: "#FF9800",
+                        marginLeft: "1%",
+                        '&:hover': {
+                            backgroundColor: '#F57C00',
+                        },
+                        transition: 'background-color 0.2s ease'
+                    }} size={"small"}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        updateTask(row.id, {"isCompleted": false})
+                          .then(r => {
+                              if (r.errors.length > 0) {
+                                  addErrors(r.errors);
+                              } else {
+                                  refreshTasks();
+                                  setOpen(false);
+                                  setTaskChangedMessage(`Task "${row.title}" rolled back`);
+                              }
+                          })
+                          .catch(error => {
+                              const errors = []
+                              error.response.data['errors'].forEach((error) => {
+                                  errors.push(error['description']);
+                              })
+                              addErrors(errors);
+                          });
+                    }}>
+                        <ReplayIcon sx={{color: "white"}} fontSize={"small"}/>
+                    </IconButton>
+                  )}
                   <IconButton sx={{
                       backgroundColor: "#F44336",
                       marginLeft: "1%",
@@ -412,11 +445,11 @@ function Row(props) {
                       },
                       transition: 'background-color 0.2s ease'
                   }} size={"small"}
-                              onClick={(e) => {
-                                  e.stopPropagation();
-                                  setDeleteTaskId(row.id);
-                                  setDeleteTaskError(null);
-                              }}>
+                  onClick={(e) => {
+                      e.stopPropagation();
+                      setDeleteTaskId(row.id);
+                      setDeleteTaskError(null);
+                  }}>
                       <DeleteIcon sx={{color: "white"}} fontSize={"small"}/>
                   </IconButton>
               </TableCell>
