@@ -197,7 +197,7 @@ function TasksTable() {
                             </Box>
                         </TableCell>
                         <TableCell sx={{py: 1.5}}>
-                            <Box sx={{ position: 'relative' }}>
+                            <Box sx={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
                                 <TextField
                                   id="title-filter"
                                   variant="outlined"
@@ -211,7 +211,7 @@ function TasksTable() {
                                   placeholder="Search by title..."
                                   sx={{
                                       backgroundColor: '#FFFFFF',
-                                      pr: titleFilterValue ? '40px' : 1,
+                                      flex: 1,
                                       '& .MuiOutlinedInput-root': {
                                           '& fieldset': {
                                               borderColor: '#CBD5E0'
@@ -230,10 +230,9 @@ function TasksTable() {
                                       size="small"
                                       onClick={() => setTitleFilterValue("")}
                                       sx={{
-                                          position: 'absolute',
-                                          right: 4,
-                                          top: 8,
+                                          marginLeft: 1,
                                           color: '#718096',
+                                          backgroundColor: '#F7FAFC',
                                           '&:hover': {
                                               color: '#2D3748',
                                               backgroundColor: 'rgba(0, 0, 0, 0.04)'
@@ -247,7 +246,7 @@ function TasksTable() {
                         </TableCell>
                         {activeTab === "completed" &&
                           <TableCell sx={{minWidth: '21%', py: 1.5}}>
-                              <Box sx={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                              <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                   <LocalizationProvider dateAdapter={AdapterDayjs}>
                                       <DatePicker
                                         value={completionDateFilterValue}
@@ -258,7 +257,7 @@ function TasksTable() {
                                                 fullWidth: true,
                                                 sx: {
                                                     backgroundColor: '#FFFFFF',
-                                                    pr: completionDateFilterValue ? '40px' : 1,
+                                                    flex: 1,
                                                     '& .MuiOutlinedInput-root': {
                                                         '& fieldset': {
                                                             borderColor: '#CBD5E0'
@@ -277,9 +276,9 @@ function TasksTable() {
                                       size="small"
                                       onClick={() => setCompletionDateFilterValue(null)}
                                       sx={{
-                                          position: 'absolute',
-                                          right: 4,
+                                          marginLeft: 1,
                                           color: '#718096',
+                                          backgroundColor: '#F7FAFC',
                                           '&:hover': {
                                               color: '#2D3748',
                                               backgroundColor: 'rgba(0, 0, 0, 0.04)'
@@ -294,7 +293,7 @@ function TasksTable() {
                         }
                         {activeTab === "inactive" &&
                             <TableCell sx={{minWidth: '21%', py: 1.5}}>
-                                <Box sx={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                                         <DatePicker
                                           value={startTimeDateFilterValue}
@@ -305,7 +304,7 @@ function TasksTable() {
                                                   fullWidth: true,
                                                   sx: {
                                                       backgroundColor: '#FFFFFF',
-                                                      pr: startTimeDateFilterValue ? '40px' : 1,
+                                                      flex: 1,
                                                       '& .MuiOutlinedInput-root': {
                                                           '& fieldset': {
                                                               borderColor: '#CBD5E0'
@@ -324,9 +323,9 @@ function TasksTable() {
                                           size="small"
                                           onClick={() => setStartTimeDateFilterValue(null)}
                                           sx={{
-                                              position: 'absolute',
-                                              right: 4,
+                                              marginLeft: 1,
                                               color: '#718096',
+                                              backgroundColor: '#F7FAFC',
                                               '&:hover': {
                                                   color: '#2D3748',
                                                   backgroundColor: 'rgba(0, 0, 0, 0.04)'
@@ -340,7 +339,7 @@ function TasksTable() {
                             </TableCell>
                         }
                         <TableCell sx={{minWidth: '21%', py: 1.5}}>
-                            <Box sx={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                                     <DatePicker
                                       value={deadlineDateFilterValue}
@@ -351,7 +350,7 @@ function TasksTable() {
                                               fullWidth: true,
                                               sx: {
                                                   backgroundColor: '#FFFFFF',
-                                                  pr: deadlineDateFilterValue ? '40px' : 1,
+                                                  flex: 1,
                                                   '& .MuiOutlinedInput-root': {
                                                       '& fieldset': {
                                                           borderColor: '#CBD5E0'
@@ -370,9 +369,9 @@ function TasksTable() {
                                       size="small"
                                       onClick={() => setDeadlineDateFilterValue(null)}
                                       sx={{
-                                          position: 'absolute',
-                                          right: 4,
+                                          marginLeft: 1,
                                           color: '#718096',
+                                          backgroundColor: '#F7FAFC',
                                           '&:hover': {
                                               color: '#2D3748',
                                               backgroundColor: 'rgba(0, 0, 0, 0.04)'
