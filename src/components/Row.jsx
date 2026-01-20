@@ -193,14 +193,15 @@ function Row(props) {
                   setDeleteSubtaskError(null);
                   setDeleteSubtaskTitle('');
                   if (filterEnabled) {
-                      refreshSubtasks(
-                        priorityFilterValue || null,
-                        titleFilterValue || null,
-                        null,
-                        deadlineDateFilterValue || null,
-                        assigneesFilterValues.length > 0 ? assigneesFilterValues : null,
-                        subtaskCurrentPage
-                      );
+                      refreshSubtasks({
+                          priority: priorityFilterValue || null,
+                          title: titleFilterValue || null,
+                          startDate: null,
+                          deadline: deadlineDateFilterValue || null,
+                          completionDate: null,
+                          assignees: assigneesFilterValues.length > 0 ? assigneesFilterValues : null,
+                          page: subtaskCurrentPage
+                      });
                   } else {
                       refreshSubtasks({page: subtaskCurrentPage});
                   }
@@ -412,23 +413,21 @@ function Row(props) {
                                               setSubtaskTypePending(newIsPending);
                                               setSubtaskCurrentPage(1);
                                               if (filterEnabled) {
-                                                  refreshSubtasks(
-                                                    priorityFilterValue || null,
-                                                    titleFilterValue || null,
-                                                    null,
-                                                    deadlineDateFilterValue || null,
-                                                    null,
-                                                    assigneesFilterValues.length > 0 ? assigneesFilterValues : null,
-                                                    newIsPending,
-                                                    1
-                                                  );
+                                                  refreshSubtasks({
+                                                      priority: priorityFilterValue || null,
+                                                      title: titleFilterValue || null,
+                                                      startDate: null,
+                                                      deadline: deadlineDateFilterValue || null,
+                                                      completionDate: null,
+                                                      assignees: assigneesFilterValues.length > 0 ? assigneesFilterValues : null,
+                                                      pendingOverride: newIsPending,
+                                                      page: 1
+                                                  });
                                               } else {
-                                                  refreshSubtasks(
-                                                    {
-                                                        page: 1,
-                                                        pendingOverride: newIsPending
-                                                    }
-                                                  );
+                                                  refreshSubtasks({
+                                                      page: 1,
+                                                      pendingOverride: newIsPending
+                                                  });
                                               }
                                           }
                                       }}
@@ -699,8 +698,15 @@ function Row(props) {
                                                   transition: 'background-color 0.2s ease'
                                               }}
                                               onClick={() => {
-                                                  refreshSubtasks(priorityFilterValue, titleFilterValue,
-                                                    null, deadlineDateFilterValue, assigneesFilterValues, 1);
+                                                  refreshSubtasks({
+                                                      priority: priorityFilterValue || null,
+                                                      title: titleFilterValue || null,
+                                                      startDate: null,
+                                                      deadline: deadlineDateFilterValue || null,
+                                                      completionDate: null,
+                                                      assignees: assigneesFilterValues.length > 0 ? assigneesFilterValues : null,
+                                                      page: 1
+                                                  });
                                               }}
                                             >
                                                 Apply
@@ -759,14 +765,15 @@ function Row(props) {
                                                             addErrors(r.errors);
                                                         } else {
                                                             if (filterEnabled) {
-                                                                refreshSubtasks(
-                                                                  priorityFilterValue || null,
-                                                                  titleFilterValue || null,
-                                                                  startTimeDateFilterValue || null,
-                                                                  deadlineDateFilterValue || null,
-                                                                  assigneesFilterValues.length > 0 ? assigneesFilterValues : null,
-                                                                  subtaskCurrentPage
-                                                                );
+                                                                refreshSubtasks({
+                                                                    priority: priorityFilterValue || null,
+                                                                    title: titleFilterValue || null,
+                                                                    startDate: null,
+                                                                    deadline: deadlineDateFilterValue || null,
+                                                                    completionDate: null,
+                                                                    assignees: assigneesFilterValues.length > 0 ? assigneesFilterValues : null,
+                                                                    page: subtaskCurrentPage
+                                                                });
                                                             } else {
                                                                 refreshSubtasks({page: subtaskCurrentPage});
                                                             }
@@ -857,14 +864,15 @@ function Row(props) {
                                   showFirstButton
                                   showLastButton
                                   onChange={(event, page) => {
-                                      refreshSubtasks(
-                                        filterEnabled ? priorityFilterValue || null : null,
-                                        filterEnabled ? titleFilterValue || null : null,
-                                        null,
-                                        filterEnabled ? deadlineDateFilterValue || null : null,
-                                        filterEnabled && assigneesFilterValues.length > 0 ? assigneesFilterValues : null,
-                                        page
-                                      );
+                                      refreshSubtasks({
+                                          priority: filterEnabled ? priorityFilterValue || null : null,
+                                          title: filterEnabled ? titleFilterValue || null : null,
+                                          startDate: null,
+                                          deadline: filterEnabled ? deadlineDateFilterValue || null : null,
+                                          completionDate: null,
+                                          assignees: filterEnabled && assigneesFilterValues.length > 0 ? assigneesFilterValues : null,
+                                          page: page
+                                      });
                                   }}
                                 />
                             </Box>
