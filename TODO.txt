@@ -1,4 +1,4 @@
-Add show completed subtasks for active and inactive tasks
+Fix subtasks refresh after adding subtask
 Fix unique task names
 Fix deleting user which have tasks
 Check all API calls

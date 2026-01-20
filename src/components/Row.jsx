@@ -24,7 +24,9 @@ import {
     OutlinedInput,
     Pagination,
     Select,
-    TextField
+    TextField,
+    ToggleButton,
+    ToggleButtonGroup
 } from "@mui/material";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid2";
@@ -90,6 +92,7 @@ function Row(props) {
     const [deleteSubtaskId, setDeleteSubtaskId] = React.useState(null);
     const [deleteSubtaskError, setDeleteSubtaskError] = React.useState(null);
     const [deleteSubtaskTitle, setDeleteSubtaskTitle] = React.useState('');
+    const [subtaskTypePending, setSubtaskTypePending] = React.useState(null);
 
     React.useEffect(() => {
         if (open === false) {
@@ -123,10 +126,19 @@ function Row(props) {
         );
     };
 
-    const refreshSubtasks = (priority = null, title = null, startDate = null, deadline = null,
-                             completionDate = null, assignees = null, page = subtaskCurrentPage) => {
+    const refreshSubtasks = ({
+                                 priority = null, title = null, startDate = null, deadline = null,
+                                 completionDate = null, assignees = null, pendingOverride = null,
+                                 page = subtaskCurrentPage
+                             } = {}) => {
 
-        fetchTasks(row.id, priority, title, startDate, deadline, completionDate, false, assignees,
+        let isCompleted = !pendingOverride;
+        if (pendingOverride == null) {
+            if (activeTab !== "completed") {
+                isCompleted = subtaskTypePending == null ? false : subtaskTypePending;
+            }
+        }
+        fetchTasks(row.id, priority, title, startDate, deadline, completionDate, isCompleted, assignees,
           page, 5)
           .then(r => {
               if (r.errors.length > 0) {
@@ -178,12 +190,12 @@ function Row(props) {
                   setDeleteSubtaskTitle('');
                   if (filterEnabled) {
                       refreshSubtasks(
-                          priorityFilterValue || null,
-                          titleFilterValue || null,
-                          null,
-                          deadlineDateFilterValue || null,
-                          assigneesFilterValues.length > 0 ? assigneesFilterValues : null,
-                          subtaskCurrentPage
+                        priorityFilterValue || null,
+                        titleFilterValue || null,
+                        null,
+                        deadlineDateFilterValue || null,
+                        assigneesFilterValues.length > 0 ? assigneesFilterValues : null,
+                        subtaskCurrentPage
                       );
                   } else {
                       refreshSubtasks({page: subtaskCurrentPage});
@@ -218,6 +230,8 @@ function Row(props) {
                         () => {
                             if (!open) {
                                 refreshSubtasks({page: subtaskCurrentPage});
+                            } else {
+                                setSubtaskTypePending(null);
                             }
                             setOpen(!open)
                         }
@@ -245,26 +259,26 @@ function Row(props) {
                   }
               }}>{row.title}</TableCell>
               {activeTab === "completed" && (
-                  <TableCell onClick={(e) => {
-                      if (open) {
-                          setOpen(false);
-                      } else {
-                          e.stopPropagation();
-                          setReadOnly(true);
-                          setViewTaskPopup(true);
-                      }
-                  }}>{row.completionDate}</TableCell>
+                <TableCell onClick={(e) => {
+                    if (open) {
+                        setOpen(false);
+                    } else {
+                        e.stopPropagation();
+                        setReadOnly(true);
+                        setViewTaskPopup(true);
+                    }
+                }}>{row.completionDate}</TableCell>
               )}
               {activeTab !== "active" && activeTab !== "completed" && (
-                  <TableCell onClick={(e) => {
-                      if (open) {
-                          setOpen(false);
-                      } else {
-                          e.stopPropagation();
-                          setReadOnly(true);
-                          setViewTaskPopup(true);
-                      }
-                  }}>{row.start}</TableCell>
+                <TableCell onClick={(e) => {
+                    if (open) {
+                        setOpen(false);
+                    } else {
+                        e.stopPropagation();
+                        setReadOnly(true);
+                        setViewTaskPopup(true);
+                    }
+                }}>{row.start}</TableCell>
               )}
               <TableCell onClick={(e) => {
                   if (open) {
@@ -291,54 +305,54 @@ function Row(props) {
               </TableCell>
               <TableCell align={'right'}>
                   {activeTab !== "completed" && (
-                      <IconButton sx={{
-                          backgroundColor: "#4CAF50",
-                          '&:hover': {
-                              backgroundColor: '#45a049',
-                          },
-                          transition: 'background-color 0.2s ease'
-                      }} size={"small"} onClick={() => {
-                          updateTask(row.id, {"isCompleted": true})
-                            .then(r => {
-                                  if (r.errors.length > 0) {
-                                      addErrors(r.errors);
-                                  } else {
-                                      refreshTasks();
-                                      setOpen(false);
-                                      setTaskChangedMessage(`Task "${row.title}" completed`);
-                                  }
-                              }
-                            )
-                            .catch(error => {
-                                  const errors = []
-                                  error.response.data['errors'].forEach((error) => {
-                                      errors.push(error['description']);
-                                  })
-                                  addErrors(errors);
-                              }
-                            );
-                      }}>
-                          <CheckIcon sx={{color: "white"}} fontSize={"small"}/>
-                      </IconButton>
+                    <IconButton sx={{
+                        backgroundColor: "#4CAF50",
+                        '&:hover': {
+                            backgroundColor: '#45a049',
+                        },
+                        transition: 'background-color 0.2s ease'
+                    }} size={"small"} onClick={() => {
+                        updateTask(row.id, {"isCompleted": true})
+                          .then(r => {
+                                if (r.errors.length > 0) {
+                                    addErrors(r.errors);
+                                } else {
+                                    refreshTasks();
+                                    setOpen(false);
+                                    setTaskChangedMessage(`Task "${row.title}" completed`);
+                                }
+                            }
+                          )
+                          .catch(error => {
+                                const errors = []
+                                error.response.data['errors'].forEach((error) => {
+                                    errors.push(error['description']);
+                                })
+                                addErrors(errors);
+                            }
+                          );
+                    }}>
+                        <CheckIcon sx={{color: "white"}} fontSize={"small"}/>
+                    </IconButton>
                   )}
                   {activeTab !== "completed" && (
-                      <IconButton
-                        sx={{
-                            backgroundColor: "#2196F3",
-                            marginLeft: "1%",
-                            '&:hover': {
-                                backgroundColor: '#1976D2',
-                            },
-                            transition: 'background-color 0.2s ease'
-                        }}
-                        size={"small"}
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            setReadOnly(false);
-                            setViewTaskPopup(true);
-                        }}>
-                          <EditIcon sx={{color: "white"}} fontSize={"small"}/>
-                      </IconButton>
+                    <IconButton
+                      sx={{
+                          backgroundColor: "#2196F3",
+                          marginLeft: "1%",
+                          '&:hover': {
+                              backgroundColor: '#1976D2',
+                          },
+                          transition: 'background-color 0.2s ease'
+                      }}
+                      size={"small"}
+                      onClick={(e) => {
+                          e.stopPropagation();
+                          setReadOnly(false);
+                          setViewTaskPopup(true);
+                      }}>
+                        <EditIcon sx={{color: "white"}} fontSize={"small"}/>
+                    </IconButton>
                   )}
                   <IconButton sx={{
                       backgroundColor: "#F44336",
@@ -348,11 +362,11 @@ function Row(props) {
                       },
                       transition: 'background-color 0.2s ease'
                   }} size={"small"}
-                  onClick={(e) => {
-                      e.stopPropagation();
-                      setDeleteTaskId(row.id);
-                      setDeleteTaskError(null);
-                  }}>
+                              onClick={(e) => {
+                                  e.stopPropagation();
+                                  setDeleteTaskId(row.id);
+                                  setDeleteTaskError(null);
+                              }}>
                       <DeleteIcon sx={{color: "white"}} fontSize={"small"}/>
                   </IconButton>
               </TableCell>
@@ -371,11 +385,76 @@ function Row(props) {
                               display: 'flex',
                               justifyContent: 'space-between',
                               alignItems: 'center',
-                              marginBottom: 2
+                              marginBottom: 2,
+                              position: 'relative'
                           }}>
                               <Typography variant="h6" component="div">
                                   Subtasks
                               </Typography>
+                              {activeTab !== "completed" && (
+                                <Box sx={{
+                                    position: 'absolute',
+                                    left: '50%',
+                                    transform: 'translateX(-50%)',
+                                    display: 'flex',
+                                    alignItems: 'center'
+                                }}>
+                                    <ToggleButtonGroup
+                                      value={subtaskTypePending || subtaskTypePending == null ? 'active' : 'completed'}
+                                      exclusive
+                                      onChange={(event, newValue) => {
+                                          if (newValue !== null) {
+                                              const newIsPending = newValue === "active";
+                                              setSubtaskTypePending(newIsPending);
+                                              setSubtaskCurrentPage(1);
+                                              if (filterEnabled) {
+                                                  refreshSubtasks(
+                                                    priorityFilterValue || null,
+                                                    titleFilterValue || null,
+                                                    null,
+                                                    deadlineDateFilterValue || null,
+                                                    null,
+                                                    assigneesFilterValues.length > 0 ? assigneesFilterValues : null,
+                                                    newIsPending,
+                                                    1
+                                                  );
+                                              } else {
+                                                  refreshSubtasks(
+                                                    {
+                                                        page: 1,
+                                                        pendingOverride: newIsPending
+                                                    }
+                                                  );
+                                              }
+                                          }
+                                      }}
+                                      size="small"
+                                      sx={{
+                                          '& .MuiToggleButton-root': {
+                                              color: '#2D3748',
+                                              borderColor: '#CBD5E0',
+                                              '&.Mui-selected': {
+                                                  backgroundColor: '#5B7FA6',
+                                                  color: '#FFFFFF',
+                                                  '&:hover': {
+                                                      backgroundColor: '#4A6B8F',
+                                                  }
+                                              },
+                                              '&:hover': {
+                                                  backgroundColor: '#E0E7FF',
+                                              }
+                                          }
+                                      }}
+                                    >
+                                        <ToggleButton value="active">
+                                            Pending subtasks
+                                        </ToggleButton>
+                                        <ToggleButton value="completed">
+                                            Completed subtasks
+                                        </ToggleButton>
+                                    </ToggleButtonGroup>
+                                </Box>
+                              )}
                               <IconButton
                                 sx={{
                                     backgroundColor: '#5B7FA6',
@@ -543,12 +622,12 @@ function Row(props) {
                                                           size={"small"}
                                                           sx={{backgroundColor: '#FFFFFF'}}
                                                           MenuProps={{
-                                                            PaperProps: {
-                                                              style: {
-                                                                maxHeight: 300,
-                                                                width: 'auto',
+                                                              PaperProps: {
+                                                                  style: {
+                                                                      maxHeight: 300,
+                                                                      width: 'auto',
+                                                                  },
                                                               },
-                                                            },
                                                           }}
                                                         >
                                                             {users.map((name) => (
@@ -662,30 +741,31 @@ function Row(props) {
                                             setViewSubtaskPopup(true);
                                         }} sx={{cursor: 'pointer'}}>{subtaskRow.assignees}</TableCell>
                                         <TableCell align={'right'}>
-                                            <IconButton sx={{
-                                                backgroundColor: "#4CAF50",
-                                                '&:hover': {
-                                                    backgroundColor: '#45a049',
-                                                },
-                                                transition: 'background-color 0.2s ease'
-                                            }} size={"small"} onClick={() => {
-                                                updateTask(subtaskRow.id, {"isCompleted": true})
+                                            {subtaskTypePending && (
+                                              <IconButton sx={{
+                                                  backgroundColor: "#4CAF50",
+                                                  '&:hover': {
+                                                      backgroundColor: '#45a049',
+                                                  },
+                                                  transition: 'background-color 0.2s ease'
+                                              }} size={"small"} onClick={() => {
+                                                  updateTask(subtaskRow.id, {"isCompleted": true})
                                                     .then(r => {
                                                         if (r.errors.length > 0) {
                                                             addErrors(r.errors);
-                  } else {
-                      if (filterEnabled) {
-                          refreshSubtasks(
-                              priorityFilterValue || null,
-                              titleFilterValue || null,
-                              startTimeDateFilterValue || null,
-                              deadlineDateFilterValue || null,
-                              assigneesFilterValues.length > 0 ? assigneesFilterValues : null,
-                              subtaskCurrentPage
-                          );
-                      } else {
-                          refreshSubtasks({page: subtaskCurrentPage});
-                      }
+                                                        } else {
+                                                            if (filterEnabled) {
+                                                                refreshSubtasks(
+                                                                  priorityFilterValue || null,
+                                                                  titleFilterValue || null,
+                                                                  startTimeDateFilterValue || null,
+                                                                  deadlineDateFilterValue || null,
+                                                                  assigneesFilterValues.length > 0 ? assigneesFilterValues : null,
+                                                                  subtaskCurrentPage
+                                                                );
+                                                            } else {
+                                                                refreshSubtasks({page: subtaskCurrentPage});
+                                                            }
                                                             setTaskChangedMessage(`Subtask "${subtaskRow.title}" completed`);
                                                         }
                                                     })
@@ -696,28 +776,31 @@ function Row(props) {
                                                         })
                                                         addErrors(errors);
                                                     });
-                                            }}>
-                                                <CheckIcon sx={{color: "white"}} fontSize={"small"}/>
-                                            </IconButton>
-                                            <IconButton
-                                              sx={{
-                                                  backgroundColor: "#2196F3",
-                                                  marginLeft: "1%",
-                                                  '&:hover': {
-                                                      backgroundColor: '#1976D2',
-                                                  },
-                                                  transition: 'background-color 0.2s ease'
-                                              }}
-                                              size={"small"}
-                                              onClick={(e) => {
-                                                  e.stopPropagation();
-                                                  setSelectedSubtaskId(subtaskRow.id);
-                                                  setSubtaskReadOnly(false);
-                                                  setViewSubtaskPopup(true);
-                                              }}
-                                            >
-                                                <EditIcon sx={{color: "white"}} fontSize={"small"}/>
-                                            </IconButton>
+                                              }}>
+                                                  <CheckIcon sx={{color: "white"}} fontSize={"small"}/>
+                                              </IconButton>
+                                            )}
+                                            {subtaskTypePending && (
+                                              <IconButton
+                                                sx={{
+                                                    backgroundColor: "#2196F3",
+                                                    marginLeft: "1%",
+                                                    '&:hover': {
+                                                        backgroundColor: '#1976D2',
+                                                    },
+                                                    transition: 'background-color 0.2s ease'
+                                                }}
+                                                size={"small"}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setSelectedSubtaskId(subtaskRow.id);
+                                                    setSubtaskReadOnly(false);
+                                                    setViewSubtaskPopup(true);
+                                                }}
+                                              >
+                                                  <EditIcon sx={{color: "white"}} fontSize={"small"}/>
+                                              </IconButton>
+                                            )}
                                             <IconButton
                                               sx={{
                                                   backgroundColor: "#F44336",
@@ -771,12 +854,12 @@ function Row(props) {
                                   showLastButton
                                   onChange={(event, page) => {
                                       refreshSubtasks(
-                                          filterEnabled ? priorityFilterValue || null : null,
-                                          filterEnabled ? titleFilterValue || null : null,
-                                          null,
-                                          filterEnabled ? deadlineDateFilterValue || null : null,
-                                          filterEnabled && assigneesFilterValues.length > 0 ? assigneesFilterValues : null,
-                                          page
+                                        filterEnabled ? priorityFilterValue || null : null,
+                                        filterEnabled ? titleFilterValue || null : null,
+                                        null,
+                                        filterEnabled ? deadlineDateFilterValue || null : null,
+                                        filterEnabled && assigneesFilterValues.length > 0 ? assigneesFilterValues : null,
+                                        page
                                       );
                                   }}
                                 />
@@ -828,9 +911,9 @@ function Row(props) {
               <DialogTitle>Delete Task</DialogTitle>
               <DialogContent>
                   {deleteTaskError && (
-                      <Alert severity="error" sx={{marginBottom: 2}} onClose={() => setDeleteTaskError(null)}>
-                          {deleteTaskError}
-                      </Alert>
+                    <Alert severity="error" sx={{marginBottom: 2}} onClose={() => setDeleteTaskError(null)}>
+                        {deleteTaskError}
+                    </Alert>
                   )}
                   <DialogContentText>
                       Are you sure you want to delete task <strong>"{row.title}"</strong>?
@@ -878,9 +961,9 @@ function Row(props) {
               <DialogTitle>Delete Subtask</DialogTitle>
               <DialogContent>
                   {deleteSubtaskError && (
-                      <Alert severity="error" sx={{marginBottom: 2}} onClose={() => setDeleteSubtaskError(null)}>
-                          {deleteSubtaskError}
-                      </Alert>
+                    <Alert severity="error" sx={{marginBottom: 2}} onClose={() => setDeleteSubtaskError(null)}>
+                        {deleteSubtaskError}
+                    </Alert>
                   )}
                   <DialogContentText>
                       Are you sure you want to delete subtask <strong>"{deleteSubtaskTitle}"</strong>?
