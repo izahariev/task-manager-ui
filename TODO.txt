@@ -1,3 +1,4 @@
+Fix subtasks filtering
 Fix subtasks refresh after adding subtask
 Fix unique task names
 Fix deleting user which have tasks

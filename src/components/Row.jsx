@@ -132,11 +132,15 @@ function Row(props) {
                                  page = subtaskCurrentPage
                              } = {}) => {
 
-        let isCompleted = !pendingOverride;
-        if (pendingOverride == null) {
-            if (activeTab !== "completed") {
-                isCompleted = subtaskTypePending == null ? false : subtaskTypePending;
-            }
+        let isCompleted = null;
+        if (activeTab === "completed") {
+            isCompleted = null;
+        } else if (pendingOverride !== null) {
+            // pendingOverride is true for pending, false for completed
+            isCompleted = !pendingOverride;
+        } else {
+            // Use current state: subtaskTypePending is true for pending, false for completed, null means pending
+            isCompleted = subtaskTypePending === null ? false : !subtaskTypePending;
         }
         fetchTasks(row.id, priority, title, startDate, deadline, completionDate, isCompleted, assignees,
           page, 5)
@@ -741,7 +745,7 @@ function Row(props) {
                                             setViewSubtaskPopup(true);
                                         }} sx={{cursor: 'pointer'}}>{subtaskRow.assignees}</TableCell>
                                         <TableCell align={'right'}>
-                                            {subtaskTypePending && (
+                                            {activeTab !== "completed" && (subtaskTypePending || subtaskTypePending === null) && (
                                               <IconButton sx={{
                                                   backgroundColor: "#4CAF50",
                                                   '&:hover': {
@@ -780,7 +784,7 @@ function Row(props) {
                                                   <CheckIcon sx={{color: "white"}} fontSize={"small"}/>
                                               </IconButton>
                                             )}
-                                            {subtaskTypePending && (
+                                            {activeTab !== "completed" && (subtaskTypePending || subtaskTypePending === null) && (
                                               <IconButton
                                                 sx={{
                                                     backgroundColor: "#2196F3",
