@@ -93,6 +93,11 @@ function Row(props) {
     const [deleteSubtaskId, setDeleteSubtaskId] = React.useState(null);
     const [deleteSubtaskError, setDeleteSubtaskError] = React.useState(null);
     const [deleteSubtaskTitle, setDeleteSubtaskTitle] = React.useState('');
+    const [completeTaskId, setCompleteTaskId] = React.useState(null);
+    const [completeTaskError, setCompleteTaskError] = React.useState(null);
+    const [completeSubtaskId, setCompleteSubtaskId] = React.useState(null);
+    const [completeSubtaskError, setCompleteSubtaskError] = React.useState(null);
+    const [completeSubtaskTitle, setCompleteSubtaskTitle] = React.useState('');
     const [subtaskTypePending, setSubtaskTypePending] = React.useState(null);
 
     React.useEffect(() => {
@@ -217,6 +222,61 @@ function Row(props) {
           });
     };
 
+    const handleCompleteTaskClick = () => {
+        updateTask(completeTaskId, {"isCompleted": true})
+          .then(r => {
+              if (r.errors && r.errors.length > 0) {
+                  setCompleteTaskError(r.errors.join(', '));
+              } else {
+                  setCompleteTaskId(null);
+                  setCompleteTaskError(null);
+                  refreshTasks();
+                  setOpen(false);
+                  setTaskChangedMessage(`Task "${row.title}" completed`);
+              }
+          })
+          .catch(error => {
+              const errorMessage = error.response?.data?.errors
+                ? error.response.data.errors.map((e) => e.description).join(', ')
+                : 'An error occurred while completing the task';
+              setCompleteTaskError(errorMessage);
+          });
+    };
+
+    const handleCompleteSubtaskClick = () => {
+        const subtaskTitleToComplete = completeSubtaskTitle;
+        updateTask(completeSubtaskId, {"isCompleted": true})
+          .then(r => {
+              if (r.errors && r.errors.length > 0) {
+                  setCompleteSubtaskError(r.errors.join(', '));
+              } else {
+                  setCompleteSubtaskId(null);
+                  setCompleteSubtaskError(null);
+                  setCompleteSubtaskTitle('');
+                  if (filterEnabled) {
+                      refreshSubtasks({
+                          priority: priorityFilterValue || null,
+                          title: titleFilterValue || null,
+                          startDate: null,
+                          deadline: deadlineDateFilterValue || null,
+                          completionDate: null,
+                          assignees: assigneesFilterValues.length > 0 ? assigneesFilterValues : null,
+                          page: subtaskCurrentPage
+                      });
+                  } else {
+                      refreshSubtasks({page: subtaskCurrentPage});
+                  }
+                  setTaskChangedMessage(`Subtask "${subtaskTitleToComplete}" completed`);
+              }
+          })
+          .catch(error => {
+              const errorMessage = error.response?.data?.errors
+                ? error.response.data.errors.map((e) => e.description).join(', ')
+                : 'An error occurred while completing the subtask';
+              setCompleteSubtaskError(errorMessage);
+          });
+    };
+
     return (
       <React.Fragment>
           <TableRow sx={{
@@ -311,35 +371,19 @@ function Row(props) {
               </TableCell>
               <TableCell align={'right'}>
                   {activeTab !== "completed" && (
-                    <IconButton sx={{
-                        backgroundColor: "#4CAF50",
-                        '&:hover': {
-                            backgroundColor: '#45a049',
-                        },
-                        transition: 'background-color 0.2s ease'
-                    }} size={"small"} onClick={() => {
-                        updateTask(row.id, {"isCompleted": true})
-                          .then(r => {
-                                if (r.errors.length > 0) {
-                                    addErrors(r.errors);
-                                } else {
-                                    refreshTasks();
-                                    setOpen(false);
-                                    setTaskChangedMessage(`Task "${row.title}" completed`);
-                                }
-                            }
-                          )
-                          .catch(error => {
-                                const errors = []
-                                error.response.data['errors'].forEach((error) => {
-                                    errors.push(error['description']);
-                                })
-                                addErrors(errors);
-                            }
-                          );
-                    }}>
-                        <CheckIcon sx={{color: "white"}} fontSize={"small"}/>
-                    </IconButton>
+                     <IconButton sx={{
+                         backgroundColor: "#4CAF50",
+                         '&:hover': {
+                             backgroundColor: '#45a049',
+                         },
+                         transition: 'background-color 0.2s ease'
+                     }} size={"small"} onClick={(e) => {
+                         e.stopPropagation();
+                         setCompleteTaskId(row.id);
+                         setCompleteTaskError(null);
+                     }}>
+                         <CheckIcon sx={{color: "white"}} fontSize={"small"}/>
+                     </IconButton>
                   )}
                   {activeTab !== "completed" && (
                     <IconButton
@@ -826,35 +870,11 @@ function Row(props) {
                                                       backgroundColor: '#45a049',
                                                   },
                                                   transition: 'background-color 0.2s ease'
-                                              }} size={"small"} onClick={() => {
-                                                  updateTask(subtaskRow.id, {"isCompleted": true})
-                                                    .then(r => {
-                                                        if (r.errors.length > 0) {
-                                                            addErrors(r.errors);
-                                                        } else {
-                                                            if (filterEnabled) {
-                                                                refreshSubtasks({
-                                                                    priority: priorityFilterValue || null,
-                                                                    title: titleFilterValue || null,
-                                                                    startDate: null,
-                                                                    deadline: deadlineDateFilterValue || null,
-                                                                    completionDate: null,
-                                                                    assignees: assigneesFilterValues.length > 0 ? assigneesFilterValues : null,
-                                                                    page: subtaskCurrentPage
-                                                                });
-                                                            } else {
-                                                                refreshSubtasks({page: subtaskCurrentPage});
-                                                            }
-                                                            setTaskChangedMessage(`Subtask "${subtaskRow.title}" completed`);
-                                                        }
-                                                    })
-                                                    .catch(error => {
-                                                        const errors = []
-                                                        error.response.data['errors'].forEach((error) => {
-                                                            errors.push(error['description']);
-                                                        })
-                                                        addErrors(errors);
-                                                    });
+                                              }} size={"small"} onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  setCompleteSubtaskId(subtaskRow.id);
+                                                  setCompleteSubtaskTitle(subtaskRow.title);
+                                                  setCompleteSubtaskError(null);
                                               }}>
                                                   <CheckIcon sx={{color: "white"}} fontSize={"small"}/>
                                               </IconButton>
@@ -1078,6 +1098,106 @@ function Row(props) {
                     variant="contained"
                   >
                       Delete
+                  </Button>
+              </DialogActions>
+          </Dialog>
+          <Dialog
+            open={completeTaskId !== null}
+            onClose={() => {
+                setCompleteTaskId(null);
+                setCompleteTaskError(null);
+            }}
+          >
+              <DialogTitle>Complete Task</DialogTitle>
+              <DialogContent>
+                  {completeTaskError && (
+                      <Alert severity="error" sx={{marginBottom: 2}} onClose={() => setCompleteTaskError(null)}>
+                          {completeTaskError}
+                      </Alert>
+                  )}
+                  <DialogContentText>
+                      Are you sure you want to complete task <strong>"{row.title}"</strong>?
+                  </DialogContentText>
+              </DialogContent>
+              <DialogActions>
+                  <Button
+                    onClick={() => {
+                        setCompleteTaskId(null);
+                        setCompleteTaskError(null);
+                    }}
+                    sx={{
+                        color: '#5B7FA6',
+                        '&:hover': {
+                            backgroundColor: '#E0E7FF',
+                        }
+                    }}
+                  >
+                      Cancel
+                  </Button>
+                  <Button
+                    onClick={handleCompleteTaskClick}
+                    sx={{
+                        backgroundColor: '#4CAF50',
+                        color: 'white',
+                        '&:hover': {
+                            backgroundColor: '#45a049',
+                        },
+                        transition: 'background-color 0.2s ease'
+                    }}
+                    variant="contained"
+                  >
+                      Complete
+                  </Button>
+              </DialogActions>
+          </Dialog>
+          <Dialog
+            open={completeSubtaskId !== null}
+            onClose={() => {
+                setCompleteSubtaskId(null);
+                setCompleteSubtaskTitle('');
+                setCompleteSubtaskError(null);
+            }}
+          >
+              <DialogTitle>Complete Subtask</DialogTitle>
+              <DialogContent>
+                  {completeSubtaskError && (
+                      <Alert severity="error" sx={{marginBottom: 2}} onClose={() => setCompleteSubtaskError(null)}>
+                          {completeSubtaskError}
+                      </Alert>
+                  )}
+                  <DialogContentText>
+                      Are you sure you want to complete subtask <strong>"{completeSubtaskTitle}"</strong>?
+                  </DialogContentText>
+              </DialogContent>
+              <DialogActions>
+                  <Button
+                    onClick={() => {
+                        setCompleteSubtaskId(null);
+                        setCompleteSubtaskTitle('');
+                        setCompleteSubtaskError(null);
+                    }}
+                    sx={{
+                        color: '#5B7FA6',
+                        '&:hover': {
+                            backgroundColor: '#E0E7FF',
+                        }
+                    }}
+                  >
+                      Cancel
+                  </Button>
+                  <Button
+                    onClick={handleCompleteSubtaskClick}
+                    sx={{
+                        backgroundColor: '#4CAF50',
+                        color: 'white',
+                        '&:hover': {
+                            backgroundColor: '#45a049',
+                        },
+                        transition: 'background-color 0.2s ease'
+                    }}
+                    variant="contained"
+                  >
+                      Complete
                   </Button>
               </DialogActions>
           </Dialog>
