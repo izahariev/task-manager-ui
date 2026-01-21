@@ -443,15 +443,15 @@ function TasksTable() {
                                     >
                                         {users && Array.isArray(users) && users.length > 0 ? (
                                             [...users].sort((a, b) => {
-                                                const aSelected = assigneesFilterValues.includes(a);
-                                                const bSelected = assigneesFilterValues.includes(b);
+                                                const aSelected = assigneesFilterValues.includes(a.name);
+                                                const bSelected = assigneesFilterValues.includes(b.name);
                                                 if (aSelected && !bSelected) return -1;
                                                 if (!aSelected && bSelected) return 1;
-                                                return String(a).localeCompare(String(b));
-                                            }).map((name) => (
-                                              <MenuItem key={name} value={name}>
+                                                return String(a.name).localeCompare(String(b.name));
+                                            }).map((user) => (
+                                              <MenuItem key={user.id} value={user.name}>
                                                   <Checkbox
-                                                    checked={assigneesFilterValues.includes(name)}
+                                                    checked={assigneesFilterValues.includes(user.name)}
                                                     sx={{
                                                         color: '#5B7FA6',
                                                         '&.Mui-checked': {
@@ -459,7 +459,7 @@ function TasksTable() {
                                                         }
                                                     }}
                                                   />
-                                                  <ListItemText primary={name} />
+                                                  <ListItemText primary={user.name} />
                                               </MenuItem>
                                             ))
                                         ) : (
