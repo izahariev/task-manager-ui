@@ -31,7 +31,6 @@ import {
     ToggleButtonGroup
 } from "@mui/material";
 import Button from "@mui/material/Button";
-import Grid from "@mui/material/Grid2";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -1059,6 +1058,9 @@ function Row(props) {
                   <DialogContentText>
                       Are you sure you want to delete task <strong>"{row.title}"</strong>?
                   </DialogContentText>
+                  <DialogContentText sx={{mt: 2, fontWeight: 'bold', color: '#F44336'}}>
+                      This action can not be reverted!
+                  </DialogContentText>
               </DialogContent>
               <DialogActions>
                   <Button
@@ -1108,6 +1110,9 @@ function Row(props) {
                   )}
                   <DialogContentText>
                       Are you sure you want to delete subtask <strong>"{deleteSubtaskTitle}"</strong>?
+                  </DialogContentText>
+                  <DialogContentText sx={{mt: 2, fontWeight: 'bold', color: '#F44336'}}>
+                      This action can not be reverted!
                   </DialogContentText>
               </DialogContent>
               <DialogActions>
