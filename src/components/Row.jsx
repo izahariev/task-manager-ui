@@ -99,6 +99,8 @@ function Row(props) {
     const [completeSubtaskId, setCompleteSubtaskId] = React.useState(null);
     const [completeSubtaskError, setCompleteSubtaskError] = React.useState(null);
     const [completeSubtaskTitle, setCompleteSubtaskTitle] = React.useState('');
+    const [rollbackTaskId, setRollbackTaskId] = React.useState(null);
+    const [rollbackTaskError, setRollbackTaskError] = React.useState(null);
     const [subtaskTypePending, setSubtaskTypePending] = React.useState(null);
 
     React.useEffect(() => {
@@ -278,6 +280,27 @@ function Row(props) {
           });
     };
 
+    const handleRollbackTaskClick = () => {
+        updateTask(rollbackTaskId, {"isCompleted": false})
+          .then(r => {
+              if (r.errors && r.errors.length > 0) {
+                  setRollbackTaskError(r.errors.join(', '));
+              } else {
+                  setRollbackTaskId(null);
+                  setRollbackTaskError(null);
+                  refreshTasks();
+                  setOpen(false);
+                  setTaskChangedMessage(`Task "${row.title}" rolled back`);
+              }
+          })
+          .catch(error => {
+              const errorMessage = error.response?.data?.errors
+                ? error.response.data.errors.map((e) => e.description).join(', ')
+                : 'An error occurred while rolling back the task';
+              setRollbackTaskError(errorMessage);
+          });
+    };
+
     return (
       <React.Fragment>
           <TableRow sx={{
@@ -416,23 +439,8 @@ function Row(props) {
                     }} size={"small"}
                     onClick={(e) => {
                         e.stopPropagation();
-                        updateTask(row.id, {"isCompleted": false})
-                          .then(r => {
-                              if (r.errors.length > 0) {
-                                  addErrors(r.errors);
-                              } else {
-                                  refreshTasks();
-                                  setOpen(false);
-                                  setTaskChangedMessage(`Task "${row.title}" rolled back`);
-                              }
-                          })
-                          .catch(error => {
-                              const errors = []
-                              error.response.data['errors'].forEach((error) => {
-                                  errors.push(error['description']);
-                              })
-                              addErrors(errors);
-                          });
+                        setRollbackTaskId(row.id);
+                        setRollbackTaskError(null);
                     }}>
                         <ReplayIcon sx={{color: "white"}} fontSize={"small"}/>
                     </IconButton>
@@ -1231,6 +1239,55 @@ function Row(props) {
                     variant="contained"
                   >
                       Complete
+                  </Button>
+              </DialogActions>
+          </Dialog>
+          <Dialog
+            open={rollbackTaskId !== null}
+            onClose={() => {
+                setRollbackTaskId(null);
+                setRollbackTaskError(null);
+            }}
+          >
+              <DialogTitle>Rollback Task</DialogTitle>
+              <DialogContent>
+                  {rollbackTaskError && (
+                      <Alert severity="error" sx={{marginBottom: 2}} onClose={() => setRollbackTaskError(null)}>
+                          {rollbackTaskError}
+                      </Alert>
+                  )}
+                  <DialogContentText>
+                      Are you sure you want to rollback completed task <strong>"{row.title}"</strong>?
+                  </DialogContentText>
+              </DialogContent>
+              <DialogActions>
+                  <Button
+                    onClick={() => {
+                        setRollbackTaskId(null);
+                        setRollbackTaskError(null);
+                    }}
+                    sx={{
+                        color: '#5B7FA6',
+                        '&:hover': {
+                            backgroundColor: '#E0E7FF',
+                        }
+                    }}
+                  >
+                      Cancel
+                  </Button>
+                  <Button
+                    onClick={handleRollbackTaskClick}
+                    sx={{
+                        backgroundColor: '#FF9800',
+                        color: 'white',
+                        '&:hover': {
+                            backgroundColor: '#F57C00',
+                        },
+                        transition: 'background-color 0.2s ease'
+                    }}
+                    variant="contained"
+                  >
+                      Rollback
                   </Button>
               </DialogActions>
           </Dialog>
