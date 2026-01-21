@@ -3,7 +3,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import {Alert, Box, Divider, IconButton, TextField, Typography} from "@mui/material";
+import {Alert, Box, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, IconButton, TextField, Typography} from "@mui/material";
 import Button from "@mui/material/Button";
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -20,6 +20,7 @@ export default function UsersPopup() {
     const [editedUser, setEditedUser] = React.useState("");
     const [editedUserNewName, setEditedUserNewName] = React.useState("");
     const [deleteUser, setDeleteUser] = React.useState("");
+    const [deleteUserError, setDeleteUserError] = React.useState(null);
     const [errorMessages, setErrorMessages] = React.useState([]);
 
     React.useEffect(() => {
@@ -83,19 +84,19 @@ export default function UsersPopup() {
           .then(() => {
               refreshUsers().then(r => {
                   if (r.errors && r.errors.length > 0) {
-                      setErrorMessages([...r.errors]);
+                      setDeleteUserError(r.errors.join(', '));
                   } else {
                       setDeleteUser('');
+                      setDeleteUserError(null);
                       setErrorMessages([]);
                   }
               });
           })
           .catch(error => {
-              const errors = []
-              error.response.data['errors'].forEach((error) => {
-                  errors.push(error['description']);
-              })
-              setErrorMessages([...errors]);
+              const errorMessage = error.response?.data?.errors
+                ? error.response.data.errors.map((e) => e.description).join(', ')
+                : 'An error occurred while deleting the user';
+              setDeleteUserError(errorMessage);
           });
     };
 
@@ -106,21 +107,6 @@ export default function UsersPopup() {
           minHeight: '200px',
           padding: '16px'
       }}>
-          {deleteUser !== "" &&
-            <Alert 
-                variant="filled" 
-                severity="warning" 
-                sx={{marginBottom: "16px"}}
-                onClose={() => {
-                    setDeleteUser("");
-                    setErrorMessages([]);
-                }}
-            >
-                <Typography variant="body2">
-                    Click the red delete button to confirm deletion of user <strong>&#34;{deleteUser}&#34;</strong> or close this alert to cancel.
-                </Typography>
-            </Alert>
-          }
           {errorMessages.length !== 0 &&
             <Alert 
                 variant="filled" 
@@ -162,7 +148,7 @@ export default function UsersPopup() {
                         const labelId = `checkbox-list-secondary-label-${user}`;
                         return (
                           <React.Fragment key={user}>
-                              {user !== editedUser && user !== deleteUser &&
+                              {user !== editedUser &&
                                 <ListItem
                                   key={user}
                                   secondaryAction={
@@ -196,6 +182,7 @@ export default function UsersPopup() {
                                             size={"small"}
                                             onClick={() => {
                                                 setDeleteUser(user)
+                                                setDeleteUserError(null)
                                                 setErrorMessages([])
                                             }}
                                             aria-label={`Delete ${user}`}
@@ -279,64 +266,6 @@ export default function UsersPopup() {
                                     </ListItemButton>
                                 </ListItem>
                               }
-                              {user === deleteUser &&
-                                <ListItem
-                                  key={user}
-                                  secondaryAction={
-                                      <Box sx={{display: 'flex', gap: '4px'}}>
-                                          <IconButton
-                                            sx={{
-                                                backgroundColor: "#C85A5A",
-                                                '&:hover': {
-                                                    backgroundColor: '#B04848',
-                                                },
-                                                transition: 'background-color 0.2s ease'
-                                            }}
-                                            size={"small"}
-                                            onClick={handleDeleteUserClick}
-                                            aria-label="Confirm delete"
-                                          >
-                                              <DeleteIcon sx={{color: "white"}} fontSize={"small"}/>
-                                          </IconButton>
-                                          <IconButton
-                                            sx={{
-                                                backgroundColor: "#5B7FA6",
-                                                '&:hover': {
-                                                    backgroundColor: '#4A6B8F',
-                                                },
-                                                transition: 'background-color 0.2s ease'
-                                            }}
-                                            size={"small"}
-                                            onClick={() => {
-                                                setDeleteUser("")
-                                                setErrorMessages([])
-                                            }}
-                                            aria-label="Cancel delete"
-                                          >
-                                              <CloseIcon sx={{color: "white"}} fontSize={"small"}/>
-                                          </IconButton>
-                                      </Box>
-                                  }
-                                  sx={{
-                                      backgroundColor: "#FFF3E0",
-                                      '&:hover': {
-                                          backgroundColor: "#FFE0B2"
-                                      }
-                                  }}
-                                  disablePadding
-                                >
-                                    <ListItemButton>
-                                        <ListItemText 
-                                            id={labelId} 
-                                            primary={
-                                                <Typography variant="body1" sx={{fontWeight: 500}}>
-                                                    {user}
-                                                </Typography>
-                                            }
-                                        />
-                                    </ListItemButton>
-                                </ListItem>
-                              }
                           </React.Fragment>
                         );
                     })}
@@ -386,7 +315,6 @@ export default function UsersPopup() {
                             setErrorMessages([])
                         }
                         setEditedUser("")
-                        setDeleteUser("")
                     }}
                     onKeyDown={(e) => e.key === "Enter" && handleAddUser()}
                     value={newUser}
@@ -416,6 +344,58 @@ export default function UsersPopup() {
                   </Button>
               </Box>
           </Paper>
+          <Dialog
+            open={deleteUser !== ""}
+            onClose={() => {
+                setDeleteUser("");
+                setDeleteUserError(null);
+            }}
+          >
+              <DialogTitle>Delete User</DialogTitle>
+              <DialogContent>
+                  {deleteUserError && (
+                      <Alert severity="error" sx={{marginBottom: 2}} onClose={() => setDeleteUserError(null)}>
+                          {deleteUserError}
+                      </Alert>
+                  )}
+                  <DialogContentText>
+                      Are you sure you want to delete user <strong>"{deleteUser}"</strong>?
+                  </DialogContentText>
+                  <DialogContentText sx={{mt: 2, fontWeight: 'bold', color: '#F44336'}}>
+                      This action can not be reverted!
+                  </DialogContentText>
+              </DialogContent>
+              <DialogActions>
+                  <Button
+                    onClick={() => {
+                        setDeleteUser("");
+                        setDeleteUserError(null);
+                    }}
+                    sx={{
+                        color: '#5B7FA6',
+                        '&:hover': {
+                            backgroundColor: '#E0E7FF',
+                        }
+                    }}
+                  >
+                      Cancel
+                  </Button>
+                  <Button
+                    onClick={handleDeleteUserClick}
+                    sx={{
+                        backgroundColor: '#F44336',
+                        color: 'white',
+                        '&:hover': {
+                            backgroundColor: '#D32F2F',
+                        },
+                        transition: 'background-color 0.2s ease'
+                    }}
+                    variant="contained"
+                  >
+                      Delete
+                  </Button>
+              </DialogActions>
+          </Dialog>
       </Box>
     );
 }
