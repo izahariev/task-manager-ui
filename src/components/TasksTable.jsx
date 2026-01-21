@@ -1,6 +1,7 @@
 import CloseIcon from '@mui/icons-material/Close';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import FilterListOffIcon from '@mui/icons-material/FilterListOff';
+import InfoIcon from '@mui/icons-material/Info';
 import {
     Box,
     Checkbox,
@@ -13,7 +14,8 @@ import {
     Paper,
     Select,
     TableContainer,
-    TextField
+    TextField,
+    Tooltip
 } from "@mui/material";
 import Button from "@mui/material/Button";
 import Table from "@mui/material/Table";
@@ -271,6 +273,15 @@ function TasksTable() {
                                         }}
                                       />
                                   </LocalizationProvider>
+                                  <Tooltip title="Filters the tasks which have completion date greater or equal to the specified" arrow>
+                                      <InfoIcon 
+                                        sx={{ 
+                                            marginLeft: 1,
+                                            color: '#718096',
+                                            fontSize: '1.2rem'
+                                        }} 
+                                      />
+                                  </Tooltip>
                                   {completionDateFilterValue && (
                                     <IconButton
                                       size="small"
@@ -318,6 +329,15 @@ function TasksTable() {
                                           }}
                                         />
                                     </LocalizationProvider>
+                                    <Tooltip title="Filters the tasks which have start time greater or equal to the specified" arrow>
+                                        <InfoIcon 
+                                          sx={{ 
+                                              marginLeft: 1,
+                                              color: '#718096',
+                                              fontSize: '1.2rem'
+                                          }} 
+                                        />
+                                    </Tooltip>
                                     {startTimeDateFilterValue && (
                                         <IconButton
                                           size="small"
@@ -364,6 +384,15 @@ function TasksTable() {
                                       }}
                                     />
                                 </LocalizationProvider>
+                                <Tooltip title="Filters the tasks wihch have deadline greater or equal to the specified" arrow>
+                                    <InfoIcon 
+                                      sx={{ 
+                                          marginLeft: 1,
+                                          color: '#718096',
+                                          fontSize: '1.2rem'
+                                      }} 
+                                    />
+                                </Tooltip>
                                 {deadlineDateFilterValue && (
                                     <IconButton
                                       size="small"

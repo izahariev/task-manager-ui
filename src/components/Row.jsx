@@ -5,6 +5,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import FilterListOffIcon from '@mui/icons-material/FilterListOff';
+import InfoIcon from '@mui/icons-material/Info';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import ReplayIcon from '@mui/icons-material/Replay';
@@ -28,7 +29,8 @@ import {
     Select,
     TextField,
     ToggleButton,
-    ToggleButtonGroup
+    ToggleButtonGroup,
+    Tooltip
 } from "@mui/material";
 import Button from "@mui/material/Button";
 import Table from "@mui/material/Table";
@@ -720,6 +722,15 @@ function Row(props) {
                                                       }}
                                                     />
                                                 </LocalizationProvider>
+                                                <Tooltip title="Filters the subtasks which have deadline greater or equal to the specified" arrow>
+                                                    <InfoIcon 
+                                                      sx={{ 
+                                                          marginLeft: 1,
+                                                          color: '#718096',
+                                                          fontSize: '1.2rem'
+                                                      }} 
+                                                    />
+                                                </Tooltip>
                                                 {deadlineDateFilterValue && (
                                                     <IconButton
                                                       size="small"
