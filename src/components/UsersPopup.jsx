@@ -24,10 +24,12 @@ import ListItemText from '@mui/material/ListItemText';
 import Paper from "@mui/material/Paper";
 import axios from "axios";
 import * as React from 'react';
+import {useTasks} from "../contexts/TasksContext.jsx";
 import {useUsers} from "../contexts/UsersContext.jsx";
 
 export default function UsersPopup() {
     const {users, refreshUsers} = useUsers();
+    const {refreshTasks} = useTasks();
     const [newUser, setNewUser] = React.useState("");
     const [editedUser, setEditedUser] = React.useState("");
     const [editedUserNewName, setEditedUserNewName] = React.useState("");
@@ -101,6 +103,7 @@ export default function UsersPopup() {
                       setDeleteUser(null);
                       setDeleteUserError(null);
                       setErrorMessages([]);
+                      refreshTasks();
                   }
               });
           })
