@@ -11,6 +11,17 @@ import {FixedSizeList} from "react-window";
 function renderRow({index, style, data}) {
     const { users, readOnly, checked, handleToggle } = data;
 
+    // Determine the display text
+    let displayText = "Any";
+    if (index > 0) {
+        if (users && users[index - 1] && users[index - 1].name) {
+            displayText = users[index - 1].name;
+        } else {
+            // If user doesn't exist, don't show anything (but still render to avoid react-window issues)
+            displayText = "";
+        }
+    }
+
     return (
       <ListItem
         style={style}
@@ -46,7 +57,7 @@ function renderRow({index, style, data}) {
         }}
       >
           <ListItemButton>
-              <ListItemText id={index} primary={`${users[index]}`} />
+              <ListItemText id={index} primary={displayText} />
           </ListItemButton>
       </ListItem>
     );
@@ -67,8 +78,9 @@ function AssigneesSection({readOnly, users, assignees, setAssignees}) {
             setChecked([0]);
         } else {
             const indexes = assignees
-              .map(a => users.indexOf(a))
-              .filter(i => i !== -1);
+              .map(a => users.findIndex(u => u.name === a))
+              .filter(i => i !== -1)
+              .map(i => i + 1); // Offset by 1 because index 0 is "Any"
 
             setChecked(indexes.length > 0 ? indexes : [0]);
         }
@@ -87,14 +99,14 @@ function AssigneesSection({readOnly, users, assignees, setAssignees}) {
                     newChecked.splice(0, 1);
                 }
                 newChecked.push(value);
-                const tmpAssignees = assignees;
-                tmpAssignees.push(users[value])
+                const tmpAssignees = [...assignees];
+                tmpAssignees.push(users[value - 1].name)
                 setAssignees(tmpAssignees)
             }
         } else {
             newChecked.splice(currentIndex, 1);
-            const tmpAssignees = assignees;
-            tmpAssignees.splice(assignees.indexOf(users[value]), 1)
+            const tmpAssignees = [...assignees];
+            tmpAssignees.splice(assignees.indexOf(users[value - 1].name), 1)
             setAssignees(tmpAssignees)
         }
 
@@ -130,8 +142,8 @@ function AssigneesSection({readOnly, users, assignees, setAssignees}) {
                     height={400}
                     width={360}
                     itemSize={46}
-                    itemCount={users.length}
-                    itemData={{users, readOnly, assignees, setAssignees, checked, setChecked, handleToggle}}
+                    itemCount={(users && Array.isArray(users) ? users.filter(u => u && u.name).length : 0) + 1}
+                    itemData={{users: users && Array.isArray(users) ? users.filter(u => u && u.name) : [], readOnly, assignees, setAssignees, checked, setChecked, handleToggle}}
                     style={{ overflow: 'auto'}}
                     overscanCount={5}
                   >

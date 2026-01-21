@@ -3,7 +3,19 @@ import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import {Alert, Box, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, IconButton, TextField, Typography} from "@mui/material";
+import {
+    Alert,
+    Box,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    Divider,
+    IconButton,
+    TextField,
+    Typography
+} from "@mui/material";
 import Button from "@mui/material/Button";
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -19,7 +31,7 @@ export default function UsersPopup() {
     const [newUser, setNewUser] = React.useState("");
     const [editedUser, setEditedUser] = React.useState("");
     const [editedUserNewName, setEditedUserNewName] = React.useState("");
-    const [deleteUser, setDeleteUser] = React.useState("");
+    const [deleteUser, setDeleteUser] = React.useState(null);
     const [deleteUserError, setDeleteUserError] = React.useState(null);
     const [errorMessages, setErrorMessages] = React.useState([]);
 
@@ -37,7 +49,7 @@ export default function UsersPopup() {
           .then(() => {
               setNewUser("");
               refreshUsers().then(r => {
-                  if (r.errors.length > 0) {
+                  if (r.errors && r.errors.length > 0) {
                       setErrorMessages([...r.errors]);
                   } else {
                       setErrorMessages([]);
@@ -61,7 +73,7 @@ export default function UsersPopup() {
         })
           .then(() => {
             refreshUsers().then(r => {
-                if (r.errors.length > 0) {
+                if (r.errors && r.errors.length > 0) {
                     setErrorMessages([...r.errors]);
                 } else {
                     setEditedUser("");
@@ -80,13 +92,13 @@ export default function UsersPopup() {
     };
 
     const handleDeleteUserClick = () => {
-        axios.delete('http://localhost:8080/users/remove', {params: {name: deleteUser}})
+        axios.delete('http://localhost:8080/users/remove', {params: {id: deleteUser.id}})
           .then(() => {
               refreshUsers().then(r => {
                   if (r.errors && r.errors.length > 0) {
                       setDeleteUserError(r.errors.join(', '));
                   } else {
-                      setDeleteUser('');
+                      setDeleteUser(null);
                       setDeleteUserError(null);
                       setErrorMessages([]);
                   }
@@ -145,12 +157,12 @@ export default function UsersPopup() {
                     }}
                 >
                     {users.map((user) => {
-                        const labelId = `checkbox-list-secondary-label-${user}`;
+                        const labelId = `checkbox-list-secondary-label-${user.id}`;
                         return (
-                          <React.Fragment key={user}>
-                              {user !== editedUser &&
+                          <React.Fragment key={user.id}>
+                              {user.name !== editedUser &&
                                 <ListItem
-                                  key={user}
+                                  key={user.id}
                                   secondaryAction={
                                       <Box sx={{display: 'flex', gap: '4px'}}>
                                           <IconButton
@@ -163,11 +175,11 @@ export default function UsersPopup() {
                                             }}
                                             size={"small"}
                                             onClick={() => {
-                                                setEditedUser(user)
-                                                setEditedUserNewName(user)
+                                                setEditedUser(user.name)
+                                                setEditedUserNewName(user.name)
                                                 setErrorMessages([])
                                             }}
-                                            aria-label={`Edit ${user}`}
+                                            aria-label={`Edit ${user.name}`}
                                           >
                                               <EditIcon sx={{color: "white"}} fontSize={"small"}/>
                                           </IconButton>
@@ -185,7 +197,7 @@ export default function UsersPopup() {
                                                 setDeleteUserError(null)
                                                 setErrorMessages([])
                                             }}
-                                            aria-label={`Delete ${user}`}
+                                            aria-label={`Delete ${user.name}`}
                                           >
                                               <DeleteIcon sx={{color: "white"}} fontSize={"small"}/>
                                           </IconButton>
@@ -198,16 +210,16 @@ export default function UsersPopup() {
                                             id={labelId} 
                                             primary={
                                                 <Typography variant="body1" sx={{fontWeight: 500}}>
-                                                    {user}
+                                                    {user.name}
                                                 </Typography>
                                             }
                                         />
                                     </ListItemButton>
                                 </ListItem>
                               }
-                              {user === editedUser &&
+                              {user.name === editedUser &&
                                 <ListItem
-                                  key={user}
+                                  key={user.id}
                                   secondaryAction={
                                       <Box sx={{display: 'flex', gap: '4px'}}>
                                           <IconButton
@@ -345,9 +357,9 @@ export default function UsersPopup() {
               </Box>
           </Paper>
           <Dialog
-            open={deleteUser !== ""}
+            open={deleteUser !== null}
             onClose={() => {
-                setDeleteUser("");
+                setDeleteUser(null);
                 setDeleteUserError(null);
             }}
           >
@@ -359,7 +371,7 @@ export default function UsersPopup() {
                       </Alert>
                   )}
                   <DialogContentText>
-                      Are you sure you want to delete user <strong>"{deleteUser}"</strong>?
+                      Are you sure you want to delete user <strong>"{deleteUser?.name}"</strong>?
                   </DialogContentText>
                   <DialogContentText sx={{mt: 2, fontWeight: 'bold', color: '#F44336'}}>
                       This action can not be reverted!
@@ -368,7 +380,7 @@ export default function UsersPopup() {
               <DialogActions>
                   <Button
                     onClick={() => {
-                        setDeleteUser("");
+                        setDeleteUser(null);
                         setDeleteUserError(null);
                     }}
                     sx={{
