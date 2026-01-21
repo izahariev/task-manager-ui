@@ -73,18 +73,23 @@ AssigneesSection.propTypes = {
 function AssigneesSection({readOnly, users, assignees, setAssignees}) {
     const [checked, setChecked] = React.useState([0]);
 
+    // Filter users to only include those with valid names
+    const filteredUsers = React.useMemo(() => {
+        return users && Array.isArray(users) ? users.filter(u => u && u.name) : [];
+    }, [users]);
+
     React.useEffect(() => {
         if (!assignees || assignees.length === 0) {
             setChecked([0]);
         } else {
             const indexes = assignees
-              .map(a => users.findIndex(u => u.name === a))
+              .map(a => filteredUsers.findIndex(u => u.name === a))
               .filter(i => i !== -1)
               .map(i => i + 1); // Offset by 1 because index 0 is "Any"
 
             setChecked(indexes.length > 0 ? indexes : [0]);
         }
-    }, [users, assignees]);
+    }, [filteredUsers, assignees]);
 
     const handleToggle = (value) => () => {
         const currentIndex = checked.indexOf(value);
@@ -100,13 +105,13 @@ function AssigneesSection({readOnly, users, assignees, setAssignees}) {
                 }
                 newChecked.push(value);
                 const tmpAssignees = [...assignees];
-                tmpAssignees.push(users[value - 1].name)
+                tmpAssignees.push(filteredUsers[value - 1].name)
                 setAssignees(tmpAssignees)
             }
         } else {
             newChecked.splice(currentIndex, 1);
             const tmpAssignees = [...assignees];
-            tmpAssignees.splice(assignees.indexOf(users[value - 1].name), 1)
+            tmpAssignees.splice(assignees.indexOf(filteredUsers[value - 1].name), 1)
             setAssignees(tmpAssignees)
         }
 
@@ -142,8 +147,8 @@ function AssigneesSection({readOnly, users, assignees, setAssignees}) {
                     height={400}
                     width={360}
                     itemSize={46}
-                    itemCount={(users && Array.isArray(users) ? users.filter(u => u && u.name).length : 0) + 1}
-                    itemData={{users: users && Array.isArray(users) ? users.filter(u => u && u.name) : [], readOnly, assignees, setAssignees, checked, setChecked, handleToggle}}
+                    itemCount={filteredUsers.length + 1}
+                    itemData={{users: filteredUsers, readOnly, assignees, setAssignees, checked, setChecked, handleToggle}}
                     style={{ overflow: 'auto'}}
                     overscanCount={5}
                   >
