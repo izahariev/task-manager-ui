@@ -10,6 +10,7 @@ import TaskPopup from "../task_popup/TaskPopup.jsx";
 import TasksTable from "../TasksTable.jsx";
 import UsersPopup from "../UsersPopup.jsx";
 import CustomAlert from "./CustomAlert.jsx";
+import TabHeader from "./TabHeader.jsx";
 
 function App() {
     const {setTasks, currentPage, pageCount, refreshTasks} = useTasks();
@@ -36,57 +37,42 @@ function App() {
                       display: 'flex',
                       justifyContent: 'center',
                   }}>
-                      <h1
-                        className="tab-header"
-                        style={{
-                            color: activeTab === "inactive" ? '#2D3748' : '#718096',
-                            fontWeight: activeTab === "inactive" ? 600 : 500
-                        }}
+                      <TabHeader
+                        text="Inactive tasks"
+                        isActive={activeTab === "inactive"}
                         onClick={() => {
                             setActiveTab("inactive");
                             refreshTasks({page: currentPage, isCompleted: false});
                         }}
-                      >
-                          Inactive tasks
-                      </h1>
+                      />
                   </Grid>
                   <Grid size={4} sx={{
                       marginTop: '2%',
                       display: 'flex',
                       justifyContent: 'center',
                   }}>
-                      <h1
-                        className="tab-header"
-                        style={{
-                            color: activeTab === "active" ? '#2D3748' : '#718096',
-                            fontWeight: activeTab === "active" ? 600 : 500
-                        }}
+                      <TabHeader
+                        text="Active tasks"
+                        isActive={activeTab === "active"}
                         onClick={() => {
                             setActiveTab("active");
                             refreshTasks({page: currentPage, isCompleted: false});
                         }}
-                      >
-                          Active tasks
-                      </h1>
+                      />
                   </Grid>
                   <Grid size={4} sx={{
                       marginTop: '2%',
                       display: 'flex',
                       justifyContent: 'center',
                   }}>
-                      <h1
-                        className="tab-header"
-                        style={{
-                            color: activeTab === "completed" ? '#2D3748' : '#718096',
-                            fontWeight: activeTab === "completed" ? 600 : 500
-                        }}
+                      <TabHeader
+                        text="Completed tasks"
+                        isActive={activeTab === "completed"}
                         onClick={() => {
                             setActiveTab("completed");
                             refreshTasks({page: currentPage, isCompleted: true});
                         }}
-                      >
-                          Completed tasks
-                      </h1>
+                      />
                   </Grid>
                   <Grid size={12} sx={{margin: '1%  0 0.5% 0'}}>
                       <TasksTable/>
