@@ -50,7 +50,7 @@ function App() {
                                     display: 'flex',
                                     justifyContent: 'center',
                                 }}>
-                                    <div style={{display: 'flex', justifyContent: 'space-around'}}>
+                                    <div className="alert-content">
                                         {taskChangedMessage}
                                     </div>
                                 </Grid>
@@ -65,7 +65,7 @@ function App() {
                                 display: 'flex',
                                 justifyContent: 'center',
                             }}>
-                                <div style={{display: 'flex', justifyContent: 'space-around'}}>
+                                <div className="alert-content">
                                     <ul style={{flexGrow: '0', listStyleType: 'none'}}>
                                         {errorMessages && errorMessages.map((errorMessage, index) => (
                                           <li key={index}>
@@ -85,11 +85,10 @@ function App() {
                       justifyContent: 'center',
                   }}>
                       <h1
+                        className="tab-header"
                         style={{
                             color: activeTab === "inactive" ? '#2D3748' : '#718096',
-                            fontWeight: activeTab === "inactive" ? 600 : 500,
-                            cursor: 'pointer',
-                            userSelect: 'none'
+                            fontWeight: activeTab === "inactive" ? 600 : 500
                         }}
                         onClick={() => {
                             setActiveTab("inactive");
@@ -105,11 +104,10 @@ function App() {
                       justifyContent: 'center',
                   }}>
                       <h1
+                        className="tab-header"
                         style={{
                             color: activeTab === "active" ? '#2D3748' : '#718096',
-                            fontWeight: activeTab === "active" ? 600 : 500,
-                            cursor: 'pointer',
-                            userSelect: 'none'
+                            fontWeight: activeTab === "active" ? 600 : 500
                         }}
                         onClick={() => {
                             setActiveTab("active");
@@ -125,11 +123,10 @@ function App() {
                       justifyContent: 'center',
                   }}>
                       <h1
+                        className="tab-header"
                         style={{
                             color: activeTab === "completed" ? '#2D3748' : '#718096',
-                            fontWeight: activeTab === "completed" ? 600 : 500,
-                            cursor: 'pointer',
-                            userSelect: 'none'
+                            fontWeight: activeTab === "completed" ? 600 : 500
                         }}
                         onClick={() => {
                             setActiveTab("completed");

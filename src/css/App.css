@@ -2,3 +2,13 @@
     background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%);
     min-height: 100vh;
 }
+
+.alert-content {
+    display: flex;
+    justify-content: space-around;
+}
+
+.tab-header {
+    cursor: pointer;
+    user-select: none;
+}
