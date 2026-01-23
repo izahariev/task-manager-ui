@@ -1,11 +1,12 @@
 import '../css/App.css'
-import {Alert, Box, Button, Container, Dialog, DialogTitle, Fade, Pagination} from "@mui/material";
+import {Button, Container, Dialog, DialogTitle, Pagination} from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import React from "react";
 import {useActiveTab} from "../contexts/ActiveTabContext.jsx";
 import {useErrors} from "../contexts/ErrorMessagesContext.jsx";
 import {useTaskChangedMessage} from "../contexts/TaskChangedMessageContext.jsx";
 import {useTasks} from "../contexts/TasksContext.jsx";
+import CustomAlert from "./CustomAlert.jsx";
 import TaskPopup from "./TaskPopup.jsx";
 import TasksTable from "./TasksTable.jsx";
 import UsersPopup from "./UsersPopup.jsx";
@@ -21,63 +22,14 @@ function App() {
     return (
       <div className="App">
           <Container maxWidth="xxl" sx={{'marginBottom': '1%', backgroundColor: 'transparent', position: 'relative'}}>
-              <Box
-                sx={{
-                    position: 'fixed',
-                    top: '1%',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    zIndex: 1400,
-                    width: '100%',
-                    maxWidth: 'xl'
-                }}
-              >
-                  {taskChangedMessage !== null &&
-                    <Fade in={showAlert} timeout={500}>
-                        <Alert
-                          variant="filled"
-                          severity="success"
-                          sx={{marginBottom: '1%'}}
-                          onClose={() => {
-                              setShowAlert(false);
-                              setTimeout(() => {
-                                  setTaskChangedMessage(null);
-                              }, 500);
-                          }}
-                        >
-                            <Grid container>
-                                <Grid size={12} sx={{
-                                    display: 'flex',
-                                    justifyContent: 'center',
-                                }}>
-                                    <div className="alert-content">
-                                        {taskChangedMessage}
-                                    </div>
-                                </Grid>
-                            </Grid>
-                        </Alert>
-                    </Fade>
-                  }
-                  {errorMessages.length !== 0 &&
-                    <Alert variant="filled" severity="error" onClose={clearErrors} sx={{marginBottom: '1%'}}>
-                        <Grid container>
-                            <Grid size={12} sx={{
-                                display: 'flex',
-                                justifyContent: 'center',
-                            }}>
-                                <div className="alert-content">
-                                    <ul style={{flexGrow: '0', listStyleType: 'none'}}>
-                                        {errorMessages && errorMessages.map((errorMessage, index) => (
-                                          <li key={index}>
-                                              {errorMessage}
-                                          </li>))}
-                                    </ul>
-                                </div>
-                            </Grid>
-                        </Grid>
-                    </Alert>
-                  }
-              </Box>
+              <CustomAlert
+                taskChangedMessage={taskChangedMessage}
+                showAlert={showAlert}
+                setShowAlert={setShowAlert}
+                setTaskChangedMessage={setTaskChangedMessage}
+                errorMessages={errorMessages}
+                clearErrors={clearErrors}
+              />
               <Grid container sx={{marginTop: '2%'}}>
                   <Grid size={4} sx={{
                       marginTop: '2%',
