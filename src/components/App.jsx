@@ -1,6 +1,5 @@
 import '../css/App.css'
-import {Alert, Box, Container, Dialog, DialogTitle, Fade, Pagination} from "@mui/material";
-import Button from "@mui/material/Button";
+import {Alert, Box, Button, Container, Dialog, DialogTitle, Fade, Pagination} from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import React from "react";
 import {useActiveTab} from "../contexts/ActiveTabContext.jsx";
@@ -19,29 +18,20 @@ function App() {
     const [showUsersPopup, setShowUsersPopup] = React.useState(false);
     const [addTaskPopup, setAddTaskPopup] = React.useState(false);
 
-    function getTasksPage(event, page) {
-        refreshTasks({page: page});
-    }
-
-    function handleInactiveTasksClick() {
-        setActiveTab("inactive");
-        refreshTasks({page: currentPage, isCompleted: false});
-    }
-
-    function handleActiveTasksClick() {
-        setActiveTab("active");
-        refreshTasks({page: currentPage, isCompleted: false});
-    }
-
-    function handleCompletedTasksClick() {
-        setActiveTab("completed");
-        refreshTasks({page: currentPage, isCompleted: true});
-    }
-
     return (
       <div className="App">
           <Container maxWidth="xxl" sx={{'marginBottom': '1%', backgroundColor: 'transparent', position: 'relative'}}>
-              <Box sx={{position: 'fixed', top: '1%', left: '50%', transform: 'translateX(-50%)', zIndex: 1400, width: '100%', maxWidth: 'xl'}}>
+              <Box
+                sx={{
+                    position: 'fixed',
+                    top: '1%',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    zIndex: 1400,
+                    width: '100%',
+                    maxWidth: 'xl'
+                }}
+              >
                   {taskChangedMessage !== null &&
                     <Fade in={showAlert} timeout={500}>
                         <Alert
@@ -94,14 +84,17 @@ function App() {
                       display: 'flex',
                       justifyContent: 'center',
                   }}>
-                      <h1 
+                      <h1
                         style={{
-                            color: activeTab === "inactive" ? '#2D3748' : '#718096', 
+                            color: activeTab === "inactive" ? '#2D3748' : '#718096',
                             fontWeight: activeTab === "inactive" ? 600 : 500,
                             cursor: 'pointer',
                             userSelect: 'none'
                         }}
-                        onClick={handleInactiveTasksClick}
+                        onClick={() => {
+                            setActiveTab("inactive");
+                            refreshTasks({page: currentPage, isCompleted: false});
+                        }}
                       >
                           Inactive tasks
                       </h1>
@@ -111,14 +104,17 @@ function App() {
                       display: 'flex',
                       justifyContent: 'center',
                   }}>
-                      <h1 
+                      <h1
                         style={{
-                            color: activeTab === "active" ? '#2D3748' : '#718096', 
+                            color: activeTab === "active" ? '#2D3748' : '#718096',
                             fontWeight: activeTab === "active" ? 600 : 500,
                             cursor: 'pointer',
                             userSelect: 'none'
                         }}
-                        onClick={handleActiveTasksClick}
+                        onClick={() => {
+                            setActiveTab("active");
+                            refreshTasks({page: currentPage, isCompleted: false});
+                        }}
                       >
                           Active tasks
                       </h1>
@@ -128,20 +124,23 @@ function App() {
                       display: 'flex',
                       justifyContent: 'center',
                   }}>
-                      <h1 
+                      <h1
                         style={{
-                            color: activeTab === "completed" ? '#2D3748' : '#718096', 
+                            color: activeTab === "completed" ? '#2D3748' : '#718096',
                             fontWeight: activeTab === "completed" ? 600 : 500,
                             cursor: 'pointer',
                             userSelect: 'none'
                         }}
-                        onClick={handleCompletedTasksClick}
+                        onClick={() => {
+                            setActiveTab("completed");
+                            refreshTasks({page: currentPage, isCompleted: true});
+                        }}
                       >
                           Completed tasks
                       </h1>
                   </Grid>
                   <Grid size={12} sx={{margin: '1%  0 0.5% 0'}}>
-                      <TasksTable />
+                      <TasksTable/>
                   </Grid>
                   <Grid size={12} sx={{
                       display: 'flex',
@@ -165,7 +164,9 @@ function App() {
                             }
                         }}
                         showFirstButton showLastButton
-                        onChange={getTasksPage}
+                        onChange={(event, page) => {
+                            refreshTasks({page: page});
+                        }}
                       />
                   </Grid>
                   <Grid size={6} sx={{
@@ -202,7 +203,9 @@ function App() {
                             },
                             transition: 'background-color 0.2s ease'
                         }}
-                        onClick={() => {setAddTaskPopup(!addTaskPopup)}}>
+                        onClick={() => {
+                            setAddTaskPopup(!addTaskPopup)
+                        }}>
                           Add Task
                       </Button>
                   </Grid>
@@ -228,7 +231,7 @@ function App() {
                     color: "#FFFFFF",
                     fontWeight: 600
                 }}>Users</DialogTitle>
-                <UsersPopup />
+                <UsersPopup/>
             </Dialog>
           }
           {addTaskPopup &&
