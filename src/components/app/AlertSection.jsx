@@ -2,7 +2,7 @@ import {Alert, Box, Fade} from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import PropTypes from "prop-types";
 
-function CustomAlert({taskChangedMessage, showAlert, setShowAlert, setTaskChangedMessage, errorMessages, clearErrors}) {
+function AlertSection({taskChangedMessage, showAlert, setShowAlert, setTaskChangedMessage, errorMessages, clearErrors}) {
     return (
         <Box
             sx={{
@@ -64,7 +64,7 @@ function CustomAlert({taskChangedMessage, showAlert, setShowAlert, setTaskChange
     );
 }
 
-CustomAlert.propTypes = {
+AlertSection.propTypes = {
     taskChangedMessage: PropTypes.oneOfType([PropTypes.string, PropTypes.node, PropTypes.object]),
     showAlert: PropTypes.bool,
     setShowAlert: PropTypes.func,
@@ -73,5 +73,5 @@ CustomAlert.propTypes = {
     clearErrors: PropTypes.func
 };
 
-export default CustomAlert;
+export default AlertSection;
 

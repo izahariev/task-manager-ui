@@ -1,5 +1,5 @@
 import '../../css/App.css'
-import {Button, Container, Pagination} from "@mui/material";
+import {Container, Pagination} from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import React from "react";
 import {useActiveTab} from "../../contexts/ActiveTabContext.jsx";
@@ -9,8 +9,9 @@ import {useTasks} from "../../contexts/TasksContext.jsx";
 import TaskPopup from "../task_popup/TaskPopup.jsx";
 import TasksTable from "../TasksTable.jsx";
 import UsersPopup from "../UsersPopup.jsx";
-import CustomAlert from "./CustomAlert.jsx";
-import TabHeader from "./TabHeader.jsx";
+import AlertSection from "./AlertSection.jsx";
+import ButtonsSection from "./ButtonsSection.jsx";
+import TabsSection from "./TabsSection.jsx";
 
 function App() {
     const {setTasks, currentPage, pageCount, refreshTasks} = useTasks();
@@ -23,7 +24,7 @@ function App() {
     return (
       <div className="App">
           <Container maxWidth="xxl" sx={{'marginBottom': '1%', backgroundColor: 'transparent', position: 'relative'}}>
-              <CustomAlert
+              <AlertSection
                 taskChangedMessage={taskChangedMessage}
                 showAlert={showAlert}
                 setShowAlert={setShowAlert}
@@ -32,48 +33,12 @@ function App() {
                 clearErrors={clearErrors}
               />
               <Grid container sx={{marginTop: '2%'}}>
-                  <Grid size={4} sx={{
-                      marginTop: '2%',
-                      display: 'flex',
-                      justifyContent: 'center',
-                  }}>
-                      <TabHeader
-                        text="Inactive tasks"
-                        isActive={activeTab === "inactive"}
-                        onClick={() => {
-                            setActiveTab("inactive");
-                            refreshTasks({page: currentPage, isCompleted: false});
-                        }}
-                      />
-                  </Grid>
-                  <Grid size={4} sx={{
-                      marginTop: '2%',
-                      display: 'flex',
-                      justifyContent: 'center',
-                  }}>
-                      <TabHeader
-                        text="Active tasks"
-                        isActive={activeTab === "active"}
-                        onClick={() => {
-                            setActiveTab("active");
-                            refreshTasks({page: currentPage, isCompleted: false});
-                        }}
-                      />
-                  </Grid>
-                  <Grid size={4} sx={{
-                      marginTop: '2%',
-                      display: 'flex',
-                      justifyContent: 'center',
-                  }}>
-                      <TabHeader
-                        text="Completed tasks"
-                        isActive={activeTab === "completed"}
-                        onClick={() => {
-                            setActiveTab("completed");
-                            refreshTasks({page: currentPage, isCompleted: true});
-                        }}
-                      />
-                  </Grid>
+                  <TabsSection
+                    activeTab={activeTab}
+                    setActiveTab={setActiveTab}
+                    currentPage={currentPage}
+                    refreshTasks={refreshTasks}
+                  />
                   <Grid size={12} sx={{margin: '1%  0 0.5% 0'}}>
                       <TasksTable/>
                   </Grid>
@@ -104,46 +69,14 @@ function App() {
                         }}
                       />
                   </Grid>
-                  <Grid size={6} sx={{
-                      display: 'flex',
-                      justifyContent: 'left',
-                  }}>
-                  </Grid>
-                  <Grid size={6} sx={{
-                      display: 'flex',
-                      justifyContent: 'right',
-                  }}>
-                      <Button
-                        variant="contained"
-                        sx={{
-                            marginRight: '1%',
-                            backgroundColor: '#5B7FA6',
-                            '&:hover': {
-                                backgroundColor: '#4A6B8F',
-                            },
-                            transition: 'background-color 0.2s ease'
-                        }}
-                        onClick={() => {
-                            setShowUsersPopup(!showUsersPopup)
-                        }}
-                      >
-                          Manage Users
-                      </Button>
-                      <Button
-                        variant="contained"
-                        sx={{
-                            backgroundColor: '#5B7FA6',
-                            '&:hover': {
-                                backgroundColor: '#4A6B8F',
-                            },
-                            transition: 'background-color 0.2s ease'
-                        }}
-                        onClick={() => {
-                            setAddTaskPopup(!addTaskPopup)
-                        }}>
-                          Add Task
-                      </Button>
-                  </Grid>
+                  <ButtonsSection
+                    onManageUsersClick={() => {
+                        setShowUsersPopup(!showUsersPopup)
+                    }}
+                    onAddTaskClick={() => {
+                        setAddTaskPopup(!addTaskPopup)
+                    }}
+                  />
               </Grid>
           </Container>
           {showUsersPopup &&
