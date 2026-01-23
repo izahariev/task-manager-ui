@@ -1,15 +1,15 @@
-import '../css/App.css'
+import '../../css/App.css'
 import {Button, Container, Dialog, DialogTitle, Pagination} from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import React from "react";
-import {useActiveTab} from "../contexts/ActiveTabContext.jsx";
-import {useErrors} from "../contexts/ErrorMessagesContext.jsx";
-import {useTaskChangedMessage} from "../contexts/TaskChangedMessageContext.jsx";
-import {useTasks} from "../contexts/TasksContext.jsx";
+import {useActiveTab} from "../../contexts/ActiveTabContext.jsx";
+import {useErrors} from "../../contexts/ErrorMessagesContext.jsx";
+import {useTaskChangedMessage} from "../../contexts/TaskChangedMessageContext.jsx";
+import {useTasks} from "../../contexts/TasksContext.jsx";
+import TaskPopup from "../task_popup/TaskPopup.jsx";
+import TasksTable from "../TasksTable.jsx";
+import UsersPopup from "../UsersPopup.jsx";
 import CustomAlert from "./CustomAlert.jsx";
-import TaskPopup from "./TaskPopup.jsx";
-import TasksTable from "./TasksTable.jsx";
-import UsersPopup from "./UsersPopup.jsx";
 
 function App() {
     const {setTasks, currentPage, pageCount, refreshTasks} = useTasks();

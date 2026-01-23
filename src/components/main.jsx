@@ -10,7 +10,7 @@ import {ErrorMessagesProvider} from "../contexts/ErrorMessagesProvider.jsx";
 import {TaskChangedMessageProvider} from "../contexts/TaskChangedMessageProvider.jsx";
 import {TasksProvider} from "../contexts/TasksProvider.jsx";
 import {UsersProvider} from "../contexts/UsersProvider.jsx";
-import App from './App.jsx'
+import App from './app/App.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

@@ -49,7 +49,7 @@ import {useTaskChangedMessage} from "../contexts/TaskChangedMessageContext.jsx";
 import {useTasks} from "../contexts/TasksContext.jsx";
 import {useUsers} from "../contexts/UsersContext.jsx";
 import {deleteTask, fetchTasks, updateTask} from "../js/BackendApis.js";
-import TaskPopup from "./TaskPopup.jsx";
+import TaskPopup from "./task_popup/TaskPopup.jsx";
 
 
 Row.propTypes = {

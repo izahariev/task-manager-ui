@@ -6,13 +6,13 @@ import List from "@mui/material/List";
 import Typography from "@mui/material/Typography";
 import PropTypes from "prop-types";
 import React from "react";
-import {useTaskChangedMessage} from "../contexts/TaskChangedMessageContext.jsx";
-import {useTasks} from "../contexts/TasksContext.jsx";
-import {useUsers} from "../contexts/UsersContext.jsx";
-import {addTask, fetchTask, updateTask} from "../js/BackendApis.js";
-import AssigneesSection from "./task_popup/AssigneesSection.jsx";
-import PrioritySection from "./task_popup/PrioritySection.jsx";
-import TimeSection from "./task_popup/TimeSection.jsx";
+import {useTaskChangedMessage} from "../../contexts/TaskChangedMessageContext.jsx";
+import {useTasks} from "../../contexts/TasksContext.jsx";
+import {useUsers} from "../../contexts/UsersContext.jsx";
+import {addTask, fetchTask, updateTask} from "../../js/BackendApis.js";
+import AssigneesSection from "./AssigneesSection.jsx";
+import PrioritySection from "./PrioritySection.jsx";
+import TimeSection from "./TimeSection.jsx";
 
 const Transition = React.forwardRef(
   function Transition(props, ref) {
