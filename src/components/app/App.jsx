@@ -1,5 +1,5 @@
 import '../../css/App.css'
-import {Button, Container, Dialog, DialogTitle, Pagination} from "@mui/material";
+import {Button, Container, Pagination} from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import React from "react";
 import {useActiveTab} from "../../contexts/ActiveTabContext.jsx";
@@ -147,27 +147,10 @@ function App() {
               </Grid>
           </Container>
           {showUsersPopup &&
-            <Dialog
+            <UsersPopup
               open={showUsersPopup}
               onClose={() => setShowUsersPopup(false)}
-              maxWidth={"xs"}
-              fullWidth={true}
-              slotProps={{
-                  paper: {
-                      sx: {
-                          borderRadius: '8px',
-                          boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)'
-                      }
-                  }
-              }}
-            >
-                <DialogTitle align={"center"} sx={{
-                    backgroundColor: "#2D3748",
-                    color: "#FFFFFF",
-                    fontWeight: 600
-                }}>Users</DialogTitle>
-                <UsersPopup/>
-            </Dialog>
+            />
           }
           {addTaskPopup &&
             <TaskPopup

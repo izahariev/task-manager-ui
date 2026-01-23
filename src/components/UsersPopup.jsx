@@ -16,6 +16,7 @@ import {
     TextField,
     Typography
 } from "@mui/material";
+import PropTypes from "prop-types";
 import Button from "@mui/material/Button";
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -27,7 +28,7 @@ import * as React from 'react';
 import {useTasks} from "../contexts/TasksContext.jsx";
 import {useUsers} from "../contexts/UsersContext.jsx";
 
-export default function UsersPopup() {
+export default function UsersPopup({open, onClose}) {
     const {users, refreshUsers} = useUsers();
     const {refreshTasks} = useTasks();
     const [newUser, setNewUser] = React.useState("");
@@ -116,12 +117,31 @@ export default function UsersPopup() {
     };
 
     return (
-      <Box sx={{
-          width: '100%',
-          bgcolor: '#F7FAFC',
-          minHeight: '200px',
-          padding: '16px'
-      }}>
+      <Dialog
+        open={open}
+        onClose={onClose}
+        maxWidth={"xs"}
+        fullWidth={true}
+        slotProps={{
+            paper: {
+                sx: {
+                    borderRadius: '8px',
+                    boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)'
+                }
+            }
+        }}
+      >
+        <DialogTitle align={"center"} sx={{
+            backgroundColor: "#2D3748",
+            color: "#FFFFFF",
+            fontWeight: 600
+        }}>Users</DialogTitle>
+        <Box sx={{
+            width: '100%',
+            bgcolor: '#F7FAFC',
+            minHeight: '200px',
+            padding: '16px'
+        }}>
           {errorMessages.length !== 0 &&
             <Alert 
                 variant="filled" 
@@ -411,6 +431,12 @@ export default function UsersPopup() {
                   </Button>
               </DialogActions>
           </Dialog>
-      </Box>
+        </Box>
+      </Dialog>
     );
 }
+
+UsersPopup.propTypes = {
+    open: PropTypes.bool.isRequired,
+    onClose: PropTypes.func.isRequired
+};
