@@ -16,17 +16,17 @@ import {
     TextField,
     Typography
 } from "@mui/material";
-import PropTypes from "prop-types";
 import Button from "@mui/material/Button";
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import Paper from "@mui/material/Paper";
-import axios from "axios";
-import * as React from 'react';
+import PropTypes from "prop-types";
+import React from "react";
 import {useTasks} from "../contexts/TasksContext.jsx";
 import {useUsers} from "../contexts/UsersContext.jsx";
+import {createUser, deleteUser as deleteUserApi, updateUser} from "../js/BackendApis.js";
 
 export default function UsersPopup({open, onClose}) {
     const {users, refreshUsers} = useUsers();
@@ -42,13 +42,12 @@ export default function UsersPopup({open, onClose}) {
         refreshUsers();
     }, [refreshUsers]);
 
-    //TODO: Extract API call to BackendApis
     const handleAddUser = () => {
         if (newUser.trim() === '') {
             setErrorMessages(['Please enter a user name']);
             return;
         }
-        axios.post('http://localhost:8080/users/create', null, {params: {name: newUser}})
+        createUser(newUser)
           .then(() => {
               setNewUser("");
               refreshUsers().then(r => {
@@ -69,11 +68,7 @@ export default function UsersPopup({open, onClose}) {
     };
 
     const handleSaveEdit = () => {
-        axios.patch('http://localhost:8080/users/update', null, {
-            params: {
-                originalName: editedUser, newName: editedUserNewName
-            }
-        })
+        updateUser(editedUser, editedUserNewName)
           .then(() => {
             refreshUsers().then(r => {
                 if (r.errors && r.errors.length > 0) {
@@ -95,7 +90,7 @@ export default function UsersPopup({open, onClose}) {
     };
 
     const handleDeleteUserClick = () => {
-        axios.delete('http://localhost:8080/users/remove', {params: {id: deleteUser.id}})
+        deleteUserApi(deleteUser.id)
           .then(() => {
               refreshUsers().then(r => {
                   if (r.errors && r.errors.length > 0) {
@@ -116,6 +111,7 @@ export default function UsersPopup({open, onClose}) {
           });
     };
 
+    // noinspection JSValidateTypes
     return (
       <Dialog
         open={open}
@@ -138,7 +134,7 @@ export default function UsersPopup({open, onClose}) {
         }}>Users</DialogTitle>
         <Box sx={{
             width: '100%',
-            bgcolor: '#F7FAFC',
+            backgroundColor: '#F7FAFC',
             minHeight: '200px',
             padding: '16px'
         }}>
@@ -162,7 +158,7 @@ export default function UsersPopup({open, onClose}) {
             <Paper 
                 elevation={0} 
                 sx={{
-                    bgcolor: '#FFFFFF',
+                    backgroundColor: '#FFFFFF',
                     borderRadius: '8px',
                     marginBottom: '16px',
                     overflow: 'hidden',
@@ -196,7 +192,7 @@ export default function UsersPopup({open, onClose}) {
                                                 },
                                                 transition: 'background-color 0.2s ease'
                                             }}
-                                            size={"small"}
+                                            size="small"
                                             onClick={() => {
                                                 setEditedUser(user.name)
                                                 setEditedUserNewName(user.name)
@@ -204,7 +200,7 @@ export default function UsersPopup({open, onClose}) {
                                             }}
                                             aria-label={`Edit ${user.name}`}
                                           >
-                                              <EditIcon sx={{color: "white"}} fontSize={"small"}/>
+                                              <EditIcon sx={{color: "white"}} fontSize="small"/>
                                           </IconButton>
                                           <IconButton
                                             sx={{
@@ -214,7 +210,7 @@ export default function UsersPopup({open, onClose}) {
                                                 },
                                                 transition: 'background-color 0.2s ease'
                                             }}
-                                            size={"small"}
+                                            size="small"
                                             onClick={() => {
                                                 setDeleteUser(user)
                                                 setDeleteUserError(null)
@@ -222,7 +218,7 @@ export default function UsersPopup({open, onClose}) {
                                             }}
                                             aria-label={`Delete ${user.name}`}
                                           >
-                                              <DeleteIcon sx={{color: "white"}} fontSize={"small"}/>
+                                              <DeleteIcon sx={{color: "white"}} fontSize="small"/>
                                           </IconButton>
                                       </Box>
                                   }
@@ -253,11 +249,11 @@ export default function UsersPopup({open, onClose}) {
                                                 },
                                                 transition: 'background-color 0.2s ease'
                                             }}
-                                            size={"small"}
+                                            size="small"
                                             onClick={handleSaveEdit}
                                             aria-label="Save edit"
                                           >
-                                              <CheckIcon sx={{color: "white"}} fontSize={"small"}/>
+                                              <CheckIcon sx={{color: "white"}} fontSize="small"/>
                                           </IconButton>
                                           <IconButton
                                             sx={{
@@ -267,7 +263,7 @@ export default function UsersPopup({open, onClose}) {
                                                 },
                                                 transition: 'background-color 0.2s ease'
                                             }}
-                                            size={"small"}
+                                            size="small"
                                             onClick={() => {
                                                 setEditedUser("")
                                                 setEditedUserNewName("")
@@ -275,7 +271,7 @@ export default function UsersPopup({open, onClose}) {
                                             }}
                                             aria-label="Cancel edit"
                                           >
-                                              <CloseIcon sx={{color: "white"}} fontSize={"small"}/>
+                                              <CloseIcon sx={{color: "white"}} fontSize="small"/>
                                           </IconButton>
                                       </Box>
                                   }
@@ -312,7 +308,7 @@ export default function UsersPopup({open, onClose}) {
             <Paper 
                 elevation={0} 
                 sx={{
-                    bgcolor: '#FFFFFF',
+                    backgroundColor: '#FFFFFF',
                     borderRadius: '8px',
                     padding: '24px',
                     marginBottom: '16px',
@@ -330,7 +326,7 @@ export default function UsersPopup({open, onClose}) {
           <Paper 
               elevation={0} 
               sx={{
-                  bgcolor: '#FFFFFF',
+                  backgroundColor: '#FFFFFF',
                   borderRadius: '8px',
                   padding: '16px'
               }}
@@ -394,7 +390,7 @@ export default function UsersPopup({open, onClose}) {
                       </Alert>
                   )}
                   <DialogContentText>
-                      Are you sure you want to delete user <strong>"{deleteUser?.name}"</strong>?
+                      Are you sure you want to delete user <strong>&#34;{deleteUser?.name}&#34;</strong>?
                   </DialogContentText>
                   <DialogContentText sx={{mt: 2, fontWeight: 'bold', color: '#F44336'}}>
                       This action can not be reverted!

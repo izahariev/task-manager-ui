@@ -79,3 +79,23 @@ export async function deleteTask(id) {
     const response = await axios.delete('http://localhost:8080/tasks/' + id);
     return response.data;
 }
+
+export async function createUser(name) {
+    const response = await axios.post('http://localhost:8080/users/create', null, {params: {name}});
+    return response.data;
+}
+
+export async function updateUser(originalName, newName) {
+    const response = await axios.patch('http://localhost:8080/users/update', null, {
+        params: {
+            originalName,
+            newName
+        }
+    });
+    return response.data;
+}
+
+export async function deleteUser(id) {
+    const response = await axios.delete('http://localhost:8080/users/remove', {params: {id}});
+    return response.data;
+}
