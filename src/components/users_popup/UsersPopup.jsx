@@ -1,37 +1,15 @@
-import CheckIcon from "@mui/icons-material/Check";
-import CloseIcon from '@mui/icons-material/Close';
-import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
-import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import {
-    Alert,
-    Box,
-    Button,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogContentText,
-    DialogTitle,
-    Divider,
-    IconButton,
-    List,
-    ListItem,
-    ListItemButton,
-    ListItemText,
-    Paper,
-    TextField,
-    Typography
-} from "@mui/material";
+import {Box, Dialog, DialogTitle, Divider} from "@mui/material";
 import PropTypes from "prop-types";
 import React from "react";
-import {useTasks} from "../../contexts/TasksContext.jsx";
 import {useUsers} from "../../contexts/UsersContext.jsx";
 import {handleAddUser, handleDeleteUserClick, handleSaveEdit} from "../../js/UsersPopupFunctions.js";
+import AddUserSection from "./AddUserSection.jsx";
 import AlertSection from "./AlertSection.jsx";
+import DeleteUserDialog from "./DeleteUserDialog.jsx";
+import UsersListSection from "./UsersListSection.jsx";
 
 export default function UsersPopup({open, onClose}) {
-    const {users, refreshUsers} = useUsers();
-    const {refreshTasks} = useTasks();
+    const {refreshUsers} = useUsers();
     const [newUser, setNewUser] = React.useState("");
     const [editedUser, setEditedUser] = React.useState("");
     const [editedUserNewName, setEditedUserNewName] = React.useState("");
@@ -70,312 +48,33 @@ export default function UsersPopup({open, onClose}) {
             padding: '16px'
         }}>
           <AlertSection errorMessages={errorMessages} setErrorMessages={setErrorMessages} />
-          {users.length > 0 && (
-            <Paper 
-                elevation={0} 
-                sx={{
-                    backgroundColor: '#FFFFFF',
-                    borderRadius: '8px',
-                    marginBottom: '16px',
-                    overflow: 'hidden',
-                    maxHeight: '400px',
-                    display: 'flex',
-                    flexDirection: 'column'
-                }}
-            >
-                <List 
-                    dense
-                    sx={{
-                        overflowY: 'auto',
-                        overflowX: 'hidden',
-                        flex: 1
-                    }}
-                >
-                    {users.map((user) => {
-                        const labelId = `checkbox-list-secondary-label-${user.id}`;
-                        return (
-                          <React.Fragment key={user.id}>
-                              {user.name !== editedUser &&
-                                <ListItem
-                                  key={user.id}
-                                  secondaryAction={
-                                      <Box sx={{display: 'flex', gap: '4px'}}>
-                                          <IconButton
-                                            sx={{
-                                                backgroundColor: "#2196F3",
-                                                '&:hover': {
-                                                    backgroundColor: '#1976D2',
-                                                },
-                                                transition: 'background-color 0.2s ease'
-                                            }}
-                                            size="small"
-                                            onClick={() => {
-                                                setEditedUser(user.name)
-                                                setEditedUserNewName(user.name)
-                                                setErrorMessages([])
-                                            }}
-                                            aria-label={`Edit ${user.name}`}
-                                          >
-                                              <EditIcon sx={{color: "white"}} fontSize="small"/>
-                                          </IconButton>
-                                          <IconButton
-                                            sx={{
-                                                backgroundColor: "#F44336",
-                                                '&:hover': {
-                                                    backgroundColor: '#D32F2F',
-                                                },
-                                                transition: 'background-color 0.2s ease'
-                                            }}
-                                            size="small"
-                                            onClick={() => {
-                                                setDeleteUser(user)
-                                                setDeleteUserError(null)
-                                                setErrorMessages([])
-                                            }}
-                                            aria-label={`Delete ${user.name}`}
-                                          >
-                                              <DeleteIcon sx={{color: "white"}} fontSize="small"/>
-                                          </IconButton>
-                                      </Box>
-                                  }
-                                  disablePadding
-                                >
-                                    <ListItemButton>
-                                        <ListItemText 
-                                            id={labelId} 
-                                            primary={
-                                                <Typography variant="body1" sx={{fontWeight: 500}}>
-                                                    {user.name}
-                                                </Typography>
-                                            }
-                                        />
-                                    </ListItemButton>
-                                </ListItem>
-                              }
-                              {user.name === editedUser &&
-                                <ListItem
-                                  key={user.id}
-                                  secondaryAction={
-                                      <Box sx={{display: 'flex', gap: '4px'}}>
-                                          <IconButton
-                                            sx={{
-                                                backgroundColor: "#4CAF50",
-                                                '&:hover': {
-                                                    backgroundColor: '#45a049',
-                                                },
-                                                transition: 'background-color 0.2s ease'
-                                            }}
-                                            size="small"
-                                            onClick={() =>
-                                                handleSaveEdit({
-                                                    editedUser,
-                                                    editedUserNewName,
-                                                    setEditedUser,
-                                                    setEditedUserNewName,
-                                                    setErrorMessages,
-                                                    refreshUsers
-                                                })
-                                            }
-                                            aria-label="Save edit"
-                                          >
-                                              <CheckIcon sx={{color: "white"}} fontSize="small"/>
-                                          </IconButton>
-                                          <IconButton
-                                            sx={{
-                                                backgroundColor: "#5B7FA6",
-                                                '&:hover': {
-                                                    backgroundColor: '#4A6B8F',
-                                                },
-                                                transition: 'background-color 0.2s ease'
-                                            }}
-                                            size="small"
-                                            onClick={() => {
-                                                setEditedUser("")
-                                                setEditedUserNewName("")
-                                                setErrorMessages([])
-                                            }}
-                                            aria-label="Cancel edit"
-                                          >
-                                              <CloseIcon sx={{color: "white"}} fontSize="small"/>
-                                          </IconButton>
-                                      </Box>
-                                  }
-                                  disablePadding
-                                >
-                                    <ListItemButton>
-                                        <TextField
-                                            value={editedUserNewName}
-                                            onChange={(e) => setEditedUserNewName(e.target.value)}
-                                            onKeyDown={(e) =>
-                                                e.key === "Enter" &&
-                                                handleSaveEdit({
-                                                    editedUser,
-                                                    editedUserNewName,
-                                                    setEditedUser,
-                                                    setEditedUserNewName,
-                                                    setErrorMessages,
-                                                    refreshUsers
-                                                })
-                                            }
-                                            variant="standard"
-                                            fullWidth
-                                            autoFocus
-                                            sx={{
-                                                '& .MuiInput-underline:before': {
-                                                    borderBottomColor: '#5B7FA6',
-                                                },
-                                                '& .MuiInput-underline:hover:before': {
-                                                    borderBottomColor: '#4A6B8F',
-                                                },
-                                            }}
-                                        />
-                                    </ListItemButton>
-                                </ListItem>
-                              }
-                          </React.Fragment>
-                        );
-                    })}
-                </List>
-            </Paper>
-          )}
-          
-          {users.length === 0 && (
-            <Paper 
-                elevation={0} 
-                sx={{
-                    backgroundColor: '#FFFFFF',
-                    borderRadius: '8px',
-                    padding: '24px',
-                    marginBottom: '16px',
-                    textAlign: 'center'
-                }}
-            >
-                <Typography variant="body2" color="text.secondary">
-                    No users found. Add your first user below.
-                </Typography>
-            </Paper>
-          )}
-          
+          <UsersListSection
+            editedUser={editedUser}
+            editedUserNewName={editedUserNewName}
+            setEditedUser={setEditedUser}
+            setEditedUserNewName={setEditedUserNewName}
+            setErrorMessages={setErrorMessages}
+            setDeleteUser={setDeleteUser}
+            setDeleteUserError={setDeleteUserError}
+            handleSaveEdit={handleSaveEdit}
+          />
           <Divider sx={{marginY: '16px'}} />
-          
-          <Paper 
-              elevation={0} 
-              sx={{
-                  backgroundColor: '#FFFFFF',
-                  borderRadius: '8px',
-                  padding: '16px'
-              }}
-          >
-              <Typography variant="subtitle2" sx={{marginBottom: '12px', fontWeight: 600, color: '#2D3748'}}>
-                  Add New User
-              </Typography>
-              <Box sx={{display: 'flex', gap: '8px', alignItems: 'center'}}>
-                  <TextField
-                    label="Username"
-                    variant="outlined"
-                    fullWidth
-                    size="small"
-                    onChange={(e) => setNewUser(e.target.value)}
-                    onClick={() => {
-                        if (editedUser !== "") {
-                            setErrorMessages([])
-                        }
-                        setEditedUser("")
-                    }}
-                    onKeyDown={(e) =>
-                        e.key === "Enter" &&
-                        handleAddUser({newUser, setNewUser, setErrorMessages, refreshUsers})
-                    }
-                    value={newUser}
-                    sx={{
-                        '& .MuiOutlinedInput-root': {
-                            '&:hover fieldset': {
-                                borderColor: '#5B7FA6',
-                            },
-                        },
-                    }}
-                  />
-                  <Button
-                    variant="contained"
-                    startIcon={<PersonAddIcon />}
-                    sx={{
-                        backgroundColor: '#5B7FA6',
-                        '&:hover': {
-                            backgroundColor: '#4A6B8F',
-                        },
-                        transition: 'background-color 0.2s ease',
-                        minWidth: '120px',
-                        whiteSpace: 'nowrap'
-                    }}
-                    onClick={() =>
-                        handleAddUser({newUser, setNewUser, setErrorMessages, refreshUsers})
-                    }
-                  >
-                      Add User
-                  </Button>
-              </Box>
-          </Paper>
-          <Dialog
-            open={deleteUser !== null}
-            onClose={() => {
-                setDeleteUser(null);
-                setDeleteUserError(null);
-            }}
-          >
-              <DialogTitle>Delete User</DialogTitle>
-              <DialogContent>
-                  {deleteUserError && (
-                      <Alert severity="error" sx={{marginBottom: 2}} onClose={() => setDeleteUserError(null)}>
-                          {deleteUserError}
-                      </Alert>
-                  )}
-                  <DialogContentText>
-                      Are you sure you want to delete user <strong>&#34;{deleteUser?.name}&#34;</strong>?
-                  </DialogContentText>
-                  <DialogContentText sx={{mt: 2, fontWeight: 'bold', color: '#F44336'}}>
-                      This action can not be reverted!
-                  </DialogContentText>
-              </DialogContent>
-              <DialogActions>
-                  <Button
-                    onClick={() => {
-                        setDeleteUser(null);
-                        setDeleteUserError(null);
-                    }}
-                    sx={{
-                        color: '#5B7FA6',
-                        '&:hover': {
-                            backgroundColor: '#E0E7FF',
-                        }
-                    }}
-                  >
-                      Cancel
-                  </Button>
-                  <Button
-                    onClick={() =>
-                        handleDeleteUserClick({
-                            deleteUser,
-                            setDeleteUser,
-                            setDeleteUserError,
-                            setErrorMessages,
-                            refreshUsers,
-                            refreshTasks
-                        })
-                    }
-                    sx={{
-                        backgroundColor: '#F44336',
-                        color: 'white',
-                        '&:hover': {
-                            backgroundColor: '#D32F2F',
-                        },
-                        transition: 'background-color 0.2s ease'
-                    }}
-                    variant="contained"
-                  >
-                      Delete
-                  </Button>
-              </DialogActions>
-          </Dialog>
+          <AddUserSection
+            newUser={newUser}
+            setNewUser={setNewUser}
+            editedUser={editedUser}
+            setEditedUser={setEditedUser}
+            setErrorMessages={setErrorMessages}
+            handleAddUser={handleAddUser}
+          />
+          <DeleteUserDialog
+            deleteUser={deleteUser}
+            deleteUserError={deleteUserError}
+            setDeleteUser={setDeleteUser}
+            setDeleteUserError={setDeleteUserError}
+            setErrorMessages={setErrorMessages}
+            handleDeleteUserClick={handleDeleteUserClick}
+          />
         </Box>
       </Dialog>
     );
