@@ -24,9 +24,10 @@ import {
 } from "@mui/material";
 import PropTypes from "prop-types";
 import React from "react";
-import {useTasks} from "../contexts/TasksContext.jsx";
-import {useUsers} from "../contexts/UsersContext.jsx";
-import {handleAddUser, handleDeleteUserClick, handleSaveEdit} from "../js/UsersPopupFunctions.js";
+import {useTasks} from "../../contexts/TasksContext.jsx";
+import {useUsers} from "../../contexts/UsersContext.jsx";
+import {handleAddUser, handleDeleteUserClick, handleSaveEdit} from "../../js/UsersPopupFunctions.js";
+import AlertSection from "./AlertSection.jsx";
 
 export default function UsersPopup({open, onClose}) {
     const {users, refreshUsers} = useUsers();
@@ -42,7 +43,6 @@ export default function UsersPopup({open, onClose}) {
         refreshUsers();
     }, [refreshUsers]);
 
-    // noinspection JSValidateTypes
     return (
       <Dialog
         open={open}
@@ -69,26 +69,7 @@ export default function UsersPopup({open, onClose}) {
             minHeight: '200px',
             padding: '16px'
         }}>
-          {errorMessages.length !== 0 &&
-            <Alert 
-                variant="filled" 
-                severity="error" 
-                sx={{marginBottom: '16px'}}
-                onClose={() => setErrorMessages([])}
-            >
-                <Box>
-                    {errorMessages.map((errorMessage, index) => (
-                        <Typography
-                          key={index}
-                          variant="body2"
-                          sx={{marginBottom: index < errorMessages.length - 1 ? '4px' : 0}}
-                        >
-                            {errorMessage}
-                        </Typography>
-                    ))}
-                </Box>
-            </Alert>
-          }
+          <AlertSection errorMessages={errorMessages} setErrorMessages={setErrorMessages} />
           {users.length > 0 && (
             <Paper 
                 elevation={0} 

@@ -8,7 +8,7 @@ import {useTaskChangedMessage} from "../../contexts/TaskChangedMessageContext.js
 import {useTasks} from "../../contexts/TasksContext.jsx";
 import TaskPopup from "../task_popup/TaskPopup.jsx";
 import TasksTable from "../TasksTable.jsx";
-import UsersPopup from "../UsersPopup.jsx";
+import UsersPopup from "../users_popup/UsersPopup.jsx";
 import AlertSection from "./AlertSection.jsx";
 import ButtonsSection from "./ButtonsSection.jsx";
 import TabsSection from "./TabsSection.jsx";
