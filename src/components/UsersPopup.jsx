@@ -6,6 +6,7 @@ import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import {
     Alert,
     Box,
+    Button,
     Dialog,
     DialogActions,
     DialogContent,
@@ -13,20 +14,19 @@ import {
     DialogTitle,
     Divider,
     IconButton,
+    List,
+    ListItem,
+    ListItemButton,
+    ListItemText,
+    Paper,
     TextField,
     Typography
 } from "@mui/material";
-import Button from "@mui/material/Button";
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemText from '@mui/material/ListItemText';
-import Paper from "@mui/material/Paper";
 import PropTypes from "prop-types";
 import React from "react";
 import {useTasks} from "../contexts/TasksContext.jsx";
 import {useUsers} from "../contexts/UsersContext.jsx";
-import {createUser, deleteUser as deleteUserApi, updateUser} from "../js/BackendApis.js";
+import {handleAddUser, handleDeleteUserClick, handleSaveEdit} from "../js/UsersPopupFunctions.js";
 
 export default function UsersPopup({open, onClose}) {
     const {users, refreshUsers} = useUsers();
@@ -41,75 +41,6 @@ export default function UsersPopup({open, onClose}) {
     React.useEffect(() => {
         refreshUsers();
     }, [refreshUsers]);
-
-    const handleAddUser = () => {
-        if (newUser.trim() === '') {
-            setErrorMessages(['Please enter a user name']);
-            return;
-        }
-        createUser(newUser)
-          .then(() => {
-              setNewUser("");
-              refreshUsers().then(r => {
-                  if (r.errors && r.errors.length > 0) {
-                      setErrorMessages([...r.errors]);
-                  } else {
-                      setErrorMessages([]);
-                  }
-              });
-          })
-          .catch(error => {
-              const errors = []
-              error.response.data['errors'].forEach((error) => {
-                  errors.push(error['description']);
-              })
-              setErrorMessages([...errors]);
-          });
-    };
-
-    const handleSaveEdit = () => {
-        updateUser(editedUser, editedUserNewName)
-          .then(() => {
-            refreshUsers().then(r => {
-                if (r.errors && r.errors.length > 0) {
-                    setErrorMessages([...r.errors]);
-                } else {
-                    setEditedUser("");
-                    setEditedUserNewName("");
-                    setErrorMessages([]);
-                }
-            });
-        })
-          .catch(error => {
-              const errors = []
-              error.response.data['errors'].forEach((error) => {
-                  errors.push(error['description']);
-              })
-              setErrorMessages([...errors]);
-          });
-    };
-
-    const handleDeleteUserClick = () => {
-        deleteUserApi(deleteUser.id)
-          .then(() => {
-              refreshUsers().then(r => {
-                  if (r.errors && r.errors.length > 0) {
-                      setDeleteUserError(r.errors.join(', '));
-                  } else {
-                      setDeleteUser(null);
-                      setDeleteUserError(null);
-                      setErrorMessages([]);
-                      refreshTasks();
-                  }
-              });
-          })
-          .catch(error => {
-              const errorMessage = error.response?.data?.errors
-                ? error.response.data.errors.map((e) => e.description).join(', ')
-                : 'An error occurred while deleting the user';
-              setDeleteUserError(errorMessage);
-          });
-    };
 
     // noinspection JSValidateTypes
     return (
@@ -147,7 +78,11 @@ export default function UsersPopup({open, onClose}) {
             >
                 <Box>
                     {errorMessages.map((errorMessage, index) => (
-                        <Typography key={index} variant="body2" sx={{marginBottom: index < errorMessages.length - 1 ? '4px' : 0}}>
+                        <Typography
+                          key={index}
+                          variant="body2"
+                          sx={{marginBottom: index < errorMessages.length - 1 ? '4px' : 0}}
+                        >
                             {errorMessage}
                         </Typography>
                     ))}
@@ -250,7 +185,16 @@ export default function UsersPopup({open, onClose}) {
                                                 transition: 'background-color 0.2s ease'
                                             }}
                                             size="small"
-                                            onClick={handleSaveEdit}
+                                            onClick={() =>
+                                                handleSaveEdit({
+                                                    editedUser,
+                                                    editedUserNewName,
+                                                    setEditedUser,
+                                                    setEditedUserNewName,
+                                                    setErrorMessages,
+                                                    refreshUsers
+                                                })
+                                            }
                                             aria-label="Save edit"
                                           >
                                               <CheckIcon sx={{color: "white"}} fontSize="small"/>
@@ -281,7 +225,17 @@ export default function UsersPopup({open, onClose}) {
                                         <TextField
                                             value={editedUserNewName}
                                             onChange={(e) => setEditedUserNewName(e.target.value)}
-                                            onKeyDown={(e) => e.key === "Enter" && handleSaveEdit()}
+                                            onKeyDown={(e) =>
+                                                e.key === "Enter" &&
+                                                handleSaveEdit({
+                                                    editedUser,
+                                                    editedUserNewName,
+                                                    setEditedUser,
+                                                    setEditedUserNewName,
+                                                    setErrorMessages,
+                                                    refreshUsers
+                                                })
+                                            }
                                             variant="standard"
                                             fullWidth
                                             autoFocus
@@ -347,7 +301,10 @@ export default function UsersPopup({open, onClose}) {
                         }
                         setEditedUser("")
                     }}
-                    onKeyDown={(e) => e.key === "Enter" && handleAddUser()}
+                    onKeyDown={(e) =>
+                        e.key === "Enter" &&
+                        handleAddUser({newUser, setNewUser, setErrorMessages, refreshUsers})
+                    }
                     value={newUser}
                     sx={{
                         '& .MuiOutlinedInput-root': {
@@ -369,7 +326,9 @@ export default function UsersPopup({open, onClose}) {
                         minWidth: '120px',
                         whiteSpace: 'nowrap'
                     }}
-                    onClick={handleAddUser}
+                    onClick={() =>
+                        handleAddUser({newUser, setNewUser, setErrorMessages, refreshUsers})
+                    }
                   >
                       Add User
                   </Button>
@@ -412,7 +371,16 @@ export default function UsersPopup({open, onClose}) {
                       Cancel
                   </Button>
                   <Button
-                    onClick={handleDeleteUserClick}
+                    onClick={() =>
+                        handleDeleteUserClick({
+                            deleteUser,
+                            setDeleteUser,
+                            setDeleteUserError,
+                            setErrorMessages,
+                            refreshUsers,
+                            refreshTasks
+                        })
+                    }
                     sx={{
                         backgroundColor: '#F44336',
                         color: 'white',
