@@ -7,7 +7,7 @@ import {useErrors} from "../../contexts/ErrorMessagesContext.jsx";
 import {useTaskChangedMessage} from "../../contexts/TaskChangedMessageContext.jsx";
 import {useTasks} from "../../contexts/TasksContext.jsx";
 import TaskPopup from "../task_popup/TaskPopup.jsx";
-import TasksTable from "../TasksTable.jsx";
+import TasksTable from "../tasks_table/TasksTable.jsx";
 import UsersPopup from "../users_popup/UsersPopup.jsx";
 import AlertSection from "./AlertSection.jsx";
 import ButtonsSection from "./ButtonsSection.jsx";
