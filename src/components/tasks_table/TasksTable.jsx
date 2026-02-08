@@ -1,19 +1,11 @@
 import FilterListIcon from "@mui/icons-material/FilterList";
 import FilterListOffIcon from "@mui/icons-material/FilterListOff";
-import {
-    Paper,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow
-} from "@mui/material";
+import {Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
 import React from "react";
 import {useActiveTab} from "../../contexts/ActiveTabContext.jsx";
 import {useTasks} from "../../contexts/TasksContext.jsx";
 import {useUsers} from "../../contexts/UsersContext.jsx";
-import Row from "../Row.jsx";
+import Row from "../row/Row.jsx";
 import FilterRow from "./FilterRow.jsx";
 
 function TasksTable() {

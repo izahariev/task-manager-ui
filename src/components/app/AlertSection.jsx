@@ -52,7 +52,7 @@ function AlertSection({taskChangedMessage, showAlert, setShowAlert, setTaskChang
                                 <ul style={{flexGrow: '0', listStyleType: 'none'}}>
                                     {errorMessages && errorMessages.map((errorMessage, index) => (
                                         <li key={index}>
-                                            {errorMessage}
+                                            {errorMessage.description}
                                         </li>))}
                                 </ul>
                             </div>

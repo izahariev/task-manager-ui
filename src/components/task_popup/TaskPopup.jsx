@@ -158,7 +158,11 @@ export default function TaskPopup(props) {
                         if (r.errors.length > 0) {
                             setErrorMessages([...r.errors]);
                         } else {
-                            refreshTasks();
+                            if (parentTaskId != null && refreshSubtasks) {
+                                refreshSubtasks();
+                            } else {
+                                refreshTasks();
+                            }
                             setOpen(false);
                             setTaskChangedMessage(`Task "${currentTask.title}" updated`);
                         }
@@ -252,7 +256,11 @@ export default function TaskPopup(props) {
                                         if (r.errors.length > 0) {
                                             setErrorMessages([...r.errors]);
                                         } else {
-                                            refreshTasks();
+                                            if (parentTaskId != null && refreshSubtasks) {
+                                                refreshSubtasks();
+                                            } else {
+                                                refreshTasks();
+                                            }
                                             setOpen(false);
                                             setTaskChangedMessage(`Task "${currentTask.title}" updated`);
                                         }
