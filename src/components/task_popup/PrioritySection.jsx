@@ -25,12 +25,13 @@ function PrioritySection({priority, setPriority, readOnly}) {
           }}>
               <FormControl sx={{m: 1, minWidth: 120}}>
                   <Select
-                    {...(readOnly ? { disabled: true } : {})}
+                    variant="outlined"
+                    disabled={readOnly}
                     value={priority}
                     onChange={(e) => setPriority(e.target.value)}
                     displayEmpty
                     inputProps={{'aria-label': 'Without label'}}
-                    size={"medium"}
+                    size="medium"
                   >
                       <MenuItem value="P0">P0</MenuItem>
                       <MenuItem value="P1">P1</MenuItem>
