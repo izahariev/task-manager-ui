@@ -177,13 +177,15 @@ function SubtasksTable(props) {
                                     icon={<EditIcon sx={{color: "white"}} fontSize="small"/>}
                                 />
                             )}
-                            <RowButton
-                                backgroundColor="#F44336"
-                                hoverBackgroundColor="#D32F2F"
-                                marginLeft="1%"
-                                onClick={(e) => onDeleteClick(e, subtaskRow)}
-                                icon={<DeleteIcon sx={{color: "white"}} fontSize="small"/>}
-                            />
+                            {activeTab !== "completed" && (
+                                <RowButton
+                                    backgroundColor="#F44336"
+                                    hoverBackgroundColor="#D32F2F"
+                                    marginLeft="1%"
+                                    onClick={(e) => onDeleteClick(e, subtaskRow)}
+                                    icon={<DeleteIcon sx={{color: "white"}} fontSize="small"/>}
+                                />
+                            )}
                         </TableCell>
                     </TableRow>
                 )))}
