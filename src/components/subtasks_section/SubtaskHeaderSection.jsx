@@ -72,12 +72,14 @@ function SubtaskHeaderSection(props) {
                     </ToggleButtonGroup>
                 </Box>
             )}
-            <RowButton
-                backgroundColor="#5B7FA6"
-                hoverBackgroundColor="#4A6B8F"
-                onClick={onAddClick}
-                icon={<AddIcon sx={{color: "white"}} fontSize="small"/>}
-            />
+            {activeTab !== "completed" && (
+                <RowButton
+                    backgroundColor="#5B7FA6"
+                    hoverBackgroundColor="#4A6B8F"
+                    onClick={onAddClick}
+                    icon={<AddIcon sx={{color: "white"}} fontSize="small"/>}
+                />
+            )}
         </Box>
     );
 }
