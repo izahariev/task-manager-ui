@@ -36,8 +36,6 @@ function App() {
                   <TabsSection
                     activeTab={activeTab}
                     setActiveTab={setActiveTab}
-                    currentPage={currentPage}
-                    refreshTasks={refreshTasks}
                   />
                   <Grid size={12} sx={{margin: '1%  0 0.5% 0'}}>
                       <TasksTable/>

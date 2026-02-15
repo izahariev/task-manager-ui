@@ -2,7 +2,7 @@ import Grid from "@mui/material/Grid2";
 import PropTypes from "prop-types";
 import TabHeader from "./TabHeader.jsx";
 
-function TabsSection({activeTab, setActiveTab, currentPage, refreshTasks}) {
+function TabsSection({activeTab, setActiveTab}) {
     return (
         <>
             <Grid size={4} sx={{
@@ -15,7 +15,6 @@ function TabsSection({activeTab, setActiveTab, currentPage, refreshTasks}) {
                     isActive={activeTab === "inactive"}
                     onClick={() => {
                         setActiveTab("inactive");
-                        refreshTasks({page: currentPage, isCompleted: false});
                     }}
                 />
             </Grid>
@@ -29,7 +28,6 @@ function TabsSection({activeTab, setActiveTab, currentPage, refreshTasks}) {
                     isActive={activeTab === "active"}
                     onClick={() => {
                         setActiveTab("active");
-                        refreshTasks({page: currentPage, isCompleted: false});
                     }}
                 />
             </Grid>
@@ -43,7 +41,6 @@ function TabsSection({activeTab, setActiveTab, currentPage, refreshTasks}) {
                     isActive={activeTab === "completed"}
                     onClick={() => {
                         setActiveTab("completed");
-                        refreshTasks({page: currentPage, isCompleted: true});
                     }}
                 />
             </Grid>
@@ -54,8 +51,6 @@ function TabsSection({activeTab, setActiveTab, currentPage, refreshTasks}) {
 TabsSection.propTypes = {
     activeTab: PropTypes.string.isRequired,
     setActiveTab: PropTypes.func.isRequired,
-    currentPage: PropTypes.number.isRequired,
-    refreshTasks: PropTypes.func.isRequired
 };
 
 export default TabsSection;
