@@ -1,5 +1,5 @@
-Fix refresh subtasks on edit subtask
 Add revert completed subtask button
+Remove add subtasks for completed tasks
 Check all API calls
 Fix repeating API calls
 Fix console errors

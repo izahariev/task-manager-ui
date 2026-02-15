@@ -13,9 +13,9 @@ import {useActiveTab} from "../../contexts/ActiveTabContext.jsx";
 import {useTaskChangedMessage} from "../../contexts/TaskChangedMessageContext.jsx";
 import {useTasks} from "../../contexts/TasksContext.jsx";
 import {deleteTask, updateTask} from "../../js/BackendApis.js";
+import SubtaskSection from "../subtasks_section/SubtaskSection.jsx";
 import TaskPopup from "../task_popup/TaskPopup.jsx";
 import RowButton from "./RowButton.jsx";
-import SubtaskSection from "./SubtaskSection.jsx";
 import TaskChangeDialog from "./TaskChangeDialog.jsx";
 
 
@@ -77,24 +77,20 @@ function Row(props) {
         if (action === "delete") {
             const r = await deleteTask(taskId);
             if (r.errors && r.errors.length > 0) throw r.errors;
-            setSelectedTaskChange(null);
-            refreshTasks();
             setTaskChangedMessage(`Task "${row.title}" deleted`);
         } else if (action === "complete") {
             const r = await updateTask(taskId, {"isCompleted": true});
             if (r.errors && r.errors.length > 0) throw r.errors;
-            setSelectedTaskChange(null);
-            refreshTasks();
             setExpand(false);
             setTaskChangedMessage(`Task "${row.title}" completed`);
         } else if (action === "rollback") {
             const r = await updateTask(taskId, {"isCompleted": false});
             if (r.errors && r.errors.length > 0) throw r.errors;
-            setSelectedTaskChange(null);
-            refreshTasks();
             setExpand(false);
             setTaskChangedMessage(`Task "${row.title}" rolled back`);
         }
+        setSelectedTaskChange(null);
+        refreshTasks();
     };
 
     const handleRowClick = (e) => {

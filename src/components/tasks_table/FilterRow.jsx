@@ -21,7 +21,8 @@ export default function FilterRow({
                                       assigneesFilterValues,
                                       setAssigneesFilterValues,
                                       users,
-                                      refreshTasks
+                                      refreshTasks,
+                                      showExpandColumn = true
                                   }) {
     return (
       <TableHead>
@@ -35,7 +36,7 @@ export default function FilterRow({
                 }
             }}
           >
-              <TableCell sx={{width: "1%"}}/>
+              {showExpandColumn && <TableCell sx={{width: "1%"}}/>}
               <TableCell sx={{minWidth: "10%", py: 1.5}}>
                   <PriorityFilter
                     priorityFilterValue={priorityFilterValue}
@@ -160,5 +161,6 @@ FilterRow.propTypes = {
           name: PropTypes.string
       })
     ),
-    refreshTasks: PropTypes.func.isRequired
+    refreshTasks: PropTypes.func.isRequired,
+    showExpandColumn: PropTypes.bool
 };
