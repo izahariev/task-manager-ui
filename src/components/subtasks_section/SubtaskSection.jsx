@@ -128,6 +128,12 @@ function SubtaskSection(props) {
                 confirmLabel: "Complete",
                 confirmButtonSx: { backgroundColor: "#4CAF50", "&:hover": { backgroundColor: "#45a049" } },
             },
+            rollback: {
+                title: "Rollback Subtask",
+                contentText: <>Are you sure you want to rollback completed subtask <strong>&#34;{subtaskTitle}&#34;</strong>?</>,
+                confirmLabel: "Rollback",
+                confirmButtonSx: { backgroundColor: "#FF9800", "&:hover": { backgroundColor: "#F57C00" } },
+            },
         };
         return { subtaskId: subtaskRow.id, subtaskTitle, action, ...configs[action] };
     };
@@ -142,6 +148,9 @@ function SubtaskSection(props) {
         } else if (action === "complete") {
             r = await updateTask(subtaskId, {"isCompleted": true});
             setTaskChangedMessage(`Subtask "${subtaskTitle}" completed`);
+        } else if (action === "rollback") {
+            r = await updateTask(subtaskId, {"isCompleted": false});
+            setTaskChangedMessage(`Subtask "${subtaskTitle}" rolled back`);
         }
 
         if (r.errors && r.errors.length > 0) {
@@ -241,6 +250,10 @@ function SubtaskSection(props) {
                       onDeleteClick={(e, subtaskRow) => {
                           e.stopPropagation();
                           setSelectedSubtaskChange(getSubtaskChangeConfig(subtaskRow, "delete"));
+                      }}
+                      onRollbackClick={(e, subtaskRow) => {
+                          e.stopPropagation();
+                          setSelectedSubtaskChange(getSubtaskChangeConfig(subtaskRow, "rollback"));
                       }}
                   />
                   {subtaskPageCount > 0 &&

@@ -3,6 +3,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import FilterListOffIcon from '@mui/icons-material/FilterListOff';
+import ReplayIcon from '@mui/icons-material/Replay';
 import {Table, TableBody, TableCell, TableHead, TableRow,} from "@mui/material";
 import PropTypes from "prop-types";
 import RowButton from "../row/RowButton.jsx";
@@ -33,6 +34,7 @@ SubtasksTable.propTypes = {
     onCompleteClick: PropTypes.func.isRequired,
     onEditClick: PropTypes.func.isRequired,
     onDeleteClick: PropTypes.func.isRequired,
+    onRollbackClick: PropTypes.func.isRequired,
 };
 
 function SubtasksTable(props) {
@@ -61,6 +63,7 @@ function SubtasksTable(props) {
         onCompleteClick,
         onEditClick,
         onDeleteClick,
+        onRollbackClick,
     } = props;
 
     return (
@@ -157,7 +160,15 @@ function SubtasksTable(props) {
                                     icon={<CheckIcon sx={{color: "white"}} fontSize="small"/>}
                                 />
                             )}
-                            {activeTab !== "completed" && (subtaskTypePending || subtaskTypePending === null) && (
+                            {activeTab !== "completed" && !subtaskTypePending && (
+                                <RowButton
+                                    backgroundColor="#FF9800"
+                                    hoverBackgroundColor="#F57C00"
+                                    onClick={(e) => onRollbackClick(e, subtaskRow)}
+                                    icon={<ReplayIcon sx={{color: "white"}} fontSize="small"/>}
+                                />
+                            )}
+                            {activeTab !== "completed" && subtaskTypePending && (
                                 <RowButton
                                     backgroundColor="#2196F3"
                                     hoverBackgroundColor="#1976D2"
