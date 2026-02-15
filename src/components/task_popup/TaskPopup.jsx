@@ -1,9 +1,6 @@
-import CloseIcon from "@mui/icons-material/Close";
-import {Alert, AppBar, Dialog, IconButton, Slide, TextField, Toolbar} from "@mui/material";
-import Button from "@mui/material/Button";
+import {Alert, Dialog, Slide, TextField} from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import List from "@mui/material/List";
-import Typography from "@mui/material/Typography";
 import PropTypes from "prop-types";
 import React from "react";
 import {useTaskChangedMessage} from "../../contexts/TaskChangedMessageContext.jsx";
@@ -12,6 +9,8 @@ import {useUsers} from "../../contexts/UsersContext.jsx";
 import {addTask, fetchTask, updateTask} from "../../js/BackendApis.js";
 import AssigneesSection from "./AssigneesSection.jsx";
 import PrioritySection from "./PrioritySection.jsx";
+import TaskPopupHeader from "./TaskPopupHeader.jsx";
+import TaskPopupSection from "./TaskPopupSection.jsx";
 import TimeSection from "./TimeSection.jsx";
 
 /**
@@ -202,12 +201,35 @@ export default function TaskPopup(props) {
         setOpen(false);
     };
 
+    const handleCompleteClick = () => {
+        updateTask(taskId, {"isCompleted": true})
+            .then(r => {
+                if (r.errors.length > 0) {
+                    setErrorMessages([...r.errors]);
+                } else {
+                    if (parentTaskId != null && refreshSubtasks) {
+                        refreshSubtasks();
+                    } else {
+                        refreshTasks();
+                    }
+                    setOpen(false);
+                    setTaskChangedMessage(`Task "${currentTask.title}" updated`);
+                }
+            })
+            .catch(error => {
+                const errors = error.response?.data?.errors
+                    ? error.response.data.errors.map((err) => err?.description ?? err)
+                    : ["An error occurred"];
+                setErrorMessages(errors);
+            });
+    };
+
     return (
       <React.Fragment>
           <Dialog
             fullScreen
             open={open}
-            onClose={handleClose}
+            onClose={() => setOpen(false)}
             slots={{
                 transition: Slide
             }}
@@ -220,66 +242,17 @@ export default function TaskPopup(props) {
                 }
             }}
           >
-              <AppBar sx={{
-                  position: 'relative',
-                  backgroundColor: '#2D3748'
-              }}>
-                  <Toolbar>
-                      <IconButton
-                        edge="start"
-                        color="inherit"
-                        onClick={handleClose}
-                        aria-label="close"
-                      >
-                          <CloseIcon/>
-                      </IconButton>
-                      <Typography sx={{ml: 2, flex: 1}} variant="h6" component="div">
-                          {readOnly ? 'Task Details' : isEdit ? 'Edit Task' : 'Add Task'}
-                      </Typography>
-                      {!readOnly && (
-                        <Button color="inherit" onClick={handleSaveClick}>
-                            save
-                        </Button>
-                      )}
-                      {readOnly ? (
-                        <div>
-                            <Button color="inherit" onClick={() => {
-                                updateTask(taskId, {"isCompleted": true})
-                                  .then(r => {
-                                        if (r.errors.length > 0) {
-                                            setErrorMessages([...r.errors]);
-                                        } else {
-                                            if (parentTaskId != null && refreshSubtasks) {
-                                                refreshSubtasks();
-                                            } else {
-                                                refreshTasks();
-                                            }
-                                            setOpen(false);
-                                            setTaskChangedMessage(`Task "${currentTask.title}" updated`);
-                                        }
-                                    }
-                                  )
-                                  .catch(error => {
-                                        const errors = []
-                                        error.response.data['errors'].forEach((error) => {
-                                            errors.push(error['description']);
-                                        })
-                                        setErrorMessages([...errors]);
-                                    }
-                                  )
-                            }}>
-                                complete
-                            </Button>
-                            <Button color="inherit" onClick={() => {
-                                setReadOnly(false)
-                                setIsEdit(true)
-                            }}>
-                                edit
-                            </Button>
-                        </div>
-                      ) : null}
-                  </Toolbar>
-              </AppBar>
+              <TaskPopupHeader
+                  onClose={handleClose}
+                  readOnly={readOnly}
+                  isEdit={isEdit}
+                  onSaveClick={handleSaveClick}
+                  onCompleteClick={handleCompleteClick}
+                  onEditClick={() => {
+                      setReadOnly(false);
+                      setIsEdit(true);
+                  }}
+              />
               <List>
                   {errorMessages.length !== 0 &&
                     <Alert variant="filled" severity="error" onClose={() => setErrorMessages([])}>
@@ -304,34 +277,18 @@ export default function TaskPopup(props) {
                   <Grid container sx={{marginBottom: "2%"}}>
                       {parentTask &&
                         <>
-                            <Grid size={12} sx={{
-                                display: 'flex',
-                                justifyContent: 'center',
-                                marginBottom: "1%"
-                            }}>
+                            <TaskPopupSection>
                                 <h2>Parent task</h2>
-                            </Grid>
-                            <Grid size={12} sx={{
-                                display: 'flex',
-                                justifyContent: 'center',
-                                marginBottom: "1%"
-                            }}>
+                            </TaskPopupSection>
+                            <TaskPopupSection>
                                 <h2 style={{color: '#7C3AED'}}>{parentTask}</h2>
-                            </Grid>
+                            </TaskPopupSection>
                         </>
                       }
-                      <Grid size={12} sx={{
-                          display: 'flex',
-                          justifyContent: 'center',
-                          marginBottom: "1%"
-                      }}>
+                      <TaskPopupSection>
                           <h2>Title</h2>
-                      </Grid>
-                      <Grid size={12} sx={{
-                          display: 'flex',
-                          justifyContent: 'center',
-                          marginBottom: "1%"
-                      }}>
+                      </TaskPopupSection>
+                      <TaskPopupSection>
                           <TextField
                             value={currentTask.title}
                             onChange={(e) => {
@@ -342,19 +299,11 @@ export default function TaskPopup(props) {
                             sx={{width: "96%", margin: "0 2%"}}
                             size="small"
                           />
-                      </Grid>
-                      <Grid size={12} sx={{
-                          display: 'flex',
-                          justifyContent: 'center',
-                          marginBottom: "1%"
-                      }}>
+                      </TaskPopupSection>
+                      <TaskPopupSection>
                           <h2>Description</h2>
-                      </Grid>
-                      <Grid size={12} sx={{
-                          display: 'flex',
-                          justifyContent: 'center',
-                          marginBottom: "1%"
-                      }}>
+                      </TaskPopupSection>
+                      <TaskPopupSection>
                           <TextField
                             value={currentTask.description}
                             disabled={readOnly}
@@ -369,12 +318,8 @@ export default function TaskPopup(props) {
                                 ));
                             }}
                             sx={{width: "96%", margin: "0, 2%"}} size="small"/>
-                      </Grid>
-                      <Grid size={3} sx={{
-                          display: 'flex',
-                          justifyContent: 'center',
-                          marginBottom: "4%"
-                      }}>
+                      </TaskPopupSection>
+                      <TaskPopupSection size={3} marginBottom="4%">
                           <PrioritySection
                             priority={currentTask.priority}
                             setPriority={(p) =>
@@ -382,13 +327,9 @@ export default function TaskPopup(props) {
                                 /** @type {Task} */ ({...currentTask, priority: p}))}
                             readOnly={readOnly}
                           />
-                      </Grid>
+                      </TaskPopupSection>
                       {parentTaskId == null && (
-                          <Grid size={2} sx={{
-                              display: 'flex',
-                              justifyContent: 'center',
-                              marginBottom: "4%"
-                          }}>
+                          <TaskPopupSection size={2} marginBottom="4%">
                               <TimeSection
                                 title={"Start time"}
                                 readOnly={readOnly}
@@ -408,13 +349,9 @@ export default function TaskPopup(props) {
                                     </div>
                                 }
                               />
-                          </Grid>
+                          </TaskPopupSection>
                       )}
-                      <Grid size={2} sx={{
-                          display: 'flex',
-                          justifyContent: 'center',
-                          marginBottom: "4%"
-                      }}>
+                      <TaskPopupSection size={2} marginBottom="4%">
                           <TimeSection
                             title={"Deadline"}
                             readOnly={readOnly}
@@ -430,12 +367,8 @@ export default function TaskPopup(props) {
                                 </div>
                             }
                           />
-                      </Grid>
-                      <Grid size={2} sx={{
-                          display: 'flex',
-                          justifyContent: 'center',
-                          marginBottom: "4%"
-                      }}>
+                      </TaskPopupSection>
+                      <TaskPopupSection size={2} marginBottom="4%">
                           <TimeSection
                             title={"Repeat"}
                             readOnly={readOnly}
@@ -467,12 +400,8 @@ export default function TaskPopup(props) {
                                 </div>
                             }
                           />
-                      </Grid>
-                      <Grid size={3} sx={{
-                          display: 'flex',
-                          justifyContent: 'center',
-                          marginBottom: "1%"
-                      }}>
+                      </TaskPopupSection>
+                      <TaskPopupSection size={3}>
                           <AssigneesSection
                             readOnly={readOnly}
                             users={["Any", ...users]}
@@ -481,7 +410,7 @@ export default function TaskPopup(props) {
                               setCurrentTask((currentTask) =>
                                 /** @type {Task} */({...currentTask, assignees: a}))}
                           />
-                      </Grid>
+                      </TaskPopupSection>
                   </Grid>
               </List>
           </Dialog>
