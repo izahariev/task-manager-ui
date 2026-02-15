@@ -14,21 +14,18 @@ import AssigneesSection from "./AssigneesSection.jsx";
 import PrioritySection from "./PrioritySection.jsx";
 import TimeSection from "./TimeSection.jsx";
 
-const Transition = React.forwardRef(
-  function Transition(props, ref) {
-      const {children, ...other} = props;
-      return (
-        <Slide direction="up" ref={ref} {...other}>
-            {children}
-        </Slide>
-      );
-  }
-);
-
-Transition.propTypes = {
-    children: PropTypes.element
-}
-
+/**
+ * @typedef {{
+ *   parentTaskId: string | null | undefined,
+ *   title: string,
+ *   description: string,
+ *   priority: string,
+ *   startTime: string,
+ *   deadline: string,
+ *   repeat: string,
+ *   assignees: string[]
+ * }} Task
+ */
 export default function TaskPopup(props) {
     const {
         open,
@@ -40,7 +37,8 @@ export default function TaskPopup(props) {
         refreshSubtasks
     } = props;
     const {setTaskChangedMessage} = useTaskChangedMessage();
-    const [currentTask, setCurrentTask] = React.useState({
+    /** @type {Task} */
+    const initialTaskState = {
         parentTaskId: parentTaskId,
         title: "",
         description: "",
@@ -49,21 +47,15 @@ export default function TaskPopup(props) {
         deadline: "",
         repeat: "",
         assignees: []
-    });
+    };
+    /** @type {[Task, React.Dispatch<React.SetStateAction<Task>>]} */
+    const [currentTask, setCurrentTask] = React.useState(initialTaskState);
     const {refreshTasks} = useTasks();
     const {users, refreshUsers} = useUsers();
     const [initialTask, setInitialTask] = React.useState(null)
-    const [readOnly, setReadOnly] = React.useState(customReadOnly)
+    const [readOnly, setReadOnly] = React.useState(!!customReadOnly)
     const [isEdit, setIsEdit] = React.useState(false)
     const [errorMessages, setErrorMessages] = React.useState([]);
-
-    // React.useEffect(() => {
-    //     if (customReadOnly !== undefined) {
-    //         setReadOnly(customReadOnly);
-    //     } else if (taskId !== undefined) {
-    //         setReadOnly(true);
-    //     }
-    // }, [customReadOnly, taskId]);
 
     React.useEffect(() => {
         if (taskId !== undefined) {
@@ -217,9 +209,10 @@ export default function TaskPopup(props) {
             open={open}
             onClose={handleClose}
             slots={{
-                transition: Transition
+                transition: Slide
             }}
             slotProps={{
+                transition: { direction: 'up' },
                 paper: {
                     sx: {
                         backgroundColor: '#F7FAFC'
@@ -248,7 +241,7 @@ export default function TaskPopup(props) {
                             save
                         </Button>
                       )}
-                      {readOnly && (
+                      {readOnly ? (
                         <div>
                             <Button color="inherit" onClick={() => {
                                 updateTask(taskId, {"isCompleted": true})
@@ -284,7 +277,7 @@ export default function TaskPopup(props) {
                                 edit
                             </Button>
                         </div>
-                      )}
+                      ) : null}
                   </Toolbar>
               </AppBar>
               <List>
@@ -342,12 +335,12 @@ export default function TaskPopup(props) {
                           <TextField
                             value={currentTask.title}
                             onChange={(e) => {
-                                // setTitle(e.target.value)
-                                setCurrentTask(currentTask => ({...currentTask, title: e.target.value}));
+                                setCurrentTask(currentTask =>
+                                  /** @type {Task} */ ({...currentTask, title: e.target.value}));
                             }}
-                            {...(readOnly ? {disabled: true} : {})}
+                            disabled={readOnly}
                             sx={{width: "96%", margin: "0 2%"}}
-                            size={"small"}
+                            size="small"
                           />
                       </Grid>
                       <Grid size={12} sx={{
@@ -364,18 +357,18 @@ export default function TaskPopup(props) {
                       }}>
                           <TextField
                             value={currentTask.description}
-                            {...(readOnly ? {disabled: true} : {})}
+                            disabled={readOnly}
                             multiline={true}
                             rows={3}
                             onChange={(e) => {
-                                setCurrentTask(currentTask => (
+                                setCurrentTask(currentTask => /** @type {Task} */ (
                                   {
                                       ...currentTask,
                                       description: e.target.value
                                   }
                                 ));
                             }}
-                            sx={{width: "96%", margin: "0, 2%"}} size={"small"}/>
+                            sx={{width: "96%", margin: "0, 2%"}} size="small"/>
                       </Grid>
                       <Grid size={3} sx={{
                           display: 'flex',
@@ -385,7 +378,8 @@ export default function TaskPopup(props) {
                           <PrioritySection
                             priority={currentTask.priority}
                             setPriority={(p) =>
-                              setCurrentTask((currentTask) => ({...currentTask, priority: p}))}
+                              setCurrentTask((currentTask) =>
+                                /** @type {Task} */ ({...currentTask, priority: p}))}
                             readOnly={readOnly}
                           />
                       </Grid>
@@ -400,7 +394,8 @@ export default function TaskPopup(props) {
                                 readOnly={readOnly}
                                 timeValue={currentTask.startTime}
                                 setTimeValue={(t) =>
-                                  setCurrentTask((currentTask) => ({...currentTask, startTime: t}))}
+                                  setCurrentTask((currentTask) =>
+                                    /** @type {Task} */ ({...currentTask, startTime: t}))}
                                 tooltipContent={
                                     <div>
                                         The time from which the task can be completed and will appear in the active
@@ -425,7 +420,8 @@ export default function TaskPopup(props) {
                             readOnly={readOnly}
                             timeValue={currentTask.deadline}
                             setTimeValue={(t) =>
-                              setCurrentTask((currentTask) => ({...currentTask, deadline: t}))}
+                              setCurrentTask((currentTask) =>
+                                /** @type {Task} */ ({...currentTask, deadline: t}))}
                             tooltipContent={
                                 <div>
                                     The time at which the task must be completed. If provided the task priority will
@@ -445,7 +441,8 @@ export default function TaskPopup(props) {
                             readOnly={readOnly}
                             timeValue={currentTask.repeat}
                             setTimeValue={(t) =>
-                              setCurrentTask((currentTask) => ({...currentTask, repeat: t}))}
+                              setCurrentTask((currentTask) =>
+                                /** @type {Task} */ ({...currentTask, repeat: t}))}
                             tooltipContent={
                                 <div>
                                     The time at which the task task will repeat and appear again in the active tasks
@@ -481,7 +478,8 @@ export default function TaskPopup(props) {
                             users={["Any", ...users]}
                             assignees={currentTask.assignees}
                             setAssignees={(a) =>
-                              setCurrentTask((currentTask) => ({...currentTask, assignees: a}))}
+                              setCurrentTask((currentTask) =>
+                                /** @type {Task} */({...currentTask, assignees: a}))}
                           />
                       </Grid>
                   </Grid>
