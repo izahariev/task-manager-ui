@@ -26,7 +26,7 @@ PeriodField.propTypes = {
 function PeriodField({ label, readOnly, value, setValue}) {
     return (
       <TextField
-        {...(readOnly ? { disabled: true } : {})}
+        disabled={!!readOnly}
         id={`outlined-number-${label.toLowerCase()}`}
         label={label}
         type="number"
@@ -48,7 +48,8 @@ function PeriodField({ label, readOnly, value, setValue}) {
 }
 
 function TimeSection({title, readOnly, timeValue, setTimeValue, tooltipContent}) {
-    const [date, setDate] = React.useState(timeValue);
+    /** @type {[string, Function]} */
+    const [date, setDate] = React.useState(timeValue ?? '');
     const [days, setDays] = React.useState(0);
     const [months, setMonths] = React.useState(0);
     const [years, setYears] = React.useState(0);
@@ -68,12 +69,12 @@ function TimeSection({title, readOnly, timeValue, setTimeValue, tooltipContent})
           }}>
               <h2 style={{'marginLeft': '9%'}}>{title}</h2>
               <Tooltip title={tooltipContent}>
-                  <InfoOutlineIcon fontSize={'xsmall'} />
+                  <InfoOutlineIcon fontSize='xsmall'/>
               </Tooltip>
           </Grid>
           <Grid size={12} sx={{}}>
               {!readOnly && (<Grid component="label" container alignItems="center" spacing={1}>
-                  <Grid size={5} textAlign={"right"}>Period</Grid>
+                  <Grid size={5} textAlign="right">Period</Grid>
                   <Grid size={2}>
                       <Switch
                         checked={isDate}
