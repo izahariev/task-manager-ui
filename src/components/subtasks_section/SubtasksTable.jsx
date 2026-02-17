@@ -5,6 +5,7 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import FilterListOffIcon from '@mui/icons-material/FilterListOff';
 import ReplayIcon from '@mui/icons-material/Replay';
 import {Table, TableBody, TableCell, TableHead, TableRow,} from "@mui/material";
+import dayjs from "dayjs";
 import PropTypes from "prop-types";
 import RowButton from "../row/RowButton.jsx";
 import FilterRow from "../tasks_table/FilterRow.jsx";
@@ -124,71 +125,90 @@ function SubtasksTable(props) {
                 />
             )}
             <TableBody>
-                {/** @type {React.ReactNode} */
-                (subtasks.map((subtaskRow, subtaskIndex) => (
-                    <TableRow
-                        key={subtaskRow.title}
-                        sx={{
-                            backgroundColor: subtaskIndex % 2 === 0 ? '#FFFFFF' : '#F7FAFC',
-                            '&:hover': {
-                                backgroundColor: '#EDF2F7',
-                                transition: 'background-color 0.2s ease'
-                            }
-                        }}
-                    >
-                        <TableCell onClick={(e) => onRowClick(e, subtaskRow)} sx={{cursor: 'pointer'}}>
-                            {subtaskRow.priority}
-                        </TableCell>
-                        <TableCell onClick={(e) => onRowClick(e, subtaskRow)} sx={{cursor: 'pointer'}}>
-                            {subtaskRow.title}
-                        </TableCell>
-                        <TableCell onClick={(e) => onRowClick(e, subtaskRow)} sx={{cursor: 'pointer'}}>
-                            {subtaskRow.deadline}
-                        </TableCell>
-                        <TableCell onClick={(e) => onRowClick(e, subtaskRow)} sx={{cursor: 'pointer'}}>
-                            {subtaskRow.assignees.length > 0 ?
-                              subtaskRow.assignees.join(", ") :
-                              <span style={{fontStyle: "italic"}}>Any</span>
-                            }
-                        </TableCell>
-                        <TableCell align={'right'}>
-                            {activeTab !== "completed" && (subtaskTypePending || subtaskTypePending === null) && (
-                                <RowButton
-                                    backgroundColor="#4CAF50"
-                                    hoverBackgroundColor="#45a049"
-                                    onClick={(e) => onCompleteClick(e, subtaskRow)}
-                                    icon={<CheckIcon sx={{color: "white"}} fontSize="small"/>}
-                                />
-                            )}
-                            {activeTab !== "completed" && !subtaskTypePending && (
-                                <RowButton
-                                    backgroundColor="#FF9800"
-                                    hoverBackgroundColor="#F57C00"
-                                    onClick={(e) => onRollbackClick(e, subtaskRow)}
-                                    icon={<ReplayIcon sx={{color: "white"}} fontSize="small"/>}
-                                />
-                            )}
-                            {activeTab !== "completed" && subtaskTypePending && (
-                                <RowButton
-                                    backgroundColor="#2196F3"
-                                    hoverBackgroundColor="#1976D2"
-                                    marginLeft="1%"
-                                    onClick={(e) => onEditClick(e, subtaskRow)}
-                                    icon={<EditIcon sx={{color: "white"}} fontSize="small"/>}
-                                />
-                            )}
-                            {activeTab !== "completed" && (
-                                <RowButton
-                                    backgroundColor="#F44336"
-                                    hoverBackgroundColor="#D32F2F"
-                                    marginLeft="1%"
-                                    onClick={(e) => onDeleteClick(e, subtaskRow)}
-                                    icon={<DeleteIcon sx={{color: "white"}} fontSize="small"/>}
-                                />
-                            )}
-                        </TableCell>
-                    </TableRow>
-                )))}
+                <>
+                {subtasks.map((subtaskRow, subtaskIndex) => {
+                    let isDeadlineToday = false;
+                    let isDeadlinePast = false;
+                    if (subtaskRow?.deadline != null && typeof subtaskRow?.deadline === 'string' &&
+                      subtaskRow?.deadline.trim() !== '') {
+                        const parsed = dayjs(subtaskRow?.deadline);
+                        if (parsed.isValid()) {
+                            isDeadlineToday = parsed.isSame(dayjs(), 'day');
+                            isDeadlinePast = parsed.isBefore(dayjs(), 'day');
+                        }
+                    }
+                    const rowBg = isDeadlinePast
+                        ? (subtaskIndex % 2 === 0 ? '#FFD4D4' : '#F5A5A5')
+                        : isDeadlineToday
+                            ? (subtaskIndex % 2 === 0 ? '#FFF59D' : '#FFEE58')
+                            : (subtaskIndex % 2 === 0 ? '#FFFFFF' : '#F7FAFC');
+                    const rowHoverBg = isDeadlinePast ? '#E57373' : isDeadlineToday ? '#FDD835' : '#EDF2F7';
+                    return (
+                        <TableRow
+                            key={subtaskRow.title}
+                            sx={{
+                                backgroundColor: rowBg,
+                                '&:hover': {
+                                    backgroundColor: rowHoverBg,
+                                    transition: 'background-color 0.2s ease'
+                                }
+                            }}
+                        >
+                            <TableCell onClick={(e) => onRowClick(e, subtaskRow)} sx={{cursor: 'pointer'}}>
+                                {subtaskRow.priority}
+                            </TableCell>
+                            <TableCell onClick={(e) => onRowClick(e, subtaskRow)} sx={{cursor: 'pointer'}}>
+                                {subtaskRow.title}
+                            </TableCell>
+                            <TableCell onClick={(e) => onRowClick(e, subtaskRow)} sx={{cursor: 'pointer'}}>
+                                {subtaskRow.deadline}
+                            </TableCell>
+                            <TableCell onClick={(e) => onRowClick(e, subtaskRow)} sx={{cursor: 'pointer'}}>
+                                {subtaskRow.assignees.length > 0 ?
+                                  subtaskRow.assignees.join(", ") :
+                                  <span style={{fontStyle: "italic"}}>Any</span>
+                                }
+                            </TableCell>
+                            <TableCell align={'right'}>
+                                {activeTab !== "completed" && (subtaskTypePending || subtaskTypePending === null) && (
+                                    <RowButton
+                                        backgroundColor="#4CAF50"
+                                        hoverBackgroundColor="#45a049"
+                                        onClick={(e) => onCompleteClick(e, subtaskRow)}
+                                        icon={<CheckIcon sx={{color: "white"}} fontSize="small"/>}
+                                    />
+                                )}
+                                {activeTab !== "completed" && !subtaskTypePending && (
+                                    <RowButton
+                                        backgroundColor="#FF9800"
+                                        hoverBackgroundColor="#F57C00"
+                                        onClick={(e) => onRollbackClick(e, subtaskRow)}
+                                        icon={<ReplayIcon sx={{color: "white"}} fontSize="small"/>}
+                                    />
+                                )}
+                                {activeTab !== "completed" && subtaskTypePending && (
+                                    <RowButton
+                                        backgroundColor="#2196F3"
+                                        hoverBackgroundColor="#1976D2"
+                                        marginLeft="1%"
+                                        onClick={(e) => onEditClick(e, subtaskRow)}
+                                        icon={<EditIcon sx={{color: "white"}} fontSize="small"/>}
+                                    />
+                                )}
+                                {activeTab !== "completed" && (
+                                    <RowButton
+                                        backgroundColor="#F44336"
+                                        hoverBackgroundColor="#D32F2F"
+                                        marginLeft="1%"
+                                        onClick={(e) => onDeleteClick(e, subtaskRow)}
+                                        icon={<DeleteIcon sx={{color: "white"}} fontSize="small"/>}
+                                    />
+                                )}
+                            </TableCell>
+                        </TableRow>
+                    );
+                })}
+                </>
             </TableBody>
         </Table>
     );

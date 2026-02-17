@@ -7,6 +7,7 @@ import ReplayIcon from '@mui/icons-material/Replay';
 import {IconButton} from "@mui/material";
 import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
+import dayjs from "dayjs";
 import PropTypes from "prop-types";
 import React from "react";
 import {useActiveTab} from "../../contexts/ActiveTabContext.jsx";
@@ -103,13 +104,30 @@ function Row(props) {
         }
     };
 
+    let isDeadlineToday = false;
+    let isDeadlinePast = false;
+    const d = row?.deadline;
+    if (d != null && typeof d === 'string' && d.trim() !== '') {
+        const parsed = dayjs(d);
+        if (parsed.isValid()) {
+            isDeadlineToday = parsed.isSame(dayjs(), 'day');
+            isDeadlinePast = parsed.isBefore(dayjs(), 'day');
+        }
+    }
+    const rowBg = isDeadlinePast
+        ? (index % 2 === 0 ? '#FFD4D4' : '#F5A5A5')
+        : isDeadlineToday
+            ? (index % 2 === 0 ? '#FFF59D' : '#FFEE58')
+            : (index % 2 === 0 ? '#FFFFFF' : '#F7FAFC');
+    const rowHoverBg = isDeadlinePast ? '#E57373' : isDeadlineToday ? '#FDD835' : '#EDF2F7';
+
     return (
       <React.Fragment>
           <TableRow sx={{
               '& > *': {borderBottom: 'unset'},
-              backgroundColor: index % 2 === 0 ? '#FFFFFF' : '#F7FAFC',
+              backgroundColor: rowBg,
               '&:hover': {
-                  backgroundColor: '#EDF2F7',
+                  backgroundColor: rowHoverBg,
                   transition: 'background-color 0.2s ease'
               },
               cursor: 'pointer'
