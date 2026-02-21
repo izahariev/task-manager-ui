@@ -10,9 +10,11 @@ export function TasksProvider({ children }) {
     const [tasks, setTasks] = React.useState([]);
     const [currentPage, setCurrentPage] = React.useState(1);
     const [pageCount, setPageCount] = React.useState(0);
+    const [tasksRefreshTimestamp, setTasksRefreshTimestamp] = React.useState(0);
     const {addErrors, clearErrors} = useErrors();
     const {activeTab} = useActiveTab();
     const currentPageRef = React.useRef(currentPage);
+    const refreshTasksRef = React.useRef(() => {});
 
     React.useEffect(() => {
         currentPageRef.current = currentPage;
@@ -42,6 +44,7 @@ export function TasksProvider({ children }) {
               setTasks(r.content.elements);
               setPageCount(r.content.totalPageCount);
               if (page !== currentPageRef.current) setCurrentPage(page);
+              setTasksRefreshTimestamp(Date.now());
               clearErrors();
               return { success: true, data: r.content };
           })
@@ -54,6 +57,17 @@ export function TasksProvider({ children }) {
           });
     }, [addErrors, clearErrors, activeTab]);
 
+    React.useEffect(() => {
+        refreshTasksRef.current = refreshTasks;
+    }, [refreshTasks]);
+
+    React.useEffect(() => {
+        const intervalId = setInterval(() => {
+            refreshTasksRef.current();
+        }, 60000);
+        return () => clearInterval(intervalId);
+    }, [activeTab]);
+
     const value = React.useMemo(
       () => ({
           tasks,
@@ -62,8 +76,9 @@ export function TasksProvider({ children }) {
           pageCount,
           setPageCount,
           refreshTasks,
+          tasksRefreshTimestamp,
       }),
-      [tasks, currentPage, pageCount, refreshTasks]
+      [tasks, currentPage, pageCount, refreshTasks, tasksRefreshTimestamp]
     );
 
     return <TasksContext.Provider value={value}>{children}</TasksContext.Provider>;

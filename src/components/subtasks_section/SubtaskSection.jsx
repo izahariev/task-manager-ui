@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import React from "react";
 import {useActiveTab} from "../../contexts/ActiveTabContext.jsx";
 import {useErrors} from "../../contexts/ErrorMessagesContext.jsx";
+import {useTasks} from "../../contexts/TasksContext.jsx";
 import {useTaskChangedMessage} from "../../contexts/TaskChangedMessageContext.jsx";
 import {useUsers} from "../../contexts/UsersContext.jsx";
 import {deleteTask, fetchTasks, updateTask} from "../../js/BackendApis.js";
@@ -24,6 +25,7 @@ function SubtaskSection(props) {
         expand
     } = props;
     const {activeTab} = useActiveTab();
+    const {tasksRefreshTimestamp} = useTasks();
     const {users, refreshUsers} = useUsers();
     const {addErrors, clearErrors} = useErrors();
     const {setTaskChangedMessage} = useTaskChangedMessage();
@@ -110,7 +112,7 @@ function SubtaskSection(props) {
             setCompletionDateFilterValue(null);
             setAssigneesFilterValues([]);
         }
-    }, [activeTab, addErrors, expand, parentTaskId])
+    }, [activeTab, addErrors, expand, parentTaskId, tasksRefreshTimestamp])
 
     const getSubtaskChangeConfig = (subtaskRow, action) => {
         const subtaskTitle = subtaskRow.title;
