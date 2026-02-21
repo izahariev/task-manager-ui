@@ -1,15 +1,15 @@
-import axios from "axios";
 import * as qs from "qs";
+import api from "./Api.js";
 
 export async function fetchUsers(page = 1, size = 10) {
-    const response = await axios.get('http://localhost:8080/users/get', {
+    const response = await api.get('/users/get', {
         params: { page, size }
     });
     return response.data;
 }
 
 export async function fetchTask(id) {
-    const response = await axios.get('http://localhost:8080/tasks/' + id);
+    const response = await api.get('/tasks/' + id);
     return  response.data;
 }
 
@@ -52,7 +52,7 @@ export async function fetchTasks(parentTaskId, priority, title, startDate, deadl
         params.completionDate = completionDate.format('YYYY-MM-DD').toString();
     }
 
-    const response = await axios.get("http://localhost:8080/tasks/list", {
+    const response = await api.get("/tasks/list", {
         params,
         paramsSerializer: {
             serialize: p => qs.stringify(p, { arrayFormat: "repeat" })
@@ -62,8 +62,8 @@ export async function fetchTasks(parentTaskId, priority, title, startDate, deadl
 }
 
 export async function addTask(task) {
-    const response = await axios.post(
-      'http://localhost:8080/tasks/create',
+    const response = await api.post(
+      '/tasks/create',
       {parentTaskId: task.parentTaskId, title: task.title, description: task.description, priority: task.priority,
           start: task.startTime, deadline: task.deadline, repeat: task.repeat, assignees: task.assignees}
     )
@@ -71,22 +71,22 @@ export async function addTask(task) {
 }
 
 export async function updateTask(id, updatedFields) {
-    const response = await axios.patch('http://localhost:8080/tasks/' + id, updatedFields);
+    const response = await api.patch('/tasks/' + id, updatedFields);
     return  response.data;
 }
 
 export async function deleteTask(id) {
-    const response = await axios.delete('http://localhost:8080/tasks/' + id);
+    const response = await api.delete('/tasks/' + id);
     return response.data;
 }
 
 export async function createUser(name) {
-    const response = await axios.post('http://localhost:8080/users/create', null, {params: {name}});
+    const response = await api.post('/users/create', null, {params: {name}});
     return response.data;
 }
 
 export async function updateUser(originalName, newName) {
-    const response = await axios.patch('http://localhost:8080/users/update', null, {
+    const response = await api.patch('/users/update', null, {
         params: {
             originalName,
             newName
@@ -96,6 +96,6 @@ export async function updateUser(originalName, newName) {
 }
 
 export async function deleteUser(id) {
-    const response = await axios.delete('http://localhost:8080/users/remove', {params: {id}});
+    const response = await api.delete('/users/remove', {params: {id}});
     return response.data;
 }
