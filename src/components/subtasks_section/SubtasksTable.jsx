@@ -127,22 +127,21 @@ function SubtasksTable(props) {
             <TableBody>
                 <>
                 {subtasks.map((subtaskRow, subtaskIndex) => {
-                    let isDeadlineToday = false;
                     let isDeadlinePast = false;
-                    if (subtaskRow?.deadline != null && typeof subtaskRow?.deadline === 'string' &&
-                      subtaskRow?.deadline.trim() !== '') {
-                        const parsed = dayjs(subtaskRow?.deadline);
+                    const d = subtaskRow?.deadline;
+                    if (d != null && typeof d === 'string' && d.trim() !== '') {
+                        const parsed = dayjs(d);
                         if (parsed.isValid()) {
-                            isDeadlineToday = parsed.isSame(dayjs(), 'day');
                             isDeadlinePast = parsed.isBefore(dayjs(), 'day');
                         }
                     }
+                    const isP0 = subtaskRow?.priority === 'P0';
                     const rowBg = isDeadlinePast
                         ? (subtaskIndex % 2 === 0 ? '#FFD4D4' : '#F5A5A5')
-                        : isDeadlineToday
+                        : isP0
                             ? (subtaskIndex % 2 === 0 ? '#FFF59D' : '#FFEE58')
                             : (subtaskIndex % 2 === 0 ? '#FFFFFF' : '#F7FAFC');
-                    const rowHoverBg = isDeadlinePast ? '#E57373' : isDeadlineToday ? '#FDD835' : '#EDF2F7';
+                    const rowHoverBg = isDeadlinePast ? '#E57373' : isP0 ? '#FDD835' : '#EDF2F7';
                     return (
                         <TableRow
                             key={subtaskRow.title}

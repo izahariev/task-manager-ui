@@ -104,22 +104,22 @@ function Row(props) {
         }
     };
 
-    let isDeadlineToday = false;
     let isDeadlinePast = false;
     const d = row?.deadline;
     if (d != null && typeof d === 'string' && d.trim() !== '') {
         const parsed = dayjs(d);
         if (parsed.isValid()) {
-            isDeadlineToday = parsed.isSame(dayjs(), 'day');
             isDeadlinePast = parsed.isBefore(dayjs(), 'day');
         }
     }
+
+    const isP0 = row?.priority === 'P0';
     const rowBg = isDeadlinePast
         ? (index % 2 === 0 ? '#FFD4D4' : '#F5A5A5')
-        : isDeadlineToday
+        : isP0
             ? (index % 2 === 0 ? '#FFF59D' : '#FFEE58')
             : (index % 2 === 0 ? '#FFFFFF' : '#F7FAFC');
-    const rowHoverBg = isDeadlinePast ? '#E57373' : isDeadlineToday ? '#FDD835' : '#EDF2F7';
+    const rowHoverBg = isDeadlinePast ? '#E57373' : isP0 ? '#FDD835' : '#EDF2F7';
 
     return (
       <React.Fragment>
