@@ -31,6 +31,7 @@ export default function TaskPopup(props) {
         setOpen,
         parentTaskId,
         parentTask,
+        parentTaskStart,
         taskId,
         customReadOnly,
         refreshSubtasks
@@ -42,7 +43,7 @@ export default function TaskPopup(props) {
         title: "",
         description: "",
         priority: "P3",
-        startTime: "",
+        startTime: parentTaskStart != null ? parentTaskStart : "",
         deadline: "",
         repeat: "",
         assignees: []
@@ -109,11 +110,7 @@ export default function TaskPopup(props) {
         }
 
         if (initialTask === null) {
-            const taskToAdd = {...currentTask};
-            if (parentTaskId != null) {
-                delete taskToAdd.startTime;
-            }
-            addTask(taskToAdd)
+            addTask(currentTask)
               .then(r => {
                   if (r.errors.length > 0) {
                       setErrorMessages([...r.errors]);
@@ -423,6 +420,7 @@ TaskPopup.propTypes = {
     setOpen: PropTypes.func,
     parentTaskId: PropTypes.string,
     parentTask: PropTypes.string,
+    parentTaskStart: PropTypes.string,
     taskId: PropTypes.string,
     customReadOnly: PropTypes.bool,
     refreshSubtasks: PropTypes.func

@@ -209,6 +209,7 @@ function Row(props) {
                   <SubtaskSection
                     parentTaskId={row.id}
                     parentTaskTitle={row.title}
+                    parentTaskStart={row.start}
                     expand={expand}
                   />
               </TableCell>

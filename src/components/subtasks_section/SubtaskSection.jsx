@@ -15,6 +15,7 @@ import SubtasksTable from "./SubtasksTable.jsx";
 SubtaskSection.propTypes = {
     parentTaskId: PropTypes.string,
     parentTaskTitle: PropTypes.string,
+    parentTaskStart: PropTypes.string,
     expand: PropTypes.bool.isRequired
 };
 
@@ -22,6 +23,7 @@ function SubtaskSection(props) {
     const {
         parentTaskId,
         parentTaskTitle,
+        parentTaskStart,
         expand
     } = props;
     const {activeTab} = useActiveTab();
@@ -321,6 +323,7 @@ function SubtaskSection(props) {
               setSubtasks={setSubtasks}
               parentTaskId={parentTaskId}
               parentTask={parentTaskTitle}
+              parentTaskStart={parentTaskStart}
               refreshSubtasks={refreshSubtasks}
             />
           }
