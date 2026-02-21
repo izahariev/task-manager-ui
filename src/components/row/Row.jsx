@@ -115,11 +115,11 @@ function Row(props) {
 
     const isP0 = row?.priority === 'P0';
     const rowBg = isDeadlinePast
-        ? (index % 2 === 0 ? '#FFD4D4' : '#F5A5A5')
+        ? (index % 2 === 0 ? '#E89898' : '#E08080')
         : isP0
             ? (index % 2 === 0 ? '#FFF59D' : '#FFEE58')
             : (index % 2 === 0 ? '#FFFFFF' : '#F7FAFC');
-    const rowHoverBg = isDeadlinePast ? '#E57373' : isP0 ? '#FDD835' : '#EDF2F7';
+    const rowHoverBg = isDeadlinePast ? '#D86868' : isP0 ? '#FDD835' : '#EDF2F7';
 
     return (
       <React.Fragment>

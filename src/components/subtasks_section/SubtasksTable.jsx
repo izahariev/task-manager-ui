@@ -137,11 +137,11 @@ function SubtasksTable(props) {
                     }
                     const isP0 = subtaskRow?.priority === 'P0';
                     const rowBg = isDeadlinePast
-                        ? (subtaskIndex % 2 === 0 ? '#FFD4D4' : '#F5A5A5')
+                        ? (subtaskIndex % 2 === 0 ? '#E89898' : '#E08080')
                         : isP0
                             ? (subtaskIndex % 2 === 0 ? '#FFF59D' : '#FFEE58')
                             : (subtaskIndex % 2 === 0 ? '#FFFFFF' : '#F7FAFC');
-                    const rowHoverBg = isDeadlinePast ? '#E57373' : isP0 ? '#FDD835' : '#EDF2F7';
+                    const rowHoverBg = isDeadlinePast ? '#D86868' : isP0 ? '#FDD835' : '#EDF2F7';
                     return (
                         <TableRow
                             key={subtaskRow.title}
