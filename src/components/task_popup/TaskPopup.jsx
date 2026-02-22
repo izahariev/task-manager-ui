@@ -6,6 +6,7 @@ import React from "react";
 import {useTaskChangedMessage} from "../../contexts/TaskChangedMessageContext.jsx";
 import {useTasks} from "../../contexts/TasksContext.jsx";
 import {useUsers} from "../../contexts/UsersContext.jsx";
+import dayjs from "dayjs";
 import {addTask, fetchTask, updateTask} from "../../js/BackendApis.js";
 import AssigneesSection from "./AssigneesSection.jsx";
 import PrioritySection from "./PrioritySection.jsx";
@@ -43,7 +44,7 @@ export default function TaskPopup(props) {
         title: "",
         description: "",
         priority: "P3",
-        startTime: parentTaskStart != null ? parentTaskStart : "",
+        startTime: (parentTaskStart != null && parentTaskStart.trim() !== '') ? parentTaskStart : dayjs().format('YYYY-MM-DD'),
         deadline: "",
         repeat: "",
         assignees: []
@@ -356,6 +357,7 @@ export default function TaskPopup(props) {
                             setTimeValue={(t) =>
                               setCurrentTask((currentTask) =>
                                 /** @type {Task} */ ({...currentTask, deadline: t}))}
+                            minDate={currentTask.startTime || parentTaskStart || dayjs().format('YYYY-MM-DD')}
                             tooltipContent={
                                 <div>
                                     The time at which the task must be completed. If provided the task priority will

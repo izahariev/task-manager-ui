@@ -13,6 +13,7 @@ TimeSection.propTypes = {
     readOnly: PropTypes.bool,
     timeValue: PropTypes.string,
     setTimeValue: PropTypes.func,
+    minDate: PropTypes.string,
     tooltipContent: PropTypes.node
 }
 
@@ -47,7 +48,7 @@ function PeriodField({ label, readOnly, value, setValue}) {
     );
 }
 
-function TimeSection({title, readOnly, timeValue, setTimeValue, tooltipContent}) {
+function TimeSection({title, readOnly, timeValue, setTimeValue, minDate, tooltipContent}) {
     /** @type {[string, Function]} */
     const [date, setDate] = React.useState(timeValue ?? '');
     const [days, setDays] = React.useState(0);
@@ -131,6 +132,7 @@ function TimeSection({title, readOnly, timeValue, setTimeValue, tooltipContent})
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
                       <DatePicker
                         {...(readOnly ? { disabled: true } : {})}
+                        {...(minDate ? { minDate: dayjs(minDate) } : {})}
                         value={date ? dayjs(date) : null}
                         onChange={(e) => {
                             setDate(e.format("YYYY-MM-DD").toString())
