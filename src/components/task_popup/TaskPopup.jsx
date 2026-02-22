@@ -375,6 +375,7 @@ export default function TaskPopup(props) {
                             setTimeValue={(t) =>
                               setCurrentTask((currentTask) =>
                                 /** @type {Task} */ ({...currentTask, repeat: t}))}
+                            minDate={dayjs(currentTask.startTime || parentTaskStart || dayjs().format('YYYY-MM-DD')).add(1, 'day').format('YYYY-MM-DD')}
                             tooltipContent={
                                 <div>
                                     The time at which the task task will repeat and appear again in the active tasks
