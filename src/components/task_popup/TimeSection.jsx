@@ -56,9 +56,13 @@ function TimeSection({title, readOnly, timeValue, setTimeValue, minDate, tooltip
     const [years, setYears] = React.useState(0);
     const [isDate, setIsDate] = React.useState(true)
 
+    // Only sync timeValue from parent into date when in Date mode, so the DatePicker
+    // value is preserved when switching to Period and back.
     React.useEffect(() => {
-        setDate(timeValue);
-    }, [timeValue]);
+        if (isDate) {
+            setDate(timeValue ?? '');
+        }
+    }, [timeValue, isDate]);
 
     return (
       <Grid container sx={{marginBottom: "2%", height: "25%"}}>
