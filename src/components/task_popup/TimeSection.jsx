@@ -13,6 +13,7 @@ TimeSection.propTypes = {
     readOnly: PropTypes.bool,
     timeValue: PropTypes.string,
     setTimeValue: PropTypes.func,
+    setPeriodValue: PropTypes.func,
     minDate: PropTypes.string,
     tooltipContent: PropTypes.node
 }
@@ -48,7 +49,7 @@ function PeriodField({ label, readOnly, value, setValue}) {
     );
 }
 
-function TimeSection({title, readOnly, timeValue, setTimeValue, minDate, tooltipContent}) {
+function TimeSection({title, readOnly, timeValue, setTimeValue, setPeriodValue, minDate, tooltipContent}) {
     /** @type {[string, Function]} */
     const [date, setDate] = React.useState(timeValue ?? '');
     const [days, setDays] = React.useState(0);
@@ -83,26 +84,7 @@ function TimeSection({title, readOnly, timeValue, setTimeValue, minDate, tooltip
                   <Grid size={2}>
                       <Switch
                         checked={isDate}
-                        onChange={() =>
-                        {
-                            if (isDate) {
-                                if (days !== 0 || months !== 0 || years !== 0) {
-                                    setTimeValue(dayjs()
-                                      .add(days, 'days')
-                                      .add(months, 'months')
-                                      .add(years, 'years')
-                                      .format('YYYY-MM-DD')
-                                      .toString()
-                                    )
-                                } else {
-                                    setTimeValue('')
-                                }
-                            } else {
-                                setTimeValue(date === '' ? '' : dayjs(date).format('YYYY-MM-DD').toString())
-                            }
-                            setIsDate(!isDate)
-                        }
-                      }
+                        onChange={() => setIsDate(!isDate)}
                         value="checked" // some value you need
                         sx={{
                             ".MuiSwitch-thumb": {
@@ -148,33 +130,57 @@ function TimeSection({title, readOnly, timeValue, setTimeValue, minDate, tooltip
               {!isDate && (
                 <Grid container sx={{height: "25%"}}>
                     <PeriodField label="Days" readOnly={readOnly} value={days} setValue={(d) => {
-                        setTimeValue(dayjs()
-                          .add(d, 'days')
-                          .add(months, 'months')
-                          .add(years, 'years')
-                          .format('YYYY-MM-DD')
-                          .toString()
-                        )
+                        if (setPeriodValue) {
+                            setPeriodValue({
+                                years: years,
+                                months: months,
+                                days: d
+                            });
+                        } else {
+                            setTimeValue(dayjs()
+                              .add(d, 'days')
+                              .add(months, 'months')
+                              .add(years, 'years')
+                              .format('YYYY-MM-DD')
+                              .toString()
+                            )
+                        }
                         setDays(d)
                     }}/>
                     <PeriodField label="Months" readOnly={readOnly} value={months} setValue={(m) => {
-                        setTimeValue(dayjs()
-                          .add(days, 'days')
-                          .add(m, 'months')
-                          .add(years, 'years')
-                          .format('YYYY-MM-DD')
-                          .toString()
-                        )
+                        if (setPeriodValue) {
+                            setPeriodValue({
+                                years: years,
+                                months: m,
+                                days: days
+                            });
+                        } else {
+                            setTimeValue(dayjs()
+                              .add(days, 'days')
+                              .add(m, 'months')
+                              .add(years, 'years')
+                              .format('YYYY-MM-DD')
+                              .toString()
+                            )
+                        }
                         setMonths(m)
                     }} />
                     <PeriodField label="Years" readOnly={readOnly} value={years} setValue={(y) => {
-                        setTimeValue(dayjs()
-                          .add(days, 'days')
-                          .add(months, 'months')
-                          .add(y, 'years')
-                          .format('YYYY-MM-DD')
-                          .toString()
-                        )
+                        if (setPeriodValue) {
+                            setPeriodValue({
+                                years: y,
+                                months: months,
+                                days: days
+                            });
+                        } else {
+                            setTimeValue(dayjs()
+                              .add(days, 'days')
+                              .add(months, 'months')
+                              .add(y, 'years')
+                              .format('YYYY-MM-DD')
+                              .toString()
+                            )
+                        }
                         setYears(y)
                     }}/>
                 </Grid>

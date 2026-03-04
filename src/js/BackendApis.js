@@ -65,7 +65,8 @@ export async function addTask(task) {
     const response = await api.post(
       '/tasks/create',
       {parentTaskId: task.parentTaskId, title: task.title, description: task.description, priority: task.priority,
-          start: task.startTime, deadline: task.deadline, repeat: task.repeat, assignees: task.assignees}
+          start: task.startTime, deadline: task.deadline, repeat: task.repeat, repeatPeriod: task.repeatPeriod,
+          assignees: task.assignees}
     )
     return  response.data;
 }

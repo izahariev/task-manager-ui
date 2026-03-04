@@ -1,12 +1,12 @@
 import {Alert, Dialog, Slide, TextField} from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import List from "@mui/material/List";
+import dayjs from "dayjs";
 import PropTypes from "prop-types";
 import React from "react";
 import {useTaskChangedMessage} from "../../contexts/TaskChangedMessageContext.jsx";
 import {useTasks} from "../../contexts/TasksContext.jsx";
 import {useUsers} from "../../contexts/UsersContext.jsx";
-import dayjs from "dayjs";
 import {addTask, fetchTask, updateTask} from "../../js/BackendApis.js";
 import AssigneesSection from "./AssigneesSection.jsx";
 import PrioritySection from "./PrioritySection.jsx";
@@ -23,8 +23,15 @@ import TimeSection from "./TimeSection.jsx";
  *   startTime: string,
  *   deadline: string,
  *   repeat: string,
+ *   repeatPeriod: RepeatPeriod,
  *   assignees: string[]
  * }} Task
+ *
+ * @typedef {{
+ *     years: number,
+ *     months: number,
+ *     days: number
+ * }} RepeatPeriod
  */
 export default function TaskPopup(props) {
     const {
@@ -47,6 +54,11 @@ export default function TaskPopup(props) {
         startTime: (parentTaskStart != null && parentTaskStart.trim() !== '') ? parentTaskStart : dayjs().format('YYYY-MM-DD'),
         deadline: "",
         repeat: "",
+        repeatPeriod: {
+            years: -1,
+            months: -1,
+            days: -1
+        },
         assignees: []
     };
     /** @type {[Task, React.Dispatch<React.SetStateAction<Task>>]} */
@@ -73,6 +85,7 @@ export default function TaskPopup(props) {
                           startTime: task.start,
                           deadline: task.deadline,
                           repeat: task.repeat,
+                          repeatPeriod: task.repeatPeriod,
                           assignees: [...task.assignees]
                       })
                       setInitialTask(
@@ -83,6 +96,7 @@ export default function TaskPopup(props) {
                             startTime: task.start,
                             deadline: task.deadline,
                             repeat: task.repeat,
+                            repeatPeriod: task.repeatPeriod,
                             assignees: [...task.assignees]
                         }
                       )
@@ -201,25 +215,25 @@ export default function TaskPopup(props) {
 
     const handleCompleteClick = () => {
         updateTask(taskId, {"isCompleted": true})
-            .then(r => {
-                if (r.errors.length > 0) {
-                    setErrorMessages([...r.errors]);
-                } else {
-                    if (parentTaskId != null && refreshSubtasks) {
-                        refreshSubtasks();
-                    } else {
-                        refreshTasks();
-                    }
-                    setOpen(false);
-                    setTaskChangedMessage(`Task "${currentTask.title}" updated`);
-                }
-            })
-            .catch(error => {
-                const errors = error.response?.data?.errors
-                    ? error.response.data.errors.map((err) => err?.description ?? err)
-                    : ["An error occurred"];
-                setErrorMessages(errors);
-            });
+          .then(r => {
+              if (r.errors.length > 0) {
+                  setErrorMessages([...r.errors]);
+              } else {
+                  if (parentTaskId != null && refreshSubtasks) {
+                      refreshSubtasks();
+                  } else {
+                      refreshTasks();
+                  }
+                  setOpen(false);
+                  setTaskChangedMessage(`Task "${currentTask.title}" updated`);
+              }
+          })
+          .catch(error => {
+              const errors = error.response?.data?.errors
+                ? error.response.data.errors.map((err) => err?.description ?? err)
+                : ["An error occurred"];
+              setErrorMessages(errors);
+          });
     };
 
     return (
@@ -232,7 +246,7 @@ export default function TaskPopup(props) {
                 transition: Slide
             }}
             slotProps={{
-                transition: { direction: 'up' },
+                transition: {direction: 'up'},
                 paper: {
                     sx: {
                         backgroundColor: '#F7FAFC'
@@ -241,15 +255,15 @@ export default function TaskPopup(props) {
             }}
           >
               <TaskPopupHeader
-                  onClose={handleClose}
-                  readOnly={readOnly}
-                  isEdit={isEdit}
-                  onSaveClick={handleSaveClick}
-                  onCompleteClick={handleCompleteClick}
-                  onEditClick={() => {
-                      setReadOnly(false);
-                      setIsEdit(true);
-                  }}
+                onClose={handleClose}
+                readOnly={readOnly}
+                isEdit={isEdit}
+                onSaveClick={handleSaveClick}
+                onCompleteClick={handleCompleteClick}
+                onEditClick={() => {
+                    setReadOnly(false);
+                    setIsEdit(true);
+                }}
               />
               <List>
                   {errorMessages.length !== 0 &&
@@ -327,27 +341,27 @@ export default function TaskPopup(props) {
                           />
                       </TaskPopupSection>
                       {parentTaskId == null && (
-                          <TaskPopupSection size={2} marginBottom="4%">
-                              <TimeSection
-                                title={"Start time"}
-                                readOnly={readOnly}
-                                timeValue={currentTask.startTime}
-                                setTimeValue={(t) =>
-                                  setCurrentTask((currentTask) =>
-                                    /** @type {Task} */ ({...currentTask, startTime: t}))}
-                                tooltipContent={
-                                    <div>
-                                        The time from which the task can be completed and will appear in the active
-                                        tasks table.
-                                        <br/><br/>
-                                        If date is selected the task will appear on the given date
-                                        <br/><br/>
-                                        If period is provided the task will appear after the given period have passed
-                                        from now
-                                    </div>
-                                }
-                              />
-                          </TaskPopupSection>
+                        <TaskPopupSection size={2} marginBottom="4%">
+                            <TimeSection
+                              title={"Start time"}
+                              readOnly={readOnly}
+                              timeValue={currentTask.startTime}
+                              setTimeValue={(t) =>
+                                setCurrentTask((currentTask) =>
+                                  /** @type {Task} */ ({...currentTask, startTime: t}))}
+                              tooltipContent={
+                                  <div>
+                                      The time from which the task can be completed and will appear in the active
+                                      tasks table.
+                                      <br/><br/>
+                                      If date is selected the task will appear on the given date
+                                      <br/><br/>
+                                      If period is provided the task will appear after the given period have passed
+                                      from now
+                                  </div>
+                              }
+                            />
+                        </TaskPopupSection>
                       )}
                       <TaskPopupSection size={2} marginBottom="4%">
                           <TimeSection
@@ -375,7 +389,16 @@ export default function TaskPopup(props) {
                             setTimeValue={(t) =>
                               setCurrentTask((currentTask) =>
                                 /** @type {Task} */ ({...currentTask, repeat: t}))}
-                            minDate={dayjs(currentTask.startTime || parentTaskStart || dayjs().format('YYYY-MM-DD')).add(1, 'day').format('YYYY-MM-DD')}
+                            setPeriodValue={(p) =>
+                              setCurrentTask((currentTask) =>
+                              /** @type {Task} */ ({...currentTask, repeatPeriod: p}))}
+                            minDate={
+                                dayjs(
+                                  currentTask.startTime ||
+                                  parentTaskStart ||
+                                  dayjs().format('YYYY-MM-DD')
+                                ).add(1, 'day').format('YYYY-MM-DD')
+                            }
                             tooltipContent={
                                 <div>
                                     The time at which the task task will repeat and appear again in the active tasks
