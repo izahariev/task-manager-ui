@@ -26,6 +26,7 @@ PeriodField.propTypes = {
 };
 
 function PeriodField({ label, readOnly, value, setValue}) {
+    const displayValue = value === '' || value === undefined || value === null ? 0 : value;
     return (
       <TextField
         disabled={!!readOnly}
@@ -40,8 +41,8 @@ function PeriodField({ label, readOnly, value, setValue}) {
                 min: 0
             }
         }}
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
+        value={displayValue}
+        onChange={(e) => setValue(e.target.value === '' ? 0 : e.target.value)}
         fullWidth={true}
         sx={{ marginBottom: "5%", paddingRight: "1%", paddingLeft: "2%" }}
         defaultValue={0}
