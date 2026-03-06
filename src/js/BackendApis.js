@@ -1,7 +1,7 @@
 import * as qs from "qs";
 import api from "./Api.js";
 
-export async function fetchUsers(page = 1, size = 10) {
+export async function fetchUsers(page = 1, size = 25) {
     const response = await api.get('/users/get', {
         params: { page, size }
     });
