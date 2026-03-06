@@ -97,6 +97,45 @@ test('add-user', async () => {
     expect(requestCount).toBe(3)
 })
 
+test('add-user-existing-username', async () => {
+    const user = userEvent.setup()
+    let createRequestUrl = null
+    let requestCount = 0
+
+    server.use(
+      http.get('/users/get', () => {
+          requestCount++
+          return HttpResponse.json(USERS_GET_RESPONSE)
+      }),
+      http.post('/users/create', ({request}) => {
+          requestCount++
+          createRequestUrl = request.url
+          return HttpResponse.json(
+            {errors: [{description: 'User \'TU1\' is taken.'}]},
+            {status: 400}
+          )
+      })
+    )
+
+    render(
+      <TestWrapper>
+          <UsersPopup open={true} onClose={() => {
+          }}/>
+      </TestWrapper>
+    )
+
+    await screen.findByText('TU1')
+
+    const usernameInput = screen.getByLabelText('Username')
+    await user.clear(usernameInput)
+    await user.type(usernameInput, 'TU1')
+    await user.click(screen.getByRole('button', {name: /add user/i}))
+
+    expect(new URL(createRequestUrl).searchParams.get('name')).toBe('TU1')
+    expect(await screen.findByText('User \'TU1\' is taken.')).toBeInTheDocument()
+    expect(requestCount).toBe(2)
+})
+
 test('edit-user', async () => {
     const user = userEvent.setup()
     let updateRequestUrl = null
@@ -138,6 +177,48 @@ test('edit-user', async () => {
     expect(url.searchParams.get('originalName')).toBe('TU1')
     expect(url.searchParams.get('newName')).toBe('TU1-Edited')
     expect(requestCount).toBe(3)
+})
+
+test('edit-user-existing-username', async () => {
+    const user = userEvent.setup()
+    let updateRequestUrl = null
+    let requestCount = 0
+
+    server.use(
+      http.get('/users/get', () => {
+          requestCount++
+          return HttpResponse.json(USERS_GET_RESPONSE)
+      }),
+      http.patch('/users/update', ({request}) => {
+          requestCount++
+          updateRequestUrl = request.url
+          return HttpResponse.json(
+            {errors: [{description: 'User \'TU2\' is taken.'}]},
+            {status: 400}
+          )
+      })
+    )
+
+    render(
+      <TestWrapper>
+          <UsersPopup open={true} onClose={() => {
+          }}/>
+      </TestWrapper>
+    )
+
+    await screen.findByText('TU1')
+
+    await user.click(screen.getByRole('button', {name: 'Edit TU1'}))
+    const nameInput = screen.getByDisplayValue('TU1')
+    await user.clear(nameInput)
+    await user.type(nameInput, 'TU2')
+    await user.click(screen.getByRole('button', {name: 'Save edit'}))
+
+    const url = new URL(updateRequestUrl)
+    expect(url.searchParams.get('originalName')).toBe('TU1')
+    expect(url.searchParams.get('newName')).toBe('TU2')
+    expect(await screen.findByText('User \'TU2\' is taken.')).toBeInTheDocument()
+    expect(requestCount).toBe(2)
 })
 
 test('delete-user', async () => {
