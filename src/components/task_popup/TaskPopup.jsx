@@ -351,13 +351,17 @@ export default function TaskPopup(props) {
                                   /** @type {Task} */ ({...currentTask, startTime: t}))}
                               tooltipContent={
                                   <div>
-                                      The time from which the task can be completed and will appear in the active
-                                      tasks table.
+                                      The time from which the task will appear in the active tasks table.
                                       <br/><br/>
                                       If date is selected the task will appear on the given date
                                       <br/><br/>
                                       If period is provided the task will appear after the given period have passed
                                       from now
+                                      <br/><br/>
+                                      It is possible to set the start time to a date in the past,
+                                      this is relevant for repeating tasks. If the task has a deadline,
+                                      the repeating task deadline will be placed the same amount of time after the
+                                      repeat time as the deadline is after the start time of this task.
                                   </div>
                               }
                             />
@@ -414,11 +418,12 @@ export default function TaskPopup(props) {
                                     after each completion until cancelled
                                     <br/><br/>
                                     <i>
-                                        Ex. Given a task with start time 01.01 and deadline 07.01 and repeat of 1 month
-                                        and 2 weeks. Lets say the task was completed on 05.01. It will reappear after
-                                        1 month and 2 weeks from the completion time, which in this case is 19.02
-                                        (05.01 + 1 month is 05.02. After that we add 14 more days). The dead line will
-                                        be 7 days from the reappear time, which in this case is 25.02
+                                        Ex. Given a task with start time January 1st and deadline January 7th and repeat
+                                        of 1 month and 2 weeks. Lets say the task was completed on January 5th.
+                                        It will reappear after 1 month and 2 weeks from the completion time,
+                                        which in this case is February 19th (January 5th + 1 month is February 5th.
+                                        After that we add 14 more days). The dead line will be 7 days from the reappear
+                                        time, which in this case is February 25th
                                     </i>
                                 </div>
                             }
