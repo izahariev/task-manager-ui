@@ -1,4 +1,4 @@
-import {render, screen} from '@testing-library/react'
+import {render, screen, waitFor} from '@testing-library/react'
 import {userEvent} from "@testing-library/user-event/dist/cjs/setup/index.js";
 import {http, HttpResponse} from 'msw'
 import UsersPopup from '../components/users_popup/UsersPopup.jsx'
@@ -183,4 +183,92 @@ test('delete-user', async () => {
 
     expect(new URL(deleteRequestUrl).searchParams.get('id')).toBe(USERS_GET_RESPONSE.content.elements[0].id)
     expect(requestCount).toBe(4)
+})
+
+test('add-user-empty-username', async () => {
+    const user = userEvent.setup()
+    let requestCount = 0
+
+    server.use(
+      http.get('/users/get', () => {
+          requestCount++
+          return HttpResponse.json(USERS_GET_RESPONSE)
+      })
+    )
+
+    render(
+      <TestWrapper>
+          <UsersPopup open={true} onClose={() => {
+          }}/>
+      </TestWrapper>
+    )
+
+    await screen.findByText('TU1')
+
+    const usernameInput = screen.getByLabelText('Username')
+    await user.clear(usernameInput)
+
+    const addButton = screen.getByRole('button', {name: /add user/i})
+    await user.click(addButton)
+
+    expect(screen.getByText('Please enter a user name')).toBeInTheDocument()
+    expect(requestCount).toBe(1)
+})
+
+test('cancel-edit-user', async () => {
+    const user = userEvent.setup()
+    let requestCount = 0
+
+    server.use(
+      http.get('/users/get', () => {
+          requestCount++
+          return HttpResponse.json(USERS_GET_RESPONSE)
+      })
+    )
+
+    render(
+      <TestWrapper>
+          <UsersPopup open={true} onClose={() => {
+          }}/>
+      </TestWrapper>
+    )
+
+    await screen.findByText('TU1')
+
+    await user.click(screen.getByRole('button', {name: 'Edit TU1'}))
+    await user.click(screen.getByRole('button', {name: 'Cancel edit'}))
+
+    expect(screen.getByText('TU1')).toBeInTheDocument()
+    expect(requestCount).toBe(1)
+})
+
+test('cancel-delete-user', async () => {
+    const user = userEvent.setup()
+    let requestCount = 0
+
+    server.use(
+      http.get('/users/get', () => {
+          requestCount++
+          return HttpResponse.json(USERS_GET_RESPONSE)
+      })
+    )
+
+    render(
+      <TestWrapper>
+          <UsersPopup open={true} onClose={() => {
+          }}/>
+      </TestWrapper>
+    )
+
+    await screen.findByText('TU1')
+
+    await user.click(screen.getByRole('button', {name: 'Delete TU1'}))
+    expect(screen.getByText(/Are you sure you want to delete user/)).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', {name: 'Cancel'}))
+
+    await waitFor(() => {
+        expect(screen.queryByText(/Are you sure you want to delete user/)).not.toBeInTheDocument()
+    })
+    expect(requestCount).toBe(1)
 })
