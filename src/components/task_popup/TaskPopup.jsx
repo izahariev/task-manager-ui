@@ -321,7 +321,7 @@ export default function TaskPopup(props) {
                             }}
                             sx={{width: "96%", margin: "0, 2%"}} size="small"/>
                       </TaskPopupSection>
-                      <TaskPopupSection size={3} marginBottom="4%">
+                      <TaskPopupSection size={parentTaskId != null ? 4 : 3} marginBottom="4%">
                           <PrioritySection
                             priority={currentTask.priority}
                             setPriority={(p) =>
@@ -357,7 +357,7 @@ export default function TaskPopup(props) {
                             />
                         </TaskPopupSection>
                       )}
-                      <TaskPopupSection size={2} marginBottom="4%">
+                      <TaskPopupSection size={parentTaskId != null ? 4 : 2} marginBottom="4%">
                           <TimeSection
                             title={"Deadline"}
                             readOnly={readOnly}
@@ -375,7 +375,8 @@ export default function TaskPopup(props) {
                             }
                           />
                       </TaskPopupSection>
-                      <TaskPopupSection size={2} marginBottom="4%">
+                      {parentTaskId == null && (
+                        <TaskPopupSection size={2} marginBottom="4%">
                           <TimeSection
                             title={"Repeat"}
                             readOnly={readOnly}
@@ -419,7 +420,8 @@ export default function TaskPopup(props) {
                             }
                           />
                       </TaskPopupSection>
-                      <TaskPopupSection size={3}>
+                      )}
+                      <TaskPopupSection size={parentTaskId != null ? 4 : 3}>
                           <AssigneesSection
                             readOnly={readOnly}
                             users={["Any", ...users]}
