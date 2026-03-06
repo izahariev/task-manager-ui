@@ -76,6 +76,11 @@ export async function updateTask(id, updatedFields) {
     return  response.data;
 }
 
+export async function completeTask(id) {
+    const response = await api.patch('/tasks/' + id + '/complete');
+    return response.data;
+}
+
 export async function deleteTask(id) {
     const response = await api.delete('/tasks/' + id);
     return response.data;

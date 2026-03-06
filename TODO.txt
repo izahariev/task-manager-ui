@@ -1,3 +1,6 @@
+Fix subtasks creation for completed tasks
+Remove subtask repeat date
+Fix revert task
 Check all API calls
 Fix repeating API calls
 Fix console errors

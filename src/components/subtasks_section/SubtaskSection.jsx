@@ -6,7 +6,7 @@ import {useErrors} from "../../contexts/ErrorMessagesContext.jsx";
 import {useTasks} from "../../contexts/TasksContext.jsx";
 import {useTaskChangedMessage} from "../../contexts/TaskChangedMessageContext.jsx";
 import {useUsers} from "../../contexts/UsersContext.jsx";
-import {deleteTask, fetchTasks, updateTask} from "../../js/BackendApis.js";
+import {completeTask, deleteTask, fetchTasks, updateTask} from "../../js/BackendApis.js";
 import TaskChangeDialog from "../row/TaskChangeDialog.jsx";
 import TaskPopup from "../task_popup/TaskPopup.jsx";
 import SubtaskHeaderSection from "./SubtaskHeaderSection.jsx";
@@ -150,7 +150,7 @@ function SubtaskSection(props) {
             r = await deleteTask(subtaskId);
             setTaskChangedMessage(`Subtask "${subtaskTitle}" deleted`);
         } else if (action === "complete") {
-            r = await updateTask(subtaskId, {"isCompleted": true});
+            r = await completeTask(subtaskId);
             setTaskChangedMessage(`Subtask "${subtaskTitle}" completed`);
         } else if (action === "rollback") {
             r = await updateTask(subtaskId, {"isCompleted": false});

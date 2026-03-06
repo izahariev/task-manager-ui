@@ -13,7 +13,7 @@ import React from "react";
 import {useActiveTab} from "../../contexts/ActiveTabContext.jsx";
 import {useTaskChangedMessage} from "../../contexts/TaskChangedMessageContext.jsx";
 import {useTasks} from "../../contexts/TasksContext.jsx";
-import {deleteTask, updateTask} from "../../js/BackendApis.js";
+import {completeTask, deleteTask, updateTask} from "../../js/BackendApis.js";
 import SubtaskSection from "../subtasks_section/SubtaskSection.jsx";
 import TaskPopup from "../task_popup/TaskPopup.jsx";
 import RowButton from "./RowButton.jsx";
@@ -80,7 +80,7 @@ function Row(props) {
             if (r.errors && r.errors.length > 0) throw r.errors;
             setTaskChangedMessage(`Task "${row.title}" deleted`);
         } else if (action === "complete") {
-            const r = await updateTask(taskId, {"isCompleted": true});
+            const r = await completeTask(taskId);
             if (r.errors && r.errors.length > 0) throw r.errors;
             setExpand(false);
             setTaskChangedMessage(`Task "${row.title}" completed`);

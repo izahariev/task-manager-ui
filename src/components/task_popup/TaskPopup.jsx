@@ -7,7 +7,7 @@ import React from "react";
 import {useTaskChangedMessage} from "../../contexts/TaskChangedMessageContext.jsx";
 import {useTasks} from "../../contexts/TasksContext.jsx";
 import {useUsers} from "../../contexts/UsersContext.jsx";
-import {addTask, fetchTask, updateTask} from "../../js/BackendApis.js";
+import {addTask, completeTask, fetchTask, updateTask} from "../../js/BackendApis.js";
 import AssigneesSection from "./AssigneesSection.jsx";
 import PrioritySection from "./PrioritySection.jsx";
 import TaskPopupHeader from "./TaskPopupHeader.jsx";
@@ -214,7 +214,7 @@ export default function TaskPopup(props) {
     };
 
     const handleCompleteClick = () => {
-        updateTask(taskId, {"isCompleted": true})
+        completeTask(taskId)
           .then(r => {
               if (r.errors.length > 0) {
                   setErrorMessages([...r.errors]);
@@ -225,7 +225,7 @@ export default function TaskPopup(props) {
                       refreshTasks();
                   }
                   setOpen(false);
-                  setTaskChangedMessage(`Task "${currentTask.title}" updated`);
+                  setTaskChangedMessage(`Task "${currentTask.title}" completed`);
               }
           })
           .catch(error => {
@@ -392,7 +392,7 @@ export default function TaskPopup(props) {
                             timeValue={currentTask.repeat}
                             setTimeValue={(t) =>
                               setCurrentTask((currentTask) =>
-                                /** @type {Task} */ ({...currentTask, repeat: t}))}
+                                /** @type {Task} */ ({...currentTask, repeat: t, repeatPeriod: null}))}
                             setPeriodValue={(p) =>
                               setCurrentTask((currentTask) =>
                               /** @type {Task} */ ({...currentTask, repeatPeriod: p}))}
