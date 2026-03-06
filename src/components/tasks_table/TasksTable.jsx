@@ -39,7 +39,7 @@ function TasksTable() {
           borderRadius: '8px',
           overflow: 'hidden'
       }}>
-          <Table aria-label="collapsible table">
+          <Table aria-label="collapsible table" key={activeTab}>
               <TableHead>
                   <TableRow sx={{
                       backgroundColor: '#2D3748',
