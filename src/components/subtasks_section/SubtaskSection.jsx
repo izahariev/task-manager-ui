@@ -3,10 +3,10 @@ import PropTypes from "prop-types";
 import React from "react";
 import {useActiveTab} from "../../contexts/ActiveTabContext.jsx";
 import {useErrors} from "../../contexts/ErrorMessagesContext.jsx";
-import {useTasks} from "../../contexts/TasksContext.jsx";
 import {useTaskChangedMessage} from "../../contexts/TaskChangedMessageContext.jsx";
+import {useTasks} from "../../contexts/TasksContext.jsx";
 import {useUsers} from "../../contexts/UsersContext.jsx";
-import {completeTask, deleteTask, fetchTasks, updateTask} from "../../js/BackendApis.js";
+import {completeTask, deleteTask, fetchTasks, revertTask} from "../../js/BackendApis.js";
 import TaskChangeDialog from "../row/TaskChangeDialog.jsx";
 import TaskPopup from "../task_popup/TaskPopup.jsx";
 import SubtaskHeaderSection from "./SubtaskHeaderSection.jsx";
@@ -153,7 +153,7 @@ function SubtaskSection(props) {
             r = await completeTask(subtaskId);
             setTaskChangedMessage(`Subtask "${subtaskTitle}" completed`);
         } else if (action === "rollback") {
-            r = await updateTask(subtaskId, {"isCompleted": false});
+            r = await revertTask(subtaskId);
             setTaskChangedMessage(`Subtask "${subtaskTitle}" rolled back`);
         }
 

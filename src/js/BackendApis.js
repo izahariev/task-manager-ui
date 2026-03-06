@@ -81,6 +81,11 @@ export async function completeTask(id) {
     return response.data;
 }
 
+export async function revertTask(id) {
+    const response = await api.patch('/tasks/' + id + '/revert');
+    return response.data;
+}
+
 export async function deleteTask(id) {
     const response = await api.delete('/tasks/' + id);
     return response.data;

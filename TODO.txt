@@ -1,4 +1,3 @@
-Fix revert task
 Check all API calls
 Fix repeating API calls
 Fix console errors
