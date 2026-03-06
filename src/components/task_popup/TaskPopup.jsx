@@ -23,15 +23,9 @@ import TimeSection from "./TimeSection.jsx";
  *   startTime: string,
  *   deadline: string,
  *   repeat: string,
- *   repeatPeriod: RepeatPeriod,
+ *   repeatPeriod: object,
  *   assignees: string[]
  * }} Task
- *
- * @typedef {{
- *     years: number,
- *     months: number,
- *     days: number
- * }} RepeatPeriod
  */
 export default function TaskPopup(props) {
     const {
@@ -54,11 +48,7 @@ export default function TaskPopup(props) {
         startTime: (parentTaskStart != null && parentTaskStart.trim() !== '') ? parentTaskStart : dayjs().format('YYYY-MM-DD'),
         deadline: "",
         repeat: "",
-        repeatPeriod: {
-            years: -1,
-            months: -1,
-            days: -1
-        },
+        repeatPeriod: null,
         assignees: []
     };
     /** @type {[Task, React.Dispatch<React.SetStateAction<Task>>]} */
@@ -392,7 +382,7 @@ export default function TaskPopup(props) {
                             timeValue={currentTask.repeat}
                             setTimeValue={(t) =>
                               setCurrentTask((currentTask) =>
-                                /** @type {Task} */ ({...currentTask, repeat: t, repeatPeriod: null}))}
+                                /** @type {Task} */ ({...currentTask, repeat: t}))}
                             setPeriodValue={(p) =>
                               setCurrentTask((currentTask) =>
                               /** @type {Task} */ ({...currentTask, repeatPeriod: p}))}
