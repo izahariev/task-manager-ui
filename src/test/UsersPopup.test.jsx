@@ -522,6 +522,82 @@ test('delete-user-failure', async () => {
     expect(requestCount).toBe(2)
 })
 
+test('dismiss-delete-dialog-error', async () => {
+    const user = userEvent.setup()
+    let requestCount = 0
+
+    server.use(
+      http.get('/users/get', () => {
+          requestCount++
+          return HttpResponse.json(USERS_GET_RESPONSE)
+      }),
+      http.delete('/users/remove', () => {
+          requestCount++
+          return HttpResponse.json(
+            {errors: [{description: 'User is assigned to tasks.'}]},
+            {status: 400}
+          )
+      })
+    )
+
+    render(
+      <TestWrapper>
+          <UsersPopup open={true} onClose={() => {}} />
+      </TestWrapper>
+    )
+
+    await screen.findByText('TU1')
+
+    await user.click(screen.getByRole('button', {name: 'Delete TU1'}))
+    await user.click(screen.getByRole('button', {name: 'Delete'}))
+
+    expect(await screen.findByText('User is assigned to tasks.')).toBeInTheDocument()
+
+    const deleteDialogAlerts = screen.getAllByRole('alert')
+    const errorAlert = deleteDialogAlerts.find((el) =>
+      el.textContent?.includes('User is assigned to tasks.'))
+    expect(errorAlert).toBeDefined()
+    const closeButton = within(errorAlert).getByRole('button')
+    await user.click(closeButton)
+
+    await waitFor(() => {
+        expect(screen.queryByText('User is assigned to tasks.')).not.toBeInTheDocument()
+    })
+    expect(screen.getByText(/Are you sure you want to delete user/)).toBeInTheDocument()
+    expect(requestCount).toBe(2)
+})
+
+test('delete-user-failure-no-error-body', async () => {
+    const user = userEvent.setup()
+    let requestCount = 0
+
+    server.use(
+      http.get('/users/get', () => {
+          requestCount++
+          return HttpResponse.json(USERS_GET_RESPONSE)
+      }),
+      http.delete('/users/remove', () => {
+          requestCount++
+          return HttpResponse.json({}, {status: 500})
+      })
+    )
+
+    render(
+      <TestWrapper>
+          <UsersPopup open={true} onClose={() => {}} />
+      </TestWrapper>
+    )
+
+    await screen.findByText('TU1')
+
+    await user.click(screen.getByRole('button', {name: 'Delete TU1'}))
+    await user.click(screen.getByRole('button', {name: 'Delete'}))
+
+    expect(await screen.findByText('An error occurred while deleting the user')).toBeInTheDocument()
+    expect(screen.getByText(/Are you sure you want to delete user/)).toBeInTheDocument()
+    expect(requestCount).toBe(2)
+})
+
 test('dismiss-error-alert', async () => {
     const user = userEvent.setup()
     let requestCount = 0
