@@ -1,4 +1,4 @@
-import {render, screen, waitFor} from '@testing-library/react'
+import {render, screen, waitFor, within} from '@testing-library/react'
 import {userEvent} from "@testing-library/user-event/dist/cjs/setup/index.js";
 import {http, HttpResponse} from 'msw'
 import UsersPopup from '../components/users_popup/UsersPopup.jsx'
@@ -388,4 +388,241 @@ test('cancel-delete-user', async () => {
         expect(screen.queryByText(/Are you sure you want to delete user/)).not.toBeInTheDocument()
     })
     expect(requestCount).toBe(1)
+})
+
+test('load-users-empty-list', async () => {
+    let requestCount = 0
+    const emptyResponse = {
+        content: {elements: [], totalPageCount: 0, totalElementsCount: 0},
+        errors: []
+    }
+    server.use(
+      http.get('/users/get', () => {
+          requestCount++
+          return HttpResponse.json(emptyResponse)
+      })
+    )
+
+    render(
+      <TestWrapper>
+          <UsersPopup open={true} onClose={() => {}} />
+      </TestWrapper>
+    )
+
+    expect(await screen.findByText('No users found. Add your first user below.')).toBeInTheDocument()
+    expect(screen.getByLabelText('Username')).toBeInTheDocument()
+    expect(screen.getByRole('button', {name: /add user/i})).toBeInTheDocument()
+    expect(requestCount).toBe(1)
+})
+
+test('add-user-enter-key', async () => {
+    const user = userEvent.setup()
+    let createRequestUrl = null
+    let requestCount = 0
+
+    server.use(
+      http.get('/users/get', () => {
+          requestCount++
+          return HttpResponse.json(USERS_GET_RESPONSE)
+      }),
+      http.post('/users/create', ({request}) => {
+          requestCount++
+          createRequestUrl = request.url
+          return HttpResponse.json({errors: []})
+      })
+    )
+
+    render(
+      <TestWrapper>
+          <UsersPopup open={true} onClose={() => {}} />
+      </TestWrapper>
+    )
+
+    await screen.findByText('TU1')
+
+    const usernameInput = screen.getByLabelText('Username')
+    await user.clear(usernameInput)
+    await user.type(usernameInput, 'NewUser{Enter}')
+
+    expect(createRequestUrl).not.toBeNull()
+    expect(new URL(createRequestUrl).searchParams.get('name')).toBe('NewUser')
+    expect(requestCount).toBe(3)
+})
+
+test('edit-user-enter-key', async () => {
+    const user = userEvent.setup()
+    let updateRequestUrl = null
+    let requestCount = 0
+
+    server.use(
+      http.get('/users/get', () => {
+          requestCount++
+          return HttpResponse.json(USERS_GET_RESPONSE)
+      }),
+      http.patch('/users/update', ({request}) => {
+          requestCount++
+          updateRequestUrl = request.url
+          return HttpResponse.json({errors: []})
+      })
+    )
+
+    render(
+      <TestWrapper>
+          <UsersPopup open={true} onClose={() => {}} />
+      </TestWrapper>
+    )
+
+    await screen.findByText('TU1')
+
+    await user.click(screen.getByRole('button', {name: 'Edit TU1'}))
+    const nameInput = screen.getByDisplayValue('TU1')
+    await user.clear(nameInput)
+    await user.type(nameInput, 'TU1-Edited{Enter}')
+
+    expect(updateRequestUrl).not.toBeNull()
+    const url = new URL(updateRequestUrl)
+    expect(url.searchParams.get('originalName')).toBe('TU1')
+    expect(url.searchParams.get('newName')).toBe('TU1-Edited')
+    expect(requestCount).toBe(3)
+})
+
+test('delete-user-failure', async () => {
+    const user = userEvent.setup()
+    let requestCount = 0
+
+    server.use(
+      http.get('/users/get', () => {
+          requestCount++
+          return HttpResponse.json(USERS_GET_RESPONSE)
+      }),
+      http.delete('/users/remove', () => {
+          requestCount++
+          return HttpResponse.json(
+            {errors: [{description: 'User is assigned to tasks.'}]},
+            {status: 400}
+          )
+      })
+    )
+
+    render(
+      <TestWrapper>
+          <UsersPopup open={true} onClose={() => {}} />
+      </TestWrapper>
+    )
+
+    await screen.findByText('TU1')
+
+    await user.click(screen.getByRole('button', {name: 'Delete TU1'}))
+    expect(screen.getByText(/Are you sure you want to delete user/)).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', {name: 'Delete'}))
+
+    expect(await screen.findByText('User is assigned to tasks.')).toBeInTheDocument()
+    expect(screen.getByText(/Are you sure you want to delete user/)).toBeInTheDocument()
+    expect(requestCount).toBe(2)
+})
+
+test('dismiss-error-alert', async () => {
+    const user = userEvent.setup()
+    let requestCount = 0
+
+    server.use(
+      http.get('/users/get', () => {
+          requestCount++
+          return HttpResponse.json(USERS_GET_RESPONSE)
+      })
+    )
+
+    render(
+      <TestWrapper>
+          <UsersPopup open={true} onClose={() => {}} />
+      </TestWrapper>
+    )
+
+    await screen.findByText('TU1')
+
+    const usernameInput = screen.getByLabelText('Username')
+    await user.clear(usernameInput)
+    await user.click(screen.getByRole('button', {name: /add user/i}))
+
+    expect(screen.getByText('Please enter a user name')).toBeInTheDocument()
+
+    const alert = screen.getByRole('alert')
+    const closeButton = within(alert).getByRole('button')
+    await user.click(closeButton)
+
+    await waitFor(() => {
+        expect(screen.queryByText('Please enter a user name')).not.toBeInTheDocument()
+    })
+    expect(requestCount).toBe(1)
+})
+
+test('cancel-edit-by-add-field-click', async () => {
+    const user = userEvent.setup()
+    let requestCount = 0
+
+    server.use(
+      http.get('/users/get', () => {
+          requestCount++
+          return HttpResponse.json(USERS_GET_RESPONSE)
+      })
+    )
+
+    render(
+      <TestWrapper>
+          <UsersPopup open={true} onClose={() => {}} />
+      </TestWrapper>
+    )
+
+    await screen.findByText('TU1')
+
+    await user.click(screen.getByRole('button', {name: 'Edit TU1'}))
+    expect(screen.getByDisplayValue('TU1')).toBeInTheDocument()
+
+    await user.click(screen.getByLabelText('Username'))
+
+    expect(screen.queryByDisplayValue('TU1')).not.toBeInTheDocument()
+    expect(screen.getByText('TU1')).toBeInTheDocument()
+    expect(requestCount).toBe(1)
+})
+
+test('add-user-multiple-errors', async () => {
+    const user = userEvent.setup()
+    let requestCount = 0
+
+    server.use(
+      http.get('/users/get', () => {
+          requestCount++
+          return HttpResponse.json(USERS_GET_RESPONSE)
+      }),
+      http.post('/users/create', () => {
+          requestCount++
+          return HttpResponse.json(
+            {
+                errors: [
+                    {description: 'Username too short.'},
+                    {description: 'Invalid characters.'}
+                ]
+            },
+            {status: 400}
+          )
+      })
+    )
+
+    render(
+      <TestWrapper>
+          <UsersPopup open={true} onClose={() => {}} />
+      </TestWrapper>
+    )
+
+    await screen.findByText('TU1')
+
+    const usernameInput = screen.getByLabelText('Username')
+    await user.clear(usernameInput)
+    await user.type(usernameInput, 'Ab')
+    await user.click(screen.getByRole('button', {name: /add user/i}))
+
+    expect(await screen.findByText('Username too short.')).toBeInTheDocument()
+    expect(screen.getByText('Invalid characters.')).toBeInTheDocument()
+    expect(requestCount).toBe(2)
 })
