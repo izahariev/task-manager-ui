@@ -42,7 +42,7 @@ test('load-users', async () => {
           requestCount++
           const url = new URL(request.url)
           expect(url.searchParams.get('page')).toBe('1')
-          expect(url.searchParams.get('size')).toBe('10')
+          expect(url.searchParams.get('size')).toBe('25')
 
           return HttpResponse.json(USERS_GET_RESPONSE)
       })
@@ -57,6 +57,42 @@ test('load-users', async () => {
 
     expect(await screen.findByText('TU1')).toBeInTheDocument()
     expect(await screen.findByText('TU2')).toBeInTheDocument()
+    expect(requestCount).toBe(1)
+})
+
+test('load-max-users', async () => {
+    let requestCount = 0
+    const totalUsers = 25
+    const users = Array.from({length: totalUsers}, (_, i) => ({
+        id: `user-${i + 1}`,
+        name: `User ${i + 1}`
+    }))
+
+    server.use(
+      http.get('/users/get', () => {
+          requestCount++
+          return HttpResponse.json({
+              content: {
+                  elements: users,
+                  totalPageCount: 1,
+                  totalElementsCount: 2
+              },
+              errors: []
+          })
+      }),
+    )
+
+    render(
+      <TestWrapper>
+          <UsersPopup open={true} onClose={() => {}} />
+      </TestWrapper>
+    )
+
+    await screen.findByText('User 25')
+
+    for (let i = 1; i <= totalUsers; i++) {
+        expect(screen.getByText(`User ${i}`)).toBeInTheDocument()
+    }
     expect(requestCount).toBe(1)
 })
 
