@@ -31,6 +31,7 @@ Row.propTypes = {
         deadline: PropTypes.string,
         completionDate: PropTypes.string,
         repeat: PropTypes.string,
+        repeatPeriod: PropTypes.object,
         assignees: PropTypes.string
     }),
     index: PropTypes.number,
@@ -61,6 +62,7 @@ function Row(props) {
                 contentText: <>Are you sure you want to complete task <strong>&#34;{taskTitle}&#34;</strong>?</>,
                 confirmLabel: "Complete",
                 confirmButtonSx: { backgroundColor: "#4CAF50", "&:hover": { backgroundColor: "#45a049" } },
+                showDisableRepeatCheckbox: !!(row.repeat || row.repeatPeriod),
             },
             rollback: {
                 title: "Rollback Task",
@@ -72,7 +74,7 @@ function Row(props) {
         return { taskId: row.id, action, ...configs[action] };
     };
 
-    const handleTaskChangeConfirm = async () => {
+    const handleTaskChangeConfirm = async (confirmData = {}) => {
         if (!selectedTaskChange) return;
         const {taskId, action} = selectedTaskChange;
         if (action === "delete") {
@@ -80,7 +82,7 @@ function Row(props) {
             if (r.errors && r.errors.length > 0) throw r.errors;
             setTaskChangedMessage(`Task "${row.title}" deleted`);
         } else if (action === "complete") {
-            const r = await completeTask(taskId);
+            const r = await completeTask(taskId, {disableRepeat: !!confirmData.disableRepeat});
             if (r.errors && r.errors.length > 0) throw r.errors;
             setExpand(false);
             setTaskChangedMessage(`Task "${row.title}" completed`);
@@ -232,6 +234,7 @@ function Row(props) {
               confirmLabel={selectedTaskChange.confirmLabel}
               onConfirm={handleTaskChangeConfirm}
               confirmButtonSx={selectedTaskChange.confirmButtonSx}
+              showDisableRepeatCheckbox={selectedTaskChange.showDisableRepeatCheckbox}
             />
           ) : null}
       </React.Fragment>

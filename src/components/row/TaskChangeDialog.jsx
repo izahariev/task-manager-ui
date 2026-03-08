@@ -1,6 +1,7 @@
-import {Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from "@mui/material";
+import {Checkbox, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControlLabel} from "@mui/material";
 import Button from "@mui/material/Button";
 import PropTypes from "prop-types";
+import React from "react";
 import {useErrors} from "../../contexts/ErrorMessagesContext.jsx";
 
 TaskChangeDialog.propTypes = {
@@ -13,6 +14,7 @@ TaskChangeDialog.propTypes = {
     confirmLabel: PropTypes.string.isRequired,
     onConfirm: PropTypes.func.isRequired,
     confirmButtonSx: PropTypes.object.isRequired,
+    showDisableRepeatCheckbox: PropTypes.bool,
 };
 
 function TaskChangeDialog(props) {
@@ -26,12 +28,21 @@ function TaskChangeDialog(props) {
         confirmLabel,
         onConfirm,
         confirmButtonSx,
+        showDisableRepeatCheckbox = false,
     } = props;
     const {addErrors, clearErrors} = useErrors();
+    const [disableRepeat, setDisableRepeat] = React.useState(false);
+
+    React.useEffect(() => {
+        if (!open) {
+            setDisableRepeat(false);
+        }
+    }, [open]);
 
     const handleConfirm = async () => {
         try {
-            await onConfirm();
+            const confirmData = showDisableRepeatCheckbox ? { disableRepeat } : {};
+            await onConfirm(confirmData);
             clearErrors();
         } catch (error) {
             const messages = Array.isArray(error.response.data.errors) ?
@@ -54,6 +65,18 @@ function TaskChangeDialog(props) {
                     <DialogContentText sx={{mt: 2, fontWeight: "bold", color: "#F44336"}}>
                         {warningText}
                     </DialogContentText>
+                )}
+                {showDisableRepeatCheckbox && (
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={disableRepeat}
+                                onChange={(e) => setDisableRepeat(e.target.checked)}
+                            />
+                        }
+                        label="Disable repeat"
+                        sx={{mt: 2, display: "block"}}
+                    />
                 )}
             </DialogContent>
             <DialogActions>

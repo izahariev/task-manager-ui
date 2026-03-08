@@ -76,8 +76,9 @@ export async function updateTask(id, updatedFields) {
     return  response.data;
 }
 
-export async function completeTask(id) {
-    const response = await api.patch('/tasks/' + id + '/complete');
+export async function completeTask(id, options = {}) {
+    const params = options.disableRepeat ? { disableRepeat: true } : undefined;
+    const response = await api.patch('/tasks/' + id + '/complete', null, params ? { params } : undefined);
     return response.data;
 }
 
