@@ -383,10 +383,11 @@ export default function TaskPopup(props) {
                             timeValue={currentTask.repeat}
                             setTimeValue={(t) =>
                               setCurrentTask((currentTask) =>
-                                /** @type {Task} */ ({...currentTask, repeat: t}))}
+                                /** @type {Task} */ ({...currentTask, repeat: t, repeatPeriod: null}))}
                             setPeriodValue={(p) =>
                               setCurrentTask((currentTask) =>
-                              /** @type {Task} */ ({...currentTask, repeatPeriod: p}))}
+                              /** @type {Task} */ ({...currentTask, repeatPeriod: p, repeat: ''}))}
+                            periodValue={currentTask.repeatPeriod}
                             minDate={
                                 dayjs(
                                   currentTask.startTime ||

@@ -15,7 +15,12 @@ TimeSection.propTypes = {
     setTimeValue: PropTypes.func,
     setPeriodValue: PropTypes.func,
     minDate: PropTypes.string,
-    tooltipContent: PropTypes.node
+    tooltipContent: PropTypes.node,
+    periodValue: PropTypes.shape({
+        years: PropTypes.number,
+        months: PropTypes.number,
+        days: PropTypes.number
+    })
 }
 
 PeriodField.propTypes = {
@@ -50,21 +55,31 @@ function PeriodField({ label, readOnly, value, setValue}) {
     );
 }
 
-function TimeSection({title, readOnly, timeValue, setTimeValue, setPeriodValue, minDate, tooltipContent}) {
-    /** @type {[string, Function]} */
-    const [date, setDate] = React.useState(timeValue ?? '');
-    const [days, setDays] = React.useState(0);
-    const [months, setMonths] = React.useState(0);
-    const [years, setYears] = React.useState(0);
-    const [isDate, setIsDate] = React.useState(true)
+function TimeSection({title, readOnly, timeValue, setTimeValue, setPeriodValue, minDate, tooltipContent, periodValue}) {
+    const hasPeriod = periodValue && (periodValue.years > 0 || periodValue.months > 0 || periodValue.days > 0);
+    const hasDate = timeValue && timeValue.trim() !== '';
+    const initialIsDate = !hasPeriod;
+    const initialDate = hasDate ? timeValue : '';
+    const initialDays = periodValue?.days ?? 0;
+    const initialMonths = periodValue?.months ?? 0;
+    const initialYears = periodValue?.years ?? 0;
 
-    // Only sync timeValue from parent into date when in Date mode, so the DatePicker
-    // value is preserved when switching to Period and back.
+    const [date, setDate] = React.useState(initialDate);
+    const [days, setDays] = React.useState(initialDays);
+    const [months, setMonths] = React.useState(initialMonths);
+    const [years, setYears] = React.useState(initialYears);
+    const [isDate, setIsDate] = React.useState(initialIsDate);
+
+    // Sync from parent when timeValue or periodValue changes (e.g. task load)
     React.useEffect(() => {
-        if (isDate) {
-            setDate(timeValue ?? '');
-        }
-    }, [timeValue, isDate]);
+        const hasP = periodValue && (periodValue.years > 0 || periodValue.months > 0 || periodValue.days > 0);
+        const hasD = timeValue && timeValue.trim() !== '';
+        setIsDate(!hasP);
+        setDate(hasD ? timeValue : '');
+        setDays(periodValue?.days ?? 0);
+        setMonths(periodValue?.months ?? 0);
+        setYears(periodValue?.years ?? 0);
+    }, [timeValue, periodValue]);
 
     return (
       <Grid container sx={{marginBottom: "2%", height: "25%"}}>
