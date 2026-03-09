@@ -1,4 +1,16 @@
-import {Alert, Dialog, Slide, TextField} from "@mui/material";
+import {
+    Alert,
+    Button,
+    Checkbox,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    FormControlLabel,
+    Slide,
+    TextField
+} from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import List from "@mui/material/List";
 import dayjs from "dayjs";
@@ -59,6 +71,8 @@ export default function TaskPopup(props) {
     const [readOnly, setReadOnly] = React.useState(!!customReadOnly)
     const [isEdit, setIsEdit] = React.useState(false)
     const [errorMessages, setErrorMessages] = React.useState([]);
+    const [completeDialogOpen, setCompleteDialogOpen] = React.useState(false);
+    const [disableRepeatOnComplete, setDisableRepeatOnComplete] = React.useState(false);
 
     React.useEffect(() => {
         if (taskId !== undefined) {
@@ -204,7 +218,15 @@ export default function TaskPopup(props) {
     };
 
     const handleCompleteClick = () => {
-        completeTask(taskId)
+        if (!taskId) {
+            return;
+        }
+        setDisableRepeatOnComplete(false);
+        setCompleteDialogOpen(true);
+    };
+
+    const handleConfirmComplete = () => {
+        completeTask(taskId, {disableRepeat: disableRepeatOnComplete})
           .then(r => {
               if (r.errors.length > 0) {
                   setErrorMessages([...r.errors]);
@@ -214,6 +236,7 @@ export default function TaskPopup(props) {
                   } else {
                       refreshTasks();
                   }
+                  setCompleteDialogOpen(false);
                   setOpen(false);
                   setTaskChangedMessage(`Task "${currentTask.title}" completed`);
               }
@@ -435,6 +458,54 @@ export default function TaskPopup(props) {
                   </Grid>
               </List>
           </Dialog>
+          {completeDialogOpen && (
+            <Dialog
+              open={true}
+              onClose={() => setCompleteDialogOpen(false)}
+            >
+                <DialogTitle>Complete Task</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Are you sure you want to complete task{" "}
+                        <strong>&quot;{currentTask.title}&quot;</strong>?
+                    </DialogContentText>
+                    {(currentTask.repeat || currentTask.repeatPeriod) && (
+                      <FormControlLabel
+                        control={
+                            <Checkbox
+                              checked={disableRepeatOnComplete}
+                              onChange={(e) => setDisableRepeatOnComplete(e.target.checked)}
+                            />
+                        }
+                        label="Disable repeat"
+                        sx={{mt: 2, display: "block"}}
+                      />
+                    )}
+                </DialogContent>
+                <DialogActions>
+                    <Button
+                      onClick={() => setCompleteDialogOpen(false)}
+                      sx={{
+                          color: "#5B7FA6",
+                          "&:hover": {backgroundColor: "#E0E7FF"}
+                      }}
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                      onClick={handleConfirmComplete}
+                      sx={{
+                          backgroundColor: "#4CAF50",
+                          color: "white",
+                          "&:hover": {backgroundColor: "#45a049"}
+                      }}
+                      variant="contained"
+                    >
+                        Complete
+                    </Button>
+                </DialogActions>
+            </Dialog>
+          )}
       </React.Fragment>
     );
 }
