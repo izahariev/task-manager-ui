@@ -1,5 +1,6 @@
-import {render, screen, waitFor, within} from '@testing-library/react'
+import {fireEvent, render, screen, waitFor, within} from '@testing-library/react'
 import {userEvent} from "@testing-library/user-event/dist/cjs/setup/index.js";
+import dayjs from 'dayjs'
 import {http, HttpResponse} from 'msw'
 import TaskPopup from '../components/task_popup/TaskPopup.jsx'
 import {ActiveTabProvider} from '../contexts/ActiveTabProvider.jsx'
@@ -130,6 +131,151 @@ test('create-task-missing-title', async () => {
 
   expect(screen.getByText('Missing title')).toBeInTheDocument()
   expect(requestCount).toBe(1)
+})
+
+test('create-task-all-fields-dates-any-assignee', async () => {
+  const user = userEvent.setup()
+  let requestCount = 0
+  let createBody = null
+
+  server.use(
+    http.get('/users/get', () => {
+      requestCount++
+      return HttpResponse.json(USERS_GET_RESPONSE)
+    }),
+    http.get('/tasks/list', () => {
+      requestCount++
+      return HttpResponse.json(TASKS_LIST_RESPONSE)
+    }),
+    http.post('/tasks/create', async ({request}) => {
+      requestCount++
+      createBody = await request.json()
+      return HttpResponse.json({content: {}, errors: []})
+    })
+  )
+
+  render(
+    <TestWrapper>
+      <TaskPopup open={true} setOpen={() => {}} />
+    </TestWrapper>
+  )
+
+  const textboxes = await screen.findAllByRole('textbox')
+  await user.clear(textboxes[0])
+  await user.type(textboxes[0], 'New Task Title')
+  await user.clear(textboxes[1])
+  await user.type(textboxes[1], 'Task description')
+  await user.click(screen.getByRole('combobox', {name: /without label/i}))
+  await user.click(screen.getByRole('option', {name: 'P2'}))
+  await user.tripleClick(textboxes[2])
+  await user.keyboard('01/15/2026')
+  await user.tripleClick(textboxes[3])
+  await user.keyboard('01/20/2026')
+  await user.tripleClick(textboxes[4])
+  await user.keyboard('02/01/2026')
+
+  await user.click(screen.getByRole('button', {name: /save/i}))
+
+  await waitFor(() => {
+    expect(createBody).not.toBeNull()
+  })
+
+  expect(createBody.title).toBe('New Task Title')
+  expect(createBody.description).toBe('Task description')
+  expect(createBody.priority).toBe('P2')
+  expect(createBody.start).toBe('2026-01-15')
+  expect(createBody.deadline).toBe('2026-01-20')
+  expect(createBody.repeat).toBe('2026-02-01')
+  expect(createBody.repeatPeriod).toBeNull()
+  expect(createBody.assignees).toEqual([])
+  expect(createBody.parentTaskId ?? null).toBeNull()
+  expect(requestCount).toBe(3)
+})
+
+test('create-task-all-fields-periods-selected-assignees', async () => {
+  const user = userEvent.setup()
+  let requestCount = 0
+  let createBody = null
+
+  server.use(
+    http.get('/users/get', () => {
+      requestCount++
+      return HttpResponse.json(USERS_GET_RESPONSE)
+    }),
+    http.get('/tasks/list', () => {
+      requestCount++
+      return HttpResponse.json(TASKS_LIST_RESPONSE)
+    }),
+    http.post('/tasks/create', async ({request}) => {
+      requestCount++
+      createBody = await request.json()
+      return HttpResponse.json({content: {}, errors: []})
+    })
+  )
+
+  render(
+    <TestWrapper>
+      <TaskPopup open={true} setOpen={() => {}} />
+    </TestWrapper>
+  )
+
+  const textboxes = await screen.findAllByRole('textbox')
+  await user.clear(textboxes[0])
+  await user.type(textboxes[0], 'New Task Title')
+  await user.clear(textboxes[1])
+  await user.type(textboxes[1], 'Task description')
+  await user.click(screen.getByRole('combobox', {name: /without label/i}))
+  await user.click(screen.getByRole('option', {name: 'P2'}))
+
+  const periodSwitches = screen.getAllByRole('checkbox', {name: /period date/i})
+  await user.click(periodSwitches[0])
+  await user.click(periodSwitches[1])
+  await user.click(periodSwitches[2])
+
+  const startSection =
+    screen.getByRole('heading', {name: /start time/i}).closest('[class*="MuiGrid"]')?.parentElement ?? document
+  const startInputs = within(startSection).getAllByRole('spinbutton')
+  fireEvent.change(startInputs[0], {target: {value: '1'}})
+  fireEvent.change(startInputs[1], {target: {value: '0'}})
+  fireEvent.change(startInputs[2], {target: {value: '0'}})
+
+  const deadlineSection =
+    screen.getByRole('heading', {name: 'Deadline'}).closest('[class*="MuiGrid"]')?.parentElement ?? document
+  const deadlineInputs = within(deadlineSection).getAllByRole('spinbutton')
+  fireEvent.change(deadlineInputs[0], {target: {value: '2'}})
+  fireEvent.change(deadlineInputs[1], {target: {value: '0'}})
+  fireEvent.change(deadlineInputs[2], {target: {value: '0'}})
+
+  const repeatSection = screen.getByRole('heading', {name: 'Repeat'})
+    .closest('[class*="MuiGrid"]')?.parentElement ?? document
+  const repeatInputs = within(repeatSection).getAllByRole('spinbutton')
+  expect(repeatInputs.length).toBeGreaterThanOrEqual(3)
+  fireEvent.change(repeatInputs[1], {target: {value: '1'}})
+
+  const aliceRow = screen.getByText('Alice').closest('li')
+  await user.click(within(aliceRow).getByRole('checkbox'))
+
+  await user.click(screen.getByRole('button', {name: /save/i}))
+
+  await waitFor(() => {
+    expect(createBody).not.toBeNull()
+  })
+
+  expect(createBody.title).toBe('New Task Title')
+  expect(createBody.description).toBe('Task description')
+  expect(createBody.priority).toBe('P2')
+  const expectedStart = dayjs().add(1, 'day').format('YYYY-MM-DD')
+  const expectedDeadline = dayjs().add(2, 'days').format('YYYY-MM-DD')
+  expect(createBody.start).toBe(expectedStart)
+  expect(createBody.deadline).toBe(expectedDeadline)
+  expect(createBody.repeat).toBe('')
+  expect(createBody.repeatPeriod).not.toBeNull()
+  expect(Number(createBody.repeatPeriod.years ?? createBody.repeatPeriod.year)).toBe(0)
+  expect(Number(createBody.repeatPeriod.months ?? createBody.repeatPeriod.month)).toBe(1)
+  expect(Number(createBody.repeatPeriod.days ?? createBody.repeatPeriod.day)).toBe(0)
+  expect(createBody.assignees).toEqual(['Alice'])
+  expect(createBody.parentTaskId ?? null).toBeNull()
+  expect(requestCount).toBe(3)
 })
 
 test('close-add-task-popup-button', async () => {
