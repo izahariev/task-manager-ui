@@ -1,4 +1,6 @@
+Fix repeat period for view/edit task
 Check all API calls
 Fix repeating API calls
-Fix console errors
 Check all workflows
+V2
+From/To filter for dates

@@ -1,4 +1,4 @@
-import {render, screen, waitFor} from '@testing-library/react'
+import {render, screen, waitFor, within} from '@testing-library/react'
 import {userEvent} from "@testing-library/user-event/dist/cjs/setup/index.js";
 import {http, HttpResponse} from 'msw'
 import TaskPopup from '../components/task_popup/TaskPopup.jsx'
@@ -9,7 +9,7 @@ import {TasksProvider} from '../contexts/TasksProvider.jsx'
 import {UsersProvider} from '../contexts/UsersProvider.jsx'
 import {server} from './msw/server.js'
 
-const TASK_GET_RESPONSE = {
+const TASK_GET_RESPONSE_ALL_DATES_ANY_ASSIGNEE = {
   content: {
     id: 'task-1',
     parentTaskId: null,
@@ -89,7 +89,6 @@ test('create-task-title-only', async () => {
     </TestWrapper>
   )
 
-  // Fill in title and description
   const textboxes = await screen.findAllByRole('textbox')
   const titleInput = textboxes[0]
 
@@ -133,7 +132,57 @@ test('create-task-missing-title', async () => {
   expect(requestCount).toBe(1)
 })
 
-test('view-task-readonly', async () => {
+test('close-add-task-popup-button', async () => {
+  const user = userEvent.setup()
+  let requestCount = 0
+  const setOpen = vi.fn()
+
+  server.use(
+    http.get('/users/get', () => {
+      requestCount++
+      return HttpResponse.json(USERS_GET_RESPONSE)
+    })
+  )
+
+  render(
+    <TestWrapper>
+      <TaskPopup open={true} setOpen={setOpen} />
+    </TestWrapper>
+  )
+
+  await screen.findAllByRole('textbox')
+  await user.click(screen.getByRole('button', {name: /close/i}))
+
+  expect(setOpen).toHaveBeenCalledWith(false)
+  expect(requestCount).toBe(1)
+})
+
+test('close-add-task-popup-escape', async () => {
+  const user = userEvent.setup()
+  let requestCount = 0
+  const setOpen = vi.fn()
+
+  server.use(
+    http.get('/users/get', () => {
+      requestCount++
+      return HttpResponse.json(USERS_GET_RESPONSE)
+    })
+  )
+
+  render(
+    <TestWrapper>
+      <TaskPopup open={true} setOpen={setOpen} />
+    </TestWrapper>
+  )
+
+  await screen.findAllByRole('textbox')
+  await user.keyboard('{Escape}')
+
+  expect(setOpen).toHaveBeenCalledWith(false)
+  expect(requestCount).toBe(1)
+})
+
+test('view-task', async () => {
   let requestCount = 0
 
   server.use(
@@ -144,7 +193,7 @@ test('view-task-readonly', async () => {
     http.get('/tasks/:id', ({params}) => {
       requestCount++
       expect(params.id).toBe('task-1')
-      return HttpResponse.json(TASK_GET_RESPONSE)
+      return HttpResponse.json(TASK_GET_RESPONSE_ALL_DATES_ANY_ASSIGNEE)
     })
   )
 
@@ -159,15 +208,21 @@ test('view-task-readonly', async () => {
     </TestWrapper>
   )
 
+  // Validate all populated fields: title, description, priority, start, deadline, repeat, assignees
   const titleInput = await screen.findByDisplayValue('Parent Task 1')
   expect(titleInput).toBeDisabled()
-  expect(screen.getByText('Parent description')).toBeInTheDocument()
+  expect(screen.getByDisplayValue('Parent description')).toBeInTheDocument()
+  expect(screen.getByText('P2')).toBeInTheDocument()
+  expect(screen.getByText('Start time')).toBeInTheDocument()
+  expect(screen.getByText('Deadline')).toBeInTheDocument()
+  expect(screen.getByText('Repeat')).toBeInTheDocument()
+  expect(screen.getByText('Any')).toBeInTheDocument()
   expect(screen.getByRole('button', {name: /complete/i})).toBeInTheDocument()
   expect(screen.getByRole('button', {name: /edit/i})).toBeInTheDocument()
   expect(requestCount).toBe(2)
 })
 
-test('edit-task', async () => {
+test('edit-task-update-all-fields', async () => {
   const user = userEvent.setup()
   let requestCount = 0
   let updateBody = null
@@ -183,7 +238,7 @@ test('edit-task', async () => {
     }),
     http.get('/tasks/:id', () => {
       requestCount++
-      return HttpResponse.json(TASK_GET_RESPONSE)
+      return HttpResponse.json(TASK_GET_RESPONSE_ALL_DATES_ANY_ASSIGNEE)
     }),
     http.patch('/tasks/:id', async ({request}) => {
       requestCount++
@@ -208,10 +263,24 @@ test('edit-task', async () => {
 
   await user.click(screen.getByRole('button', {name: /edit/i}))
 
-  const editableTitle = screen.getAllByRole('textbox')[0]
-  expect(editableTitle).not.toBeDisabled()
-  await user.clear(editableTitle)
-  await user.type(editableTitle, 'Updated Parent Task')
+  // Update title
+  const textboxes = screen.getAllByRole('textbox')
+  const titleBox = textboxes[0]
+  await user.clear(titleBox)
+  await user.type(titleBox, 'Updated Parent Task')
+
+  // Update description
+  const descBox = textboxes[1]
+  await user.clear(descBox)
+  await user.type(descBox, 'Updated description')
+
+  // Update priority to P0
+  await user.click(screen.getByRole('combobox', {name: /without label/i}))
+  await user.click(screen.getByRole('option', {name: 'P0'}))
+
+  // Set assignees to Alice: find the row with "Alice" and click its checkbox
+  const aliceRow = screen.getByText('Alice').closest('li')
+  await user.click(within(aliceRow).getByRole('checkbox'))
 
   await user.click(screen.getByRole('button', {name: /save/i}))
 
@@ -220,6 +289,9 @@ test('edit-task', async () => {
   })
 
   expect(updateBody.title).toBe('Updated Parent Task')
+  expect(updateBody.description).toBe('Updated description')
+  expect(updateBody.priority).toBe('P0')
+  expect(updateBody.assignees).toEqual(['Alice'])
   expect(requestCount).toBe(4)
 })
 
@@ -239,7 +311,7 @@ test('complete-task-from-popup', async () => {
     }),
     http.get('/tasks/:id', () => {
       requestCount++
-      return HttpResponse.json(TASK_GET_RESPONSE)
+      return HttpResponse.json(TASK_GET_RESPONSE_ALL_DATES_ANY_ASSIGNEE)
     }),
     http.patch('/tasks/:id/complete', ({request}) => {
       requestCount++
