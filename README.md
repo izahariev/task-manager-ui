@@ -1,8 +1,22 @@
-# React + Vite
+# Task Manager UI
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Task Manager UI is a React application for planning and tracking tasks through their full lifecycle.
 
-Currently, two official plugins are available:
+> This UI requires the backend service to be running in order to load, create, update, and manage tasks.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## What the app does
+
+- Creates tasks with title, description, and priority.
+- Schedules tasks with start time, deadline, and repeat settings.
+- Supports repeat by fixed date or by period (days, months, years).
+- Assigns tasks to users, including multi-assignee selection.
+- Views, edits, completes, reverts, and deletes tasks.
+- Organizes work with parent tasks and subtasks.
+- Displays active/inactive tasks and refreshes task data from the backend API.
+
+## Tech stack
+
+- React
+- Vite
+- Material UI
+- Vitest + Testing Library + MSW
