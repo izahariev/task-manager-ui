@@ -32,7 +32,7 @@ import TimeSection from "./TimeSection.jsx";
  *   title: string,
  *   description: string,
  *   priority: string,
- *   startTime: string,
+ *   start: string,
  *   deadline: string,
  *   repeat: string,
  *   repeatPeriod: object,
@@ -57,7 +57,7 @@ export default function TaskPopup(props) {
         title: "",
         description: "",
         priority: "P3",
-        startTime: (parentTaskStart != null && parentTaskStart.trim() !== '') ? parentTaskStart : dayjs().format('YYYY-MM-DD'),
+        start: (parentTaskStart != null && parentTaskStart.trim() !== '') ? parentTaskStart : dayjs().format('YYYY-MM-DD'),
         deadline: "",
         repeat: "",
         repeatPeriod: null,
@@ -86,7 +86,7 @@ export default function TaskPopup(props) {
                           title: task.title,
                           description: task.description,
                           priority: task.priority,
-                          startTime: task.start,
+                          start: task.start,
                           deadline: task.deadline,
                           repeat: task.repeat,
                           repeatPeriod: task.repeatPeriod,
@@ -97,7 +97,7 @@ export default function TaskPopup(props) {
                             title: task.title,
                             description: task.description,
                             priority: task.priority,
-                            startTime: task.start,
+                            start: task.start,
                             deadline: task.deadline,
                             repeat: task.repeat,
                             repeatPeriod: task.repeatPeriod,
@@ -198,7 +198,7 @@ export default function TaskPopup(props) {
         const diffs = {};
 
         for (const key of Object.keys(currentTask)) {
-            if (key === 'startTime' && parentTaskId != null) {
+            if (key === 'start' && parentTaskId != null) {
                 continue;
             }
             if (currentTask[key] !== initialTask[key]) {
@@ -358,10 +358,10 @@ export default function TaskPopup(props) {
                             <TimeSection
                               title={"Start time"}
                               readOnly={readOnly}
-                              timeValue={currentTask.startTime}
+                              timeValue={currentTask.start}
                               setTimeValue={(t) =>
                                 setCurrentTask((currentTask) =>
-                                  /** @type {Task} */ ({...currentTask, startTime: t}))}
+                                  /** @type {Task} */ ({...currentTask, start: t}))}
                               tooltipContent={
                                   <div>
                                       The time from which the task will appear in the active tasks table.
@@ -388,7 +388,7 @@ export default function TaskPopup(props) {
                             setTimeValue={(t) =>
                               setCurrentTask((currentTask) =>
                                 /** @type {Task} */ ({...currentTask, deadline: t}))}
-                            minDate={currentTask.startTime || parentTaskStart || dayjs().format('YYYY-MM-DD')}
+                            minDate={currentTask.start || parentTaskStart || dayjs().format('YYYY-MM-DD')}
                             tooltipContent={
                                 <div>
                                     The time at which the task must be completed. If provided the task priority will
@@ -413,7 +413,7 @@ export default function TaskPopup(props) {
                             periodValue={currentTask.repeatPeriod}
                             minDate={
                                 dayjs(
-                                  currentTask.startTime ||
+                                  currentTask.start ||
                                   parentTaskStart ||
                                   dayjs().format('YYYY-MM-DD')
                                 ).add(1, 'day').format('YYYY-MM-DD')
