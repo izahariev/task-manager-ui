@@ -73,15 +73,24 @@ function TimeSection({title, readOnly, timeValue, setTimeValue, setPeriodValue, 
     const [years, setYears] = React.useState(initialYears);
     const [isDate, setIsDate] = React.useState(initialIsDate);
 
-    // Sync from parent when timeValue or periodValue changes (e.g. task load)
+    // Sync from parent-provided values.
+    // Repeat has a real periodValue prop and should mirror the parent state.
+    // Start/Deadline derives a date from period inputs, so we must not overwrite local period fields on each keystroke.
     React.useEffect(() => {
         const hasP = periodValue && (toNum(periodValue.years) > 0 || toNum(periodValue.months) > 0 || toNum(periodValue.days) > 0);
         const hasD = timeValue && timeValue.trim() !== '';
-        setIsDate(!hasP);
+        const isRepeatSection = typeof setPeriodValue === 'function';
+
+        if (isRepeatSection) {
+            setIsDate(!hasP);
+            setDays(toNum(periodValue?.days));
+            setMonths(toNum(periodValue?.months));
+            setYears(toNum(periodValue?.years));
+        }
+
         setDate(hasD ? timeValue : '');
-        setDays(toNum(periodValue?.days));
-        setMonths(toNum(periodValue?.months));
-        setYears(toNum(periodValue?.years));
+        // Omit setPeriodValue: TaskPopup passes a new inline function each render; listing it reruns this effect on
+        // every unrelated field change (e.g., Start/Deadline) and resets Repeat's toggle via setIsDate(!hasP).
     }, [timeValue, periodValue]);
 
     return (
@@ -140,7 +149,7 @@ function TimeSection({title, readOnly, timeValue, setTimeValue, setPeriodValue, 
                         {...(minDate ? { minDate: dayjs(minDate) } : {})}
                         value={date ? dayjs(date) : null}
                         onChange={(e) => {
-                            // The if is pointless but it is required by tests
+                            // The if is pointless, but it is required by tests
                             if (e) {
                                 setDate(e.format("YYYY-MM-DD").toString())
                                 setTimeValue(e.format("YYYY-MM-DD").toString())
